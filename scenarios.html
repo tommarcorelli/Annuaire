@@ -576,6 +576,190 @@ FLUSH PRIVILEGES;</pre>
       </div>
     </details>
 
+    <!-- ═══ 8. KUBERNETES ═══ -->
+    <details class="sc" id="sc-k8s" style="--c:#326CE5">
+      <summary>
+        <span class="sc-ico">☸️</span>
+        <div class="sc-head">
+          <div class="sc-name">Déployer une application sur Kubernetes</div>
+          <div class="sc-meta">Kubernetes · kubectl — 8 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Le cycle de vie complet d'une appli sur un cluster : déployer, exposer, monter en charge, mettre à jour sans coupure — et revenir en arrière si ça tourne mal.</p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Vérifier le cluster et le contexte</div>
+            <code>kubectl config current-context</code>
+            <code>kubectl get nodes</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer un espace de noms dédié</div>
+            <code>kubectl create namespace demo</code>
+          </li>
+          <li>
+            <div class="st-desc">Déployer l'application (2 réplicas)</div>
+            <code>kubectl create deployment web --image=nginx:1.27 --replicas=2 -n demo</code>
+          </li>
+          <li>
+            <div class="st-desc">L'exposer sur le réseau</div>
+            <code>kubectl expose deployment web --port=80 --type=NodePort -n demo</code>
+            <code>kubectl get svc -n demo</code>
+          </li>
+          <li>
+            <div class="st-desc">Surveiller les pods</div>
+            <code>kubectl get pods -n demo -w</code>
+            <code>kubectl logs -f deployment/web -n demo</code>
+          </li>
+          <li>
+            <div class="st-desc">Monter en charge</div>
+            <code>kubectl scale deployment web --replicas=4 -n demo</code>
+          </li>
+          <li>
+            <div class="st-desc">Mettre à jour sans coupure… et savoir reculer</div>
+            <code>kubectl set image deployment/web nginx=nginx:1.28 -n demo</code>
+            <code>kubectl rollout status deployment/web -n demo</code>
+            <code>kubectl rollout undo deployment/web -n demo</code>
+            <p class="st-note">Le <b>rollout undo</b> revient à la version précédente en quelques secondes.</p>
+          </li>
+          <li>
+            <div class="st-desc">Tout nettoyer d'un coup</div>
+            <code>kubectl delete namespace demo</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 9. ANSIBLE ═══ -->
+    <details class="sc" id="sc-ansible" style="--c:#EE0000">
+      <summary>
+        <span class="sc-ico">🤖</span>
+        <div class="sc-head">
+          <div class="sc-name">Automatiser avec un premier playbook Ansible</div>
+          <div class="sc-meta">Ansible · YAML — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Configurer un serveur à la main, c'est bien une fois. Ansible rejoue la même configuration sur 1 ou 100 machines, sans rien installer sur elles (tout passe par SSH).</p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Installer Ansible — sur ton poste seulement</div>
+            <code>sudo apt install ansible</code>
+          </li>
+          <li>
+            <div class="st-desc">Décrire tes serveurs dans un inventaire</div>
+            <code>nano hosts.ini</code>
+            <pre>[web]
+srv1 ansible_host=192.168.1.50 ansible_user=tom</pre>
+          </li>
+          <li>
+            <div class="st-desc">Tester la connexion</div>
+            <code>ansible -i hosts.ini web -m ping</code>
+            <p class="st-note">Réponse attendue : <b>"ping": "pong"</b> — SSH par clé doit déjà fonctionner.</p>
+          </li>
+          <li>
+            <div class="st-desc">Écrire le playbook</div>
+            <code>nano site.yml</code>
+            <pre>- name: Serveur web de base
+  hosts: web
+  become: true
+  tasks:
+    - name: Installer nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: true
+    - name: Demarrer et activer nginx
+      service:
+        name: nginx
+        state: started
+        enabled: true</pre>
+          </li>
+          <li>
+            <div class="st-desc">Simuler avant d'appliquer</div>
+            <code>ansible-playbook -i hosts.ini site.yml --check --diff</code>
+            <p class="st-note"><b>--check</b> montre ce qui changerait sans rien toucher.</p>
+          </li>
+          <li>
+            <div class="st-desc">Appliquer pour de vrai</div>
+            <code>ansible-playbook -i hosts.ini site.yml</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier l'idempotence</div>
+            <code>ansible-playbook -i hosts.ini site.yml</code>
+            <p class="st-note">Relancé une 2e fois : <b>changed=0</b> — tout était déjà en place. C'est ça, la magie d'Ansible.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 10. WIREGUARD ═══ -->
+    <details class="sc" id="sc-wireguard" style="--c:#88171A">
+      <summary>
+        <span class="sc-ico">🕶️</span>
+        <div class="sc-head">
+          <div class="sc-name">Monter un VPN WireGuard</div>
+          <div class="sc-meta">WireGuard · ufw — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Un tunnel chiffré entre ton poste et ton serveur en quelques minutes : accéder à ton réseau distant comme si tu y étais, avec le VPN le plus simple du moment.</p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Installer WireGuard — des deux côtés</div>
+            <code>sudo apt install wireguard</code>
+          </li>
+          <li>
+            <div class="st-desc">Générer une paire de clés — sur chaque machine</div>
+            <code>wg genkey | tee private.key | wg pubkey &gt; public.key</code>
+            <p class="st-note">La clé privée ne quitte JAMAIS sa machine ; seule la publique s'échange.</p>
+          </li>
+          <li>
+            <div class="st-desc">Configurer le serveur</div>
+            <code>sudo nano /etc/wireguard/wg0.conf</code>
+            <pre>[Interface]
+PrivateKey = &lt;privée du serveur&gt;
+Address = 10.8.0.1/24
+ListenPort = 51820
+
+[Peer]
+PublicKey = &lt;publique du client&gt;
+AllowedIPs = 10.8.0.2/32</pre>
+          </li>
+          <li>
+            <div class="st-desc">Configurer le client</div>
+            <pre>[Interface]
+PrivateKey = &lt;privée du client&gt;
+Address = 10.8.0.2/24
+
+[Peer]
+PublicKey = &lt;publique du serveur&gt;
+Endpoint = ip-du-serveur:51820
+AllowedIPs = 10.8.0.0/24
+PersistentKeepalive = 25</pre>
+            <p class="st-note"><b>AllowedIPs = 0.0.0.0/0</b> à la place ferait passer TOUT ton trafic par le VPN.</p>
+          </li>
+          <li>
+            <div class="st-desc">Ouvrir le port sur le serveur</div>
+            <code>sudo ufw allow 51820/udp</code>
+          </li>
+          <li>
+            <div class="st-desc">Activer le tunnel — des deux côtés</div>
+            <code>sudo systemctl enable --now wg-quick@wg0</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier que ça passe</div>
+            <code>sudo wg show</code>
+            <code>ping 10.8.0.1</code>
+            <p class="st-note">Un <b>latest handshake</b> récent dans wg show = le tunnel est monté.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
   </div>
 
   <div class="sc-toast" id="scToast">✓ Copié !</div>

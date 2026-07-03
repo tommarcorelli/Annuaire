@@ -20,6 +20,9 @@
     { id: 'sc-docker',  title: 'Conteneuriser une application avec Docker',   kw: 'docker conteneur image dockerfile hub build push' },
     { id: 'sc-mysql',   title: 'Installer MySQL et automatiser les sauvegardes', kw: 'mysql mariadb dump cron base de donnees sql backup' },
     { id: 'sc-reseau',  title: 'Diagnostiquer une panne réseau',              kw: 'reseau ping dns dig traceroute tcpdump panne internet' },
+    { id: 'sc-k8s',     title: 'Déployer une application sur Kubernetes',     kw: 'kubernetes kubectl k8s deploiement pod service rollout cluster' },
+    { id: 'sc-ansible', title: 'Automatiser avec un premier playbook Ansible', kw: 'ansible playbook yaml automatisation inventaire idempotence' },
+    { id: 'sc-wireguard', title: 'Monter un VPN WireGuard',                   kw: 'wireguard vpn tunnel wg chiffrement distant' },
   ];
 
   var loaded  = false;

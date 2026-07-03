@@ -1885,6 +1885,201 @@ const EXTRA_COMMANDS = [
     ],
     flags: ["venv", "pip install/freeze", "run"]
   },
+
+  // ── UNIVERSEL : TRAITEMENT DE TEXTE & ESSENTIELS ──────────
+  {
+    name: "jq",
+    os: "universal",
+    category: "Fichiers",
+    description: "Manipule et filtre du JSON en ligne de commande — le grep/sed du JSON.",
+    syntax: "jq '<filtre>' [fichier.json]",
+    examples: [
+      { cmd: "curl -s https://api.site.fr/users | jq '.'", desc: "Affiche le JSON joliment indenté" },
+      { cmd: "jq '.users[].name' data.json", desc: "Extrait le nom de chaque utilisateur" },
+      { cmd: "jq -r '.items[] | select(.prix > 10) | .nom' catalogue.json", desc: "Filtre puis extrait en texte brut" }
+    ],
+    flags: ["-r (sortie brute sans guillemets)", ".champ / .[] (accès et itération)", "select(condition)", "| (enchaîne les filtres)"]
+  },
+  {
+    name: "cut",
+    os: "universal",
+    category: "Fichiers",
+    description: "Extrait des colonnes ou des plages de caractères de chaque ligne.",
+    syntax: "cut -d <délim> -f <champs> [fichier]",
+    examples: [
+      { cmd: "cut -d: -f1 /etc/passwd", desc: "Liste tous les noms d'utilisateurs" },
+      { cmd: "echo \"a,b,c\" | cut -d, -f2", desc: "Extrait le 2e champ (b)" },
+      { cmd: "cut -c1-8 fichier.txt", desc: "Les 8 premiers caractères de chaque ligne" }
+    ],
+    flags: ["-d (délimiteur)", "-f (numéros de champs)", "-c (plage de caractères)"]
+  },
+  {
+    name: "sort",
+    os: "universal",
+    category: "Fichiers",
+    description: "Trie les lignes d'un texte : alphabétique, numérique, inversé, par colonne.",
+    syntax: "sort [options] [fichier]",
+    examples: [
+      { cmd: "sort noms.txt", desc: "Tri alphabétique" },
+      { cmd: "du -sh * | sort -rh", desc: "Dossiers du plus gros au plus petit" },
+      { cmd: "sort -t: -k3 -n /etc/passwd", desc: "Tri numérique sur la 3e colonne (UID)" }
+    ],
+    flags: ["-n (numérique)", "-r (inverse)", "-u (supprime les doublons)", "-k (colonne)", "-h (tailles humaines : K, M, G)"]
+  },
+  {
+    name: "uniq",
+    os: "universal",
+    category: "Fichiers",
+    description: "Supprime ou compte les lignes dupliquées adjacentes — toujours après un sort.",
+    syntax: "sort fichier | uniq [options]",
+    examples: [
+      { cmd: "sort ips.txt | uniq", desc: "Liste sans doublons" },
+      { cmd: "sort ips.txt | uniq -c | sort -rn | head", desc: "Top des IP les plus fréquentes" },
+      { cmd: "sort liste.txt | uniq -d", desc: "N'affiche que les doublons" }
+    ],
+    flags: ["-c (compte les occurrences)", "-d (doublons seulement)", "-u (lignes uniques seulement)"]
+  },
+  {
+    name: "tr",
+    os: "universal",
+    category: "Fichiers",
+    description: "Remplace, supprime ou compresse des caractères dans un flux.",
+    syntax: "tr [options] <jeu1> [jeu2]",
+    examples: [
+      { cmd: "echo 'bonjour' | tr 'a-z' 'A-Z'", desc: "Passe en majuscules" },
+      { cmd: "tr -d '\\r' < windows.txt > unix.txt", desc: "Retire les retours chariot Windows" },
+      { cmd: "echo 'a    b' | tr -s ' '", desc: "Compresse les espaces répétés" }
+    ],
+    flags: ["-d (supprime le jeu de caractères)", "-s (compresse les répétitions)"]
+  },
+  {
+    name: "xargs",
+    os: "universal",
+    category: "Système",
+    description: "Construit et exécute des commandes à partir de l'entrée standard (sortie d'un find, d'un cat…).",
+    syntax: "<commande> | xargs [options] <commande2>",
+    examples: [
+      { cmd: "find . -name '*.tmp' | xargs rm", desc: "Supprime tous les fichiers trouvés" },
+      { cmd: "cat urls.txt | xargs -n1 curl -O", desc: "Télécharge chaque URL, une par une" },
+      { cmd: "find . -name '*.log' -print0 | xargs -0 grep ERROR", desc: "Gère les noms avec espaces (-print0/-0)" }
+    ],
+    flags: ["-n1 (un argument par commande)", "-0 (entrées séparées par NUL)", "-I {} (placeholder)", "-P <n> (exécutions en parallèle)"]
+  },
+  {
+    name: "tee",
+    os: "universal",
+    category: "Fichiers",
+    description: "Duplique un flux : affiche à l'écran ET écrit dans un fichier en même temps.",
+    syntax: "<commande> | tee [-a] <fichier>",
+    examples: [
+      { cmd: "make 2>&1 | tee build.log", desc: "Voit la compilation et la journalise" },
+      { cmd: "echo '10.0.0.5 srv1' | sudo tee -a /etc/hosts", desc: "Ajoute une ligne à un fichier protégé (le sudo s'applique à tee)" }
+    ],
+    flags: ["-a (ajoute à la fin au lieu d'écraser)"]
+  },
+  {
+    name: "tail",
+    os: "universal",
+    category: "Fichiers",
+    description: "Affiche la fin d'un fichier ; avec -f, suit un journal en temps réel.",
+    syntax: "tail [-n N] [-f] <fichier>",
+    examples: [
+      { cmd: "tail -n 50 app.log", desc: "Les 50 dernières lignes" },
+      { cmd: "tail -f /var/log/syslog", desc: "Suit le journal en direct (Ctrl+C pour quitter)" },
+      { cmd: "tail -f app.log | grep ERROR", desc: "Ne montre que les erreurs au fil de l'eau" }
+    ],
+    flags: ["-n (nombre de lignes)", "-f (suivre en continu)", "-F (suit même si le fichier est recréé, ex. logrotate)"]
+  },
+  {
+    name: "column",
+    os: "universal",
+    category: "Fichiers",
+    description: "Aligne du texte en colonnes lisibles, pratique pour les sorties denses.",
+    syntax: "<commande> | column -t [-s <délim>]",
+    examples: [
+      { cmd: "mount | column -t", desc: "Sortie de mount alignée" },
+      { cmd: "column -t -s: /etc/passwd", desc: "Fichier passwd en tableau lisible" }
+    ],
+    flags: ["-t (mode tableau)", "-s (délimiteur d'entrée)"]
+  },
+  {
+    name: "crontab",
+    os: "universal",
+    category: "Système",
+    description: "Planifie des tâches récurrentes : sauvegardes nocturnes, scripts de maintenance…",
+    syntax: "crontab [-e | -l | -r]",
+    examples: [
+      { cmd: "crontab -e", desc: "Édite tes tâches planifiées" },
+      { cmd: "crontab -l", desc: "Liste les tâches actuelles" },
+      { cmd: "0 3 * * * /home/tom/backup.sh", desc: "Ligne : tous les jours à 3h00 (min heure jour mois jour-semaine)" }
+    ],
+    flags: ["-e (éditer)", "-l (lister)", "-r (tout supprimer !)", "@reboot / @daily (raccourcis)"]
+  },
+  {
+    name: "wget",
+    os: "universal",
+    category: "Réseau",
+    description: "Télécharge des fichiers via HTTP/FTP ; sait reprendre un téléchargement interrompu.",
+    syntax: "wget [options] <url>",
+    examples: [
+      { cmd: "wget https://site.fr/fichier.iso", desc: "Téléchargement simple" },
+      { cmd: "wget -c https://site.fr/gros-fichier.iso", desc: "Reprend là où ça s'était arrêté" },
+      { cmd: "wget -r -np -k https://docs.site.fr/", desc: "Aspire un site pour lecture hors-ligne" }
+    ],
+    flags: ["-c (reprendre)", "-O <nom> (renommer)", "-r (récursif)", "-q (silencieux)"]
+  },
+  {
+    name: "scp",
+    os: "universal",
+    category: "Réseau",
+    description: "Copie des fichiers entre machines à travers SSH, dans les deux sens.",
+    syntax: "scp [options] <source> <destination>",
+    examples: [
+      { cmd: "scp fichier.txt tom@srv:/tmp/", desc: "Envoie un fichier vers le serveur" },
+      { cmd: "scp tom@srv:/var/log/app.log .", desc: "Rapatrie un fichier du serveur" },
+      { cmd: "scp -r dossier/ tom@srv:~/", desc: "Copie un dossier entier" }
+    ],
+    flags: ["-r (récursif)", "-P <port> (port SSH non standard)", "-C (compression)"]
+  },
+  {
+    name: "htop",
+    os: "universal",
+    category: "Processus",
+    description: "Moniteur de processus interactif : CPU, RAM, arbre des processus, kill au clavier.",
+    syntax: "htop [-u utilisateur]",
+    examples: [
+      { cmd: "htop", desc: "Vue d'ensemble interactive" },
+      { cmd: "htop -u www-data", desc: "Seulement les processus d'un utilisateur" },
+      { cmd: "F5 / F9 / F6", desc: "Arbre / tuer un processus / changer le tri" }
+    ],
+    flags: ["-u (filtre par utilisateur)", "-p <PID> (processus précis)", "-d (délai de rafraîchissement)"]
+  },
+  {
+    name: "ln",
+    os: "universal",
+    category: "Fichiers",
+    description: "Crée des liens entre fichiers ; -s crée un lien symbolique (raccourci).",
+    syntax: "ln -s <cible> <lien>",
+    examples: [
+      { cmd: "ln -s /var/www/monsite ~/site", desc: "Raccourci vers le dossier du site" },
+      { cmd: "ln -sf /etc/nginx/sites-available/monsite /etc/nginx/sites-enabled/", desc: "Active un vhost nginx (écrase si existe)" },
+      { cmd: "ls -l", desc: "Les liens symboliques montrent leur cible avec →" }
+    ],
+    flags: ["-s (symbolique)", "-f (remplace si le lien existe)", "sans -s : lien dur (même inode)"]
+  },
+  {
+    name: "watch",
+    os: "universal",
+    category: "Système",
+    description: "Relance une commande à intervalle régulier et affiche son résultat en continu.",
+    syntax: "watch [-n sec] [-d] <commande>",
+    examples: [
+      { cmd: "watch -n 2 df -h", desc: "Surveille l'espace disque toutes les 2 s" },
+      { cmd: "watch -d free -h", desc: "Surligne ce qui change dans la mémoire" },
+      { cmd: "watch 'ss -t | wc -l'", desc: "Compte les connexions TCP en direct" }
+    ],
+    flags: ["-n (intervalle en secondes)", "-d (surligne les différences)"]
+  },
 ];
 
 // Fusion dans l'annuaire principal (data.js doit être chargé avant)
