@@ -144,6 +144,17 @@
       line-height: 1.5;
     }
     .st-note b { color: var(--accent-2); }
+    .sc-links {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      margin: -8px 0 18px;
+    }
+    .sc-links a {
+      color: var(--c, var(--accent));
+      text-decoration: none;
+      border-bottom: 1px dashed currentColor;
+    }
+    .sc-links a:hover { opacity: 0.75; }
 
     .sc-toast {
       position: fixed;
@@ -201,6 +212,7 @@
       </summary>
       <div class="sc-body">
         <p class="sc-intro">De zéro à un site servi en HTTPS avec un certificat gratuit qui se renouvelle tout seul. Prérequis : un serveur Debian/Ubuntu et un nom de domaine qui pointe déjà vers son IP.</p>
+        <p class="sc-links"><a href="commands.html?os=nginx">⌘ commandes Nginx</a> · <a href="quiz.html?os=nginx">🎓 quiz Nginx</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Installer Nginx et l'activer au démarrage</div>
@@ -262,6 +274,7 @@
       </summary>
       <div class="sc-body">
         <p class="sc-intro">Les 20 premières minutes d'un serveur exposé sur Internet : compte admin, connexion par clé, SSH durci, pare-feu et bannissement automatique des attaquants.</p>
+        <p class="sc-links"><a href="commands.html?os=openssl">⌘ commandes OpenSSL/SSH</a> · <a href="quiz.html?os=openssl">🎓 quiz OpenSSL/SSH</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Tout mettre à jour</div>
@@ -319,6 +332,7 @@ PubkeyAuthentication yes</pre>
       </summary>
       <div class="sc-body">
         <p class="sc-intro">Segmenter le réseau : créer un VLAN, y affecter des ports, monter un trunk vers un autre switch, puis sauvegarder pour que tout survive au redémarrage.</p>
+        <p class="sc-links"><a href="commands.html?os=cisco">⌘ commandes Cisco IOS</a> · <a href="quiz.html?os=cisco">🎓 quiz Cisco IOS</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Passer en mode configuration</div>
@@ -378,6 +392,7 @@ PubkeyAuthentication yes</pre>
       </summary>
       <div class="sc-body">
         <p class="sc-intro">Tout en ligne de commande : créer une VM Debian, la démarrer, puis la sauvegarder à chaud et savoir la restaurer.</p>
+        <p class="sc-links"><a href="commands.html?os=proxmox">⌘ commandes Proxmox</a> · <a href="quiz.html?os=proxmox">🎓 quiz Proxmox</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Repérer le stockage et les ISO disponibles</div>
@@ -429,6 +444,7 @@ PubkeyAuthentication yes</pre>
       </summary>
       <div class="sc-body">
         <p class="sc-intro">Du code source à l'image publiée sur Docker Hub : construire, lancer, déboguer, publier, nettoyer.</p>
+        <p class="sc-links"><a href="commands.html?os=docker">⌘ commandes Docker</a> · <a href="quiz.html?os=docker">🎓 quiz Docker</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Écrire le Dockerfile à la racine du projet</div>
@@ -486,6 +502,7 @@ CMD ["node", "server.js"]</pre>
       </summary>
       <div class="sc-body">
         <p class="sc-intro">Base de données prête pour une appli : installation sécurisée, utilisateur dédié aux droits limités, et un dump compressé chaque nuit à 3 h.</p>
+        <p class="sc-links"><a href="commands.html?os=mysql">⌘ commandes MySQL</a> · <a href="quiz.html?os=mysql">🎓 quiz MySQL</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Installer et sécuriser</div>
@@ -535,6 +552,7 @@ FLUSH PRIVILEGES;</pre>
       </summary>
       <div class="sc-body">
         <p class="sc-intro">« Internet ne marche plus » : la méthode en couches, de la carte réseau jusqu'à la capture de paquets, pour localiser la panne au lieu de deviner.</p>
+        <p class="sc-links"><a href="commands.html?os=universal">⌘ commandes universelles</a> · <a href="commands.html?os=tcpdump">⌘ tcpdump</a> · <a href="quiz.html?os=universal">🎓 quiz</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">La machine a-t-elle une IP et une route ?</div>
@@ -588,6 +606,7 @@ FLUSH PRIVILEGES;</pre>
       </summary>
       <div class="sc-body">
         <p class="sc-intro">Le cycle de vie complet d'une appli sur un cluster : déployer, exposer, monter en charge, mettre à jour sans coupure — et revenir en arrière si ça tourne mal.</p>
+        <p class="sc-links"><a href="commands.html?os=kubectl">⌘ commandes Kubernetes</a> · <a href="quiz.html?os=kubectl">🎓 quiz Kubernetes</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Vérifier le cluster et le contexte</div>
@@ -643,6 +662,7 @@ FLUSH PRIVILEGES;</pre>
       </summary>
       <div class="sc-body">
         <p class="sc-intro">Configurer un serveur à la main, c'est bien une fois. Ansible rejoue la même configuration sur 1 ou 100 machines, sans rien installer sur elles (tout passe par SSH).</p>
+        <p class="sc-links"><a href="commands.html?os=ansible">⌘ commandes Ansible</a> · <a href="quiz.html?os=ansible">🎓 quiz Ansible</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Installer Ansible — sur ton poste seulement</div>

@@ -125,6 +125,17 @@
       wrap.appendChild(btn);
     });
 
+    // Domaine présélectionné via l'URL : quiz.html?os=cisco
+    var osParam = new URLSearchParams(location.search).get('os');
+    if (osParam) {
+      var preChip = wrap.querySelector('[data-os="' + osParam + '"]');
+      if (preChip) {
+        wrap.querySelectorAll('.quiz-chip').forEach(function(b) { b.classList.remove('active'); });
+        preChip.classList.add('active');
+        state.os = osParam;
+      }
+    }
+
     wrap.addEventListener('click', function(e) {
       var btn = e.target.closest('[data-os]');
       if (!btn) return;
@@ -163,6 +174,15 @@
     picked = shuffle(picked);
 
     return picked.map(function(cmd) {
+      var review = !!errors[cmdKey(cmd)];
+
+      // ~1 question sur 4 porte sur une option de la commande
+      var flags = parseFlags(cmd);
+      if (flags.length && Math.random() < 0.25) {
+        var fq = buildFlagQuestion(cmd, flags, pool, review);
+        if (fq) return fq;
+      }
+
       var type = Math.random() < 0.5 ? 'cmd' : 'desc';
       // Les leurres viennent en priorité du même OS/outil (plus dur)
       var sameOs = pool.filter(function(c) { return c !== cmd && c.os === cmd.os; });
@@ -170,9 +190,50 @@
       var decoys = shuffle(sameOs).slice(0, 3);
       if (decoys.length < 3) decoys = decoys.concat(shuffle(others).slice(0, 3 - decoys.length));
 
-      var options = shuffle([cmd].concat(decoys));
-      return { cmd: cmd, type: type, options: options, review: !!errors[cmdKey(cmd)] };
+      var options = shuffle([cmd].concat(decoys)).map(function(c) {
+        return { label: type === 'cmd' ? c.name : c.description, good: c === cmd };
+      });
+      return {
+        cmd: cmd, type: type, review: review, options: options,
+        prompt: type === 'cmd' ? 'Quelle commande correspond à cette description ?' : 'À quoi sert cette commande ?',
+        code: type === 'cmd' ? '« ' + cmd.description + ' »' : (cmd.syntax || cmd.name)
+      };
     });
+  }
+
+  // Extrait les options au format "-x (explication)" du champ flags
+  function parseFlags(cmd) {
+    var out = [];
+    (cmd.flags || []).forEach(function(f) {
+      var m = /^(.{1,28}?)\s*\((.{6,})\)$/.exec(f);
+      if (m) out.push({ flag: m[1], desc: m[2] });
+    });
+    return out;
+  }
+
+  // Question « Que fait cette option ? » — leurres : les autres options
+  // de la même commande d'abord, puis celles du reste du pool.
+  function buildFlagQuestion(cmd, flags, pool, review) {
+    var f = flags[Math.floor(Math.random() * flags.length)];
+    var decoys = shuffle(flags.filter(function(x) { return x !== f; })
+      .map(function(x) { return x.desc; }));
+    shuffle(pool).slice(0, 30).forEach(function(c) {
+      if (c !== cmd) parseFlags(c).forEach(function(x) { decoys.push(x.desc); });
+    });
+
+    var options = [{ label: f.desc, good: true }];
+    for (var i = 0; i < decoys.length && options.length < 4; i++) {
+      if (decoys[i] !== f.desc && !options.some(function(o) { return o.label === decoys[i]; })) {
+        options.push({ label: decoys[i], good: false });
+      }
+    }
+    if (options.length < 4) return null; // pas assez de leurres : repli sur cmd/desc
+
+    return {
+      cmd: cmd, type: 'flag', review: review, options: shuffle(options),
+      prompt: "Que fait l'option de cette commande ?",
+      code: cmd.name + '  ' + f.flag
+    };
   }
 
   // ── Affichage d'une question ─────────────────────────────
@@ -191,17 +252,10 @@
     badge.textContent = meta.label + ' · ' + q.cmd.category + (q.review ? ' · 🔁 à revoir' : '');
     badge.style.setProperty('--q-color', meta.color);
 
-    var qText = $('qText');
+    $('qText').textContent = q.prompt;
     var qCode = $('qCode');
-    if (q.type === 'cmd') {
-      qText.textContent = 'Quelle commande correspond à cette description ?';
-      qCode.textContent = '« ' + q.cmd.description + ' »';
-      qCode.classList.remove('hidden');
-    } else {
-      qText.textContent = 'À quoi sert cette commande ?';
-      qCode.textContent = q.cmd.syntax || q.cmd.name;
-      qCode.classList.remove('hidden');
-    }
+    qCode.textContent = q.code;
+    qCode.classList.remove('hidden');
 
     var keys = ['A', 'B', 'C', 'D'];
     var optWrap = $('qOptions');
@@ -209,9 +263,8 @@
     q.options.forEach(function(opt, i) {
       var btn = document.createElement('button');
       btn.className = 'q-opt';
-      var label = q.type === 'cmd' ? opt.name : opt.description;
       btn.innerHTML = '<span class="opt-key">[' + keys[i] + ']</span>';
-      btn.appendChild(document.createTextNode(label));
+      btn.appendChild(document.createTextNode(opt.label));
       btn.addEventListener('click', function() { answer(opt, btn); });
       optWrap.appendChild(btn);
     });
@@ -225,14 +278,14 @@
     if (state.locked) return;
     state.locked = true;
     var q = state.questions[state.current];
-    var good = opt === q.cmd;
+    var good = !!opt.good;
     var feedback = $('qFeedback');
 
     // Révèle la bonne réponse
     var buttons = document.querySelectorAll('.q-opt');
     buttons.forEach(function(b) { b.disabled = true; });
     q.options.forEach(function(o, i) {
-      if (o === q.cmd) buttons[i].classList.add('correct');
+      if (o.good) buttons[i].classList.add('correct');
     });
 
     // Révision espacée : met à jour la dette de la commande
@@ -260,7 +313,10 @@
     } else {
       btn.classList.add('wrong');
       state.streak = 0;
-      feedback.textContent = '✗ Raté — la bonne réponse était : ' + q.cmd.name;
+      var correct = '';
+      q.options.forEach(function(o) { if (o.good) correct = o.label; });
+      feedback.textContent = '✗ Raté — la bonne réponse était : ' +
+        (q.type === 'flag' ? correct : q.cmd.name);
       feedback.classList.add('bad');
     }
 
@@ -360,6 +416,70 @@
   buildOsChoices();
   decorateChips();
   updateReviewNote();
+
+  // ── Export / import de la progression ─────────────────────
+  // Tout vit dans le localStorage : un fichier JSON permet de le
+  // sauvegarder ou de le transférer sur un autre appareil.
+  var IO_KEYS = ['mpx-favorites', 'mpx-quiz-best', 'mpx-quiz-errors', 'mpx-search-history', 'mpx-theme', 'mpx-sound'];
+
+  function ioStatus(msg) {
+    var el = $('ioStatus');
+    if (!el) return;
+    el.textContent = msg;
+    setTimeout(function() { if (el.textContent === msg) el.textContent = ''; }, 4000);
+  }
+
+  var exportBtn = $('exportBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', function() {
+      var data = { app: 'manpages.exe', date: new Date().toISOString(), values: {} };
+      IO_KEYS.forEach(function(k) {
+        var v = localStorage.getItem(k);
+        if (v !== null) data.values[k] = v;
+      });
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'manpages-progression-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      ioStatus('✓ Fichier exporté');
+    });
+  }
+
+  var importBtn = $('importBtn');
+  var importFile = $('importFile');
+  if (importBtn && importFile) {
+    importBtn.addEventListener('click', function() { importFile.click(); });
+    importFile.addEventListener('change', function() {
+      var file = this.files[0];
+      this.value = '';
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function() {
+        try {
+          var data = JSON.parse(reader.result);
+          if (!data || data.app !== 'manpages.exe' || !data.values) {
+            ioStatus('✗ Fichier non reconnu');
+            return;
+          }
+          var n = 0;
+          IO_KEYS.forEach(function(k) {
+            if (typeof data.values[k] === 'string') {
+              localStorage.setItem(k, data.values[k]);
+              n++;
+            }
+          });
+          decorateChips();
+          updateReviewNote();
+          ioStatus('✓ Progression importée (' + n + ' éléments)');
+        } catch (err) {
+          ioStatus('✗ JSON invalide');
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
 
   // ── Thème (même mécanique que le reste du site) ──────────
   var html = document.documentElement;

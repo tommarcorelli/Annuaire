@@ -88,6 +88,29 @@
       color: var(--accent-3);
       min-height: 15px;
     }
+    .quiz-io {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .quiz-io-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 6px 10px;
+      background: transparent;
+      border: 1px dashed var(--border2);
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .quiz-io-btn:hover { color: var(--text); border-color: var(--text); }
+    .quiz-io-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent-3);
+    }
     .quiz-chip.active {
       background: var(--accent-glow);
       border-color: var(--accent);
@@ -294,6 +317,13 @@
       <p class="quiz-review-note" id="reviewNote"></p>
 
       <button class="quiz-start" id="startBtn">▶ INSERT COIN — START</button>
+
+      <div class="quiz-io">
+        <button class="quiz-io-btn" id="exportBtn" title="Sauvegarde favoris, records et erreurs dans un fichier">💾 Exporter ma progression</button>
+        <button class="quiz-io-btn" id="importBtn" title="Restaure une progression exportée">📥 Importer</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden/>
+        <span class="quiz-io-status" id="ioStatus"></span>
+      </div>
     </div>
 
     <!-- ÉCRAN 2 : QUESTION -->

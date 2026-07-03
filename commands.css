@@ -465,6 +465,20 @@ body::after {
   text-transform: uppercase;
 }
 [data-theme="light"] .cat-badge { color: var(--ink); border-color: var(--ink); background: var(--accent-3); }
+.quiz-badge {
+  font-family: var(--pixel);
+  font-size: 12px;
+  padding: 2px 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1BB91F;
+  border: 1px solid #1BB91F;
+  text-decoration: none;
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}
+.quiz-badge:hover { opacity: 1; }
+@media print { .quiz-badge { display: none; } }
 
 /* Description */
 .cmd-desc {

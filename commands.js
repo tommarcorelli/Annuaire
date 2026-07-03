@@ -134,8 +134,18 @@ function init() {
   var allEl = document.getElementById('count-all');
   if (allEl) allEl.textContent = COMMANDS.length;
 
-  renderGrid(COMMANDS);
-  updateCount(COMMANDS.length);
+  // Filtre présélectionné via l'URL : commands.html?os=cisco
+  var osParam = new URLSearchParams(location.search).get('os');
+  if (osParam && OS_META[osParam]) {
+    activeOS = osParam;
+    var paramPill = document.querySelector('[data-os="' + osParam + '"]');
+    if (paramPill) {
+      document.querySelectorAll('[data-os]').forEach(function(p) { p.classList.remove('active'); });
+      paramPill.classList.add('active');
+    }
+  }
+
+  filter();
   updateFavCount();
 
   document.getElementById('searchInput').addEventListener('input', function() {
@@ -520,6 +530,9 @@ function buildCard(cmd, tpl) {
     osBadge.style.borderColor = meta.color + '66';
 
     clone.querySelector('.cat-badge').textContent = cmd.category;
+
+    var quizBadge = clone.querySelector('.quiz-badge');
+    if (quizBadge) quizBadge.href = 'quiz.html?os=' + encodeURIComponent(cmd.os);
 
     var exList = clone.querySelector('.examples-list');
     (cmd.examples || []).forEach(function(ex) {
