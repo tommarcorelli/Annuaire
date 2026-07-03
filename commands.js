@@ -40,6 +40,15 @@ let activeCat = 'all';
 let query     = '';
 let favoritesOnly = false;
 
+// ── RENDU PROGRESSIF ─────────────────────────────────────────
+// Les cartes sont rendues par lots : les suivantes n'arrivent que
+// quand on approche du bas de la page (IntersectionObserver).
+var CHUNK_SIZE = 60;
+var renderList = [];
+var renderedCount = 0;
+var gridSentinel = null;
+var searchTimer = null;
+
 // ── HISTORIQUE DE RECHERCHE ──────────────────────────────────
 var HISTORY_MAX = 8;
 
@@ -132,7 +141,9 @@ function init() {
   document.getElementById('searchInput').addEventListener('input', function() {
     query = this.value.toLowerCase().trim();
     renderHistory(this.value.trim());
-    filter();
+    // Debounce : attend une pause dans la frappe avant de filtrer
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(filter, 150);
   });
 
   document.getElementById('searchInput').addEventListener('focus', function() {
@@ -228,17 +239,23 @@ function init() {
   var printBtn = document.getElementById('printBtn');
   if (printBtn) {
     printBtn.addEventListener('click', function() {
+      renderAll(); // imprime toute la sélection, pas juste les cartes visibles
       window.print();
     });
   }
+  window.addEventListener('beforeprint', renderAll);
 
   // Bouton 🎲 : saute sur une carte au hasard parmi celles affichées
   var randomBtn = document.getElementById('randomBtn');
   if (randomBtn) {
     randomBtn.addEventListener('click', function() {
-      var cards = document.querySelectorAll('.cmd-card');
-      if (!cards.length) return;
-      var card = cards[Math.floor(Math.random() * cards.length)];
+      if (!renderList.length) return;
+      // Tire dans la liste complète (pas seulement les cartes déjà rendues)
+      var pick = renderList[Math.floor(Math.random() * renderList.length)];
+      var id = 'cmd-' + slugify(pick.name);
+      ensureCardRendered(id);
+      var card = document.getElementById(id);
+      if (!card) return;
       document.querySelectorAll('.cmd-card.highlight').forEach(function(c) { c.classList.remove('highlight'); });
       card.scrollIntoView({ behavior: 'smooth', block: 'center' });
       card.classList.add('highlight');
@@ -264,6 +281,7 @@ function init() {
   // Lien direct : si l'URL contient #cmd-xxx au chargement, on scrolle/surligne la carte
   if (location.hash && location.hash.indexOf('#cmd-') === 0) {
     setTimeout(function() {
+      ensureCardRendered(location.hash.slice(1));
       var target = document.getElementById(location.hash.slice(1));
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -431,6 +449,8 @@ function renderGrid(commands) {
   var grid  = document.getElementById('commandGrid');
   var empty = document.getElementById('emptyState');
   grid.innerHTML = '';
+  renderList = commands;
+  renderedCount = 0;
 
   if (!commands.length) {
     empty.style.display = 'flex';
@@ -438,9 +458,51 @@ function renderGrid(commands) {
   }
   empty.style.display = 'none';
 
-  var tpl = document.getElementById('cardTemplate');
+  if (!window.IntersectionObserver) {
+    appendChunk(commands.length); // vieux navigateurs : tout d'un coup
+    return;
+  }
+  appendChunk(CHUNK_SIZE);
+  initSentinel();
+}
 
-  commands.forEach(function(cmd) {
+function appendChunk(size) {
+  var grid = document.getElementById('commandGrid');
+  var tpl  = document.getElementById('cardTemplate');
+  var end  = Math.min(renderedCount + (size || CHUNK_SIZE), renderList.length);
+  var frag = document.createDocumentFragment();
+  for (var i = renderedCount; i < end; i++) {
+    frag.appendChild(buildCard(renderList[i], tpl));
+  }
+  renderedCount = end;
+  grid.appendChild(frag);
+}
+
+function renderAll() {
+  if (renderedCount < renderList.length) {
+    appendChunk(renderList.length - renderedCount);
+  }
+}
+
+// Rend des lots jusqu'à ce que la carte demandée existe (lien direct,
+// bouton aléatoire) ou que la liste soit épuisée.
+function ensureCardRendered(id) {
+  while (!document.getElementById(id) && renderedCount < renderList.length) {
+    appendChunk(CHUNK_SIZE * 4);
+  }
+}
+
+function initSentinel() {
+  if (gridSentinel) return;
+  gridSentinel = document.createElement('div');
+  gridSentinel.style.height = '1px';
+  document.getElementById('commandGrid').insertAdjacentElement('afterend', gridSentinel);
+  new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting) appendChunk();
+  }, { rootMargin: '800px' }).observe(gridSentinel);
+}
+
+function buildCard(cmd, tpl) {
     var meta  = OS_META[cmd.os] || { label: cmd.os, color: '#c9a84c' };
     var clone = tpl.content.cloneNode(true);
     var card  = clone.querySelector('.cmd-card');
@@ -523,8 +585,7 @@ function renderGrid(commands) {
       });
     });
 
-    grid.appendChild(clone);
-  });
+    return clone;
 }
 
 window.addEventListener('load', init);

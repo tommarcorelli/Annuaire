@@ -66,6 +66,12 @@
         MAN<span class="slash">//</span>PAGES<span class="exe">.EXE</span>
       </h1>
       <p class="tagline"><span id="typed"></span><span class="cursor"></span></p>
+
+      <div class="gsearch">
+        <input id="gsInput" type="text" placeholder="Rechercher partout : commande, paquet, scénario…  ( / )" autocomplete="off" spellcheck="false" aria-label="Recherche globale"/>
+        <div class="gsearch-results" id="gsResults"></div>
+      </div>
+
       <div class="hero-btns">
         <a href="commands.html" class="btn-primary">⌘ Explorer l'annuaire</a>
         <a href="quiz.html" class="btn-outline">🎓 Mode quiz</a>
@@ -444,6 +450,7 @@
       installBtn.classList.add('hidden');
     });
   </script>
+  <script src="global-search.js"></script>
   <script src="arcade-fun.js"></script>
 </body>
 </html>

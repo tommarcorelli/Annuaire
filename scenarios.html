@@ -190,7 +190,7 @@
     <p class="sc-sub">Des missions concrètes qui enchaînent les commandes de l'annuaire, dans l'ordre. Clique sur une commande pour la copier.</p>
 
     <!-- ═══ 1. NGINX + HTTPS ═══ -->
-    <details class="sc" style="--c:#009639">
+    <details class="sc" id="sc-nginx" style="--c:#009639">
       <summary>
         <span class="sc-ico">🌐</span>
         <div class="sc-head">
@@ -251,7 +251,7 @@
     </details>
 
     <!-- ═══ 2. SÉCURISER UN SERVEUR ═══ -->
-    <details class="sc" style="--c:#DA4E2B">
+    <details class="sc" id="sc-secure" style="--c:#DA4E2B">
       <summary>
         <span class="sc-ico">🔐</span>
         <div class="sc-head">
@@ -308,7 +308,7 @@ PubkeyAuthentication yes</pre>
     </details>
 
     <!-- ═══ 3. VLAN CISCO ═══ -->
-    <details class="sc" style="--c:#049FD9">
+    <details class="sc" id="sc-vlan" style="--c:#049FD9">
       <summary>
         <span class="sc-ico">🔀</span>
         <div class="sc-head">
@@ -367,7 +367,7 @@ PubkeyAuthentication yes</pre>
     </details>
 
     <!-- ═══ 4. VM PROXMOX ═══ -->
-    <details class="sc" style="--c:#E57000">
+    <details class="sc" id="sc-proxmox" style="--c:#E57000">
       <summary>
         <span class="sc-ico">🖥️</span>
         <div class="sc-head">
@@ -418,7 +418,7 @@ PubkeyAuthentication yes</pre>
     </details>
 
     <!-- ═══ 5. DOCKER ═══ -->
-    <details class="sc" style="--c:#2496ED">
+    <details class="sc" id="sc-docker" style="--c:#2496ED">
       <summary>
         <span class="sc-ico">🐳</span>
         <div class="sc-head">
@@ -475,7 +475,7 @@ CMD ["node", "server.js"]</pre>
     </details>
 
     <!-- ═══ 6. MYSQL + SAUVEGARDES ═══ -->
-    <details class="sc" style="--c:#4479A1">
+    <details class="sc" id="sc-mysql" style="--c:#4479A1">
       <summary>
         <span class="sc-ico">🗄️</span>
         <div class="sc-head">
@@ -524,7 +524,7 @@ FLUSH PRIVILEGES;</pre>
     </details>
 
     <!-- ═══ 7. DIAGNOSTIC RÉSEAU ═══ -->
-    <details class="sc" style="--c:#3E6E93">
+    <details class="sc" id="sc-reseau" style="--c:#3E6E93">
       <summary>
         <span class="sc-ico">📡</span>
         <div class="sc-head">
@@ -611,6 +611,18 @@ FLUSH PRIVILEGES;</pre>
           localStorage.setItem('mpx-theme', next);
         });
       }
+
+      // Lien profond depuis la recherche globale : scenarios.html#sc-xxx
+      function openFromHash() {
+        if (!location.hash) return;
+        var target = document.querySelector(location.hash);
+        if (target && target.tagName === 'DETAILS') {
+          target.open = true;
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+      openFromHash();
+      window.addEventListener('hashchange', openFromHash);
 
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {

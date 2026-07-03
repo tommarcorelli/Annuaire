@@ -417,6 +417,82 @@ body::after {
 }
 [data-theme="light"] .tagline { color: var(--accent-2); }
 
+/* ── RECHERCHE GLOBALE (accueil) ─────────────────────────── */
+.gsearch {
+  position: relative;
+  max-width: 580px;
+  margin: -26px auto 34px;
+}
+.gsearch input {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 13px 16px;
+  background: var(--bg2);
+  border: 2px solid var(--border2);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.gsearch input::placeholder { color: var(--muted); }
+.gsearch input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.gsearch-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  background: var(--bg2);
+  border: 2px solid var(--border2);
+  box-shadow: 6px 6px 0 var(--accent-glow);
+  display: none;
+  text-align: left;
+  max-height: 55vh;
+  overflow-y: auto;
+  z-index: 60;
+}
+.gsearch-results.show { display: block; }
+.gs-head {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 14px 4px;
+}
+.gs-item {
+  display: block;
+  padding: 8px 14px;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+}
+.gs-item:hover, .gs-item.active {
+  background: var(--bg3);
+  border-left-color: var(--accent);
+}
+.gs-name {
+  display: block;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+}
+.gs-desc {
+  display: block;
+  font-size: 11.5px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gs-empty {
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
 .cursor {
   display: inline-block;
   width: 10px;
