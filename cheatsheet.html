@@ -12,6 +12,7 @@
   <link rel="icon" href="icons/favicon-32.png"/>
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
   <meta name="theme-color" content="#0f0820"/>
+  <script>/* Thème : préférence sauvegardée, sinon réglage système */(function(){var t=localStorage.getItem('mpx-theme');if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
   <style>
     .cs-wrap {
       max-width: 1200px;
@@ -133,6 +134,34 @@
     .cs-toast.show { transform: translateX(-50%) translateY(0); }
 
     @media (max-width: 640px) { .cs-wrap { padding-top: 80px; } }
+
+    /* ── IMPRESSION / EXPORT PDF ─────────────────────────── */
+    @page { size: A4 landscape; margin: 10mm; }
+    @media print {
+      nav.nav, .cs-toast, canvas { display: none !important; }
+      body { background: #fff !important; }
+      .cs-wrap { padding: 0; max-width: none; }
+      .cs-eye { color: #555 !important; }
+      .cs-title, .cs-title span, .cs-sub, .cs-h, .cs-h span,
+      .cs-note, table.cs td { color: #000 !important; text-shadow: none !important; }
+      .cs-sub code { background: none; border-color: #bbb; }
+      .cs-section { margin-bottom: 20px; }
+      .cs-h { border-bottom-color: #000; break-after: avoid; }
+      .cs-scroll { overflow: visible; border: 1px solid #888; }
+      table.cs { min-width: 0; width: 100%; background: #fff !important; font-size: 8.5px; }
+      table.cs th {
+        position: static;
+        background: #eee !important;
+        color: #000 !important;
+        border-color: #888;
+        font-size: 8px;
+        padding: 4px 6px;
+      }
+      table.cs td { border-color: #ccc; padding: 3px 6px; }
+      table.cs td.action { color: #000 !important; font-size: 8px; }
+      table.cs code { font-size: 8.5px; padding: 0; }
+      table.cs tr { break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
@@ -147,6 +176,8 @@
       <a href="commands.html" class="nav-back">⌘ Annuaire</a>
       <a href="packages.html" class="nav-back" style="border-color:var(--accent-3);color:var(--accent-3)">📦 Paquets</a>
       <a href="quiz.html" class="nav-back" style="border-color:#1BB91F;color:#1BB91F">🎓 Quiz</a>
+      <a href="scenarios.html" class="nav-back" style="border-color:#c77dff;color:#c77dff">🧭 Scénarios</a>
+      <button class="nav-back" id="printBtn" title="Imprimer ou exporter en PDF" style="background:none;border:none;cursor:pointer">🖨 PDF</button>
       <a href="index.html" class="nav-back">← Accueil</a>
     </div>
   </nav>
@@ -557,6 +588,10 @@
           }, 1500);
         });
       });
+
+      // Impression / export PDF
+      var printBtn = document.getElementById('printBtn');
+      if (printBtn) printBtn.addEventListener('click', function() { window.print(); });
 
       // Thème
       var html = document.documentElement;

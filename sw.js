@@ -13,6 +13,7 @@ const CORE_ASSETS = [
   './packages.html',
   './quiz.html',
   './cheatsheet.html',
+  './scenarios.html',
   './style.css',
   './commands.css',
   './data.js',

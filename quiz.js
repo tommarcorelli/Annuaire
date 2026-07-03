@@ -69,6 +69,31 @@
     try { return JSON.parse(localStorage.getItem('mpx-quiz-best')) || {}; } catch (e) { return {}; }
   }
 
+  // ── Révision espacée : erreurs mémorisées ─────────────────
+  // Une commande ratée gagne 2 points de "dette" ; chaque bonne
+  // réponse en retire 1. Tant qu'elle a de la dette, elle revient
+  // en priorité dans les prochaines parties.
+  function loadErrors() {
+    try { return JSON.parse(localStorage.getItem('mpx-quiz-errors')) || {}; } catch (e) { return {}; }
+  }
+  function saveErrors(errs) {
+    try { localStorage.setItem('mpx-quiz-errors', JSON.stringify(errs)); } catch (e) {}
+  }
+  function cmdKey(c) { return c.os + '|' + c.name; }
+
+  function updateReviewNote() {
+    var el = $('reviewNote');
+    if (!el) return;
+    var errs = loadErrors();
+    var n = COMMANDS.filter(function(c) {
+      if (state.os !== 'all' && c.os !== state.os) return false;
+      return errs[cmdKey(c)];
+    }).length;
+    el.textContent = n
+      ? '🔁 ' + n + ' commande' + (n > 1 ? 's' : '') + ' à revoir — elles reviendront en priorité.'
+      : '';
+  }
+
   // Affiche le record (%) sur chaque chip de domaine
   function decorateChips() {
     var best = loadBest();
@@ -106,6 +131,7 @@
       wrap.querySelectorAll('.quiz-chip').forEach(function(b) { b.classList.remove('active'); });
       btn.classList.add('active');
       state.os = btn.dataset.os;
+      updateReviewNote();
     });
 
     $('countChoices').addEventListener('click', function(e) {
@@ -123,7 +149,18 @@
       if (state.os !== 'all' && c.os !== state.os) return false;
       return c.description && c.description.length > 15;
     });
-    var picked = shuffle(pool).slice(0, state.total);
+
+    // Révision espacée : ~40% des questions viennent des commandes
+    // déjà ratées, le reste est tiré au hasard.
+    var errors = loadErrors();
+    var revShuffled = shuffle(pool.filter(function(c) { return errors[cmdKey(c)]; }));
+    var fresh = shuffle(pool.filter(function(c) { return !errors[cmdKey(c)]; }));
+    var nReview = Math.min(revShuffled.length, Math.ceil(state.total * 0.4));
+    var picked = revShuffled.slice(0, nReview).concat(fresh.slice(0, state.total - nReview));
+    if (picked.length < state.total) {
+      picked = picked.concat(revShuffled.slice(nReview, nReview + state.total - picked.length));
+    }
+    picked = shuffle(picked);
 
     return picked.map(function(cmd) {
       var type = Math.random() < 0.5 ? 'cmd' : 'desc';
@@ -134,7 +171,7 @@
       if (decoys.length < 3) decoys = decoys.concat(shuffle(others).slice(0, 3 - decoys.length));
 
       var options = shuffle([cmd].concat(decoys));
-      return { cmd: cmd, type: type, options: options };
+      return { cmd: cmd, type: type, options: options, review: !!errors[cmdKey(cmd)] };
     });
   }
 
@@ -151,7 +188,7 @@
     $('barFill').style.width = (state.current / state.total * 100) + '%';
 
     var badge = $('qBadge');
-    badge.textContent = meta.label + ' · ' + q.cmd.category;
+    badge.textContent = meta.label + ' · ' + q.cmd.category + (q.review ? ' · 🔁 à revoir' : '');
     badge.style.setProperty('--q-color', meta.color);
 
     var qText = $('qText');
@@ -197,6 +234,20 @@
     q.options.forEach(function(o, i) {
       if (o === q.cmd) buttons[i].classList.add('correct');
     });
+
+    // Révision espacée : met à jour la dette de la commande
+    var errs = loadErrors();
+    var key = cmdKey(q.cmd);
+    if (good) {
+      if (errs[key]) {
+        errs[key]--;
+        if (errs[key] <= 0) delete errs[key];
+        saveErrors(errs);
+      }
+    } else {
+      errs[key] = (errs[key] || 0) + 2;
+      saveErrors(errs);
+    }
 
     if (good) {
       state.score++;
@@ -302,11 +353,13 @@
   $('replayBtn').addEventListener('click', function() {
     $('resultScreen').classList.add('hidden');
     $('setupScreen').classList.remove('hidden');
-    decorateChips(); // rafraîchit les records après la partie
+    decorateChips();     // rafraîchit les records après la partie
+    updateReviewNote();  // ... et le compteur de commandes à revoir
   });
 
   buildOsChoices();
   decorateChips();
+  updateReviewNote();
 
   // ── Thème (même mécanique que le reste du site) ──────────
   var html = document.documentElement;

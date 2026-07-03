@@ -12,6 +12,7 @@
   <link rel="icon" href="icons/favicon-32.png"/>
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
   <meta name="theme-color" content="#0f0820"/>
+  <script>/* Thème : préférence sauvegardée, sinon réglage système */(function(){var t=localStorage.getItem('mpx-theme');if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
 
@@ -26,6 +27,7 @@
     <a href="packages.html" class="nav-cta" style="background:transparent;border-color:var(--accent-3);color:var(--accent-3)">📦 Paquets</a>
     <a href="quiz.html" class="nav-cta" style="background:transparent;border-color:#1BB91F;color:#1BB91F">🎓 Quiz</a>
     <a href="cheatsheet.html" class="nav-cta" style="background:transparent;border-color:#d4a843;color:#d4a843">⚡ Cheatsheet</a>
+    <a href="scenarios.html" class="nav-cta" style="background:transparent;border-color:#c77dff;color:#c77dff">🧭 Scénarios</a>
     <button class="theme-toggle" id="themeToggle" title="Changer le thème" data-testid="theme-toggle-btn">
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -68,6 +70,7 @@
         <a href="commands.html" class="btn-primary">⌘ Explorer l'annuaire</a>
         <a href="quiz.html" class="btn-outline">🎓 Mode quiz</a>
         <a href="cheatsheet.html" class="btn-outline">⚡ Cheatsheet</a>
+        <a href="scenarios.html" class="btn-outline">🧭 Scénarios</a>
         <a href="packages.html" class="btn-outline">📦 Voir les paquets</a>
       </div>
     </div>
@@ -359,7 +362,7 @@
     <div class="cta-bg" aria-hidden="true">EXEC</div>
     <div class="cta-inner">
       <h2 class="cta-title">Prêt à <span>explorer</span> ?</h2>
-      <p class="cta-sub">872 commandes · 74 paquets · 32 outils · quiz · cheatsheet · recherche floue</p>
+      <p class="cta-sub">872 commandes · 74 paquets · 32 outils · quiz · cheatsheet · scénarios · recherche floue</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
         <a href="commands.html" class="btn-primary btn-lg">⌘ OUVRIR L'ANNUAIRE</a>
         <a href="quiz.html" class="btn-primary btn-lg" style="background:transparent;border:2px solid #1BB91F;color:#1BB91F">🎓 LANCER LE QUIZ</a>

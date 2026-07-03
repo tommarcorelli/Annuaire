@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MANPAGES.EXE — Scénarios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=VT323&family=Honk&family=Noto+Sans+JP:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="commands.css"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="icons/favicon-32.png"/>
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+  <meta name="theme-color" content="#0f0820"/>
+  <script>/* Thème : préférence sauvegardée, sinon réglage système */(function(){var t=localStorage.getItem('mpx-theme');if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <style>
+    .sc-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 90px 20px 60px;
+    }
+    .sc-eye {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+    .sc-title {
+      font-family: 'VT323', monospace;
+      font-size: clamp(34px, 6vw, 52px);
+      line-height: 1;
+      margin: 0 0 10px;
+      color: var(--text);
+    }
+    .sc-title span { color: #c77dff; }
+    .sc-sub { color: var(--text); opacity: 0.75; margin-bottom: 34px; font-size: 14px; }
+
+    details.sc {
+      background: var(--bg2);
+      border: 2px solid var(--border2);
+      border-left: 4px solid var(--c, var(--accent));
+      margin-bottom: 14px;
+    }
+    details.sc[open] { box-shadow: 6px 6px 0 var(--accent-glow); }
+    details.sc summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      user-select: none;
+    }
+    details.sc summary::-webkit-details-marker { display: none; }
+    details.sc summary:hover { background: var(--bg3); }
+    .sc-ico { font-size: 26px; flex-shrink: 0; }
+    .sc-head { flex: 1; min-width: 0; }
+    .sc-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+    }
+    .sc-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--c, var(--accent));
+      margin-top: 3px;
+    }
+    .sc-arrow {
+      color: var(--muted);
+      font-size: 12px;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    details.sc[open] .sc-arrow { transform: rotate(180deg); }
+
+    .sc-body { padding: 4px 18px 20px; border-top: 1px solid var(--border); }
+    .sc-intro {
+      font-size: 13.5px;
+      color: var(--text);
+      opacity: 0.85;
+      margin: 14px 0 18px;
+      line-height: 1.55;
+    }
+    ol.sc-steps {
+      list-style: none;
+      counter-reset: step;
+      margin: 0;
+      padding: 0;
+    }
+    ol.sc-steps > li {
+      counter-increment: step;
+      position: relative;
+      padding: 0 0 20px 44px;
+      border-left: 2px dashed var(--border2);
+      margin-left: 14px;
+    }
+    ol.sc-steps > li:last-child { border-left-color: transparent; padding-bottom: 4px; }
+    ol.sc-steps > li::before {
+      content: counter(step);
+      position: absolute;
+      left: -15px; top: -2px;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 2px solid var(--c, var(--accent));
+      color: var(--c, var(--accent));
+      font-family: 'VT323', monospace;
+      font-size: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .st-desc {
+      font-weight: 600;
+      font-size: 13.5px;
+      color: var(--text);
+      margin-bottom: 8px;
+      padding-top: 3px;
+    }
+    .sc-body code, .sc-body pre {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--accent-3);
+      padding: 8px 12px;
+      margin: 0 0 6px;
+      cursor: copy;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      transition: border-color 0.15s;
+    }
+    .sc-body code:hover, .sc-body pre:hover { border-color: var(--c, var(--accent)); }
+    .sc-body code.flash, .sc-body pre.flash { background: #14381c; color: #2ecc71; border-color: #2ecc71; }
+    .st-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 4px 0 0;
+      line-height: 1.5;
+    }
+    .st-note b { color: var(--accent-2); }
+
+    .sc-toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--accent);
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      padding: 10px 22px;
+      box-shadow: 4px 4px 0 var(--accent-2);
+      transition: transform 0.25s;
+      z-index: 200;
+      max-width: 90vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sc-toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 640px) { .sc-wrap { padding-top: 80px; } }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">MAN<span>//</span>PAGES.EXE</a>
+    <div class="nav-right" style="margin-left:auto">
+      <button class="theme-toggle" id="themeToggle" title="Changer le thème">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <a href="commands.html" class="nav-back">⌘ Annuaire</a>
+      <a href="packages.html" class="nav-back" style="color:var(--accent-3)">📦 Paquets</a>
+      <a href="quiz.html" class="nav-back" style="color:#1BB91F">🎓 Quiz</a>
+      <a href="cheatsheet.html" class="nav-back" style="color:#d4a843">⚡ Cheatsheet</a>
+      <a href="index.html" class="nav-back">← Accueil</a>
+    </div>
+  </nav>
+
+  <div class="sc-wrap">
+    <div class="sc-eye">// GUIDES PAS-À-PAS</div>
+    <h1 class="sc-title">SCÉNA<span>//</span>RIOS</h1>
+    <p class="sc-sub">Des missions concrètes qui enchaînent les commandes de l'annuaire, dans l'ordre. Clique sur une commande pour la copier.</p>
+
+    <!-- ═══ 1. NGINX + HTTPS ═══ -->
+    <details class="sc" style="--c:#009639">
+      <summary>
+        <span class="sc-ico">🌐</span>
+        <div class="sc-head">
+          <div class="sc-name">Déployer un site Nginx avec HTTPS</div>
+          <div class="sc-meta">Debian/Ubuntu · Nginx · Let's Encrypt — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">De zéro à un site servi en HTTPS avec un certificat gratuit qui se renouvelle tout seul. Prérequis : un serveur Debian/Ubuntu et un nom de domaine qui pointe déjà vers son IP.</p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Installer Nginx et l'activer au démarrage</div>
+            <code>sudo apt update &amp;&amp; sudo apt install nginx</code>
+            <code>sudo systemctl enable --now nginx</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier qu'il répond</div>
+            <code>curl -I http://localhost</code>
+            <p class="st-note">Tu dois voir <b>HTTP/1.1 200 OK</b> — la page d'accueil par défaut de Nginx.</p>
+          </li>
+          <li>
+            <div class="st-desc">Créer la racine du site</div>
+            <code>sudo mkdir -p /var/www/monsite</code>
+            <code>echo '&lt;h1&gt;Ça marche !&lt;/h1&gt;' | sudo tee /var/www/monsite/index.html</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer le bloc serveur (vhost)</div>
+            <code>sudo nano /etc/nginx/sites-available/monsite</code>
+            <pre>server {
+    listen 80;
+    server_name monsite.fr www.monsite.fr;
+    root /var/www/monsite;
+    index index.html;
+}</pre>
+          </li>
+          <li>
+            <div class="st-desc">Activer le site et recharger</div>
+            <code>sudo ln -s /etc/nginx/sites-available/monsite /etc/nginx/sites-enabled/</code>
+            <code>sudo nginx -t</code>
+            <code>sudo systemctl reload nginx</code>
+            <p class="st-note"><b>nginx -t</b> valide la syntaxe AVANT de recharger — toujours le lancer d'abord.</p>
+          </li>
+          <li>
+            <div class="st-desc">Ouvrir le pare-feu</div>
+            <code>sudo ufw allow 'Nginx Full'</code>
+            <p class="st-note">Le profil « Nginx Full » ouvre les ports 80 (HTTP) et 443 (HTTPS).</p>
+          </li>
+          <li>
+            <div class="st-desc">Passer en HTTPS avec Let's Encrypt</div>
+            <code>sudo apt install certbot python3-certbot-nginx</code>
+            <code>sudo certbot --nginx -d monsite.fr -d www.monsite.fr</code>
+            <code>sudo certbot renew --dry-run</code>
+            <p class="st-note">Certbot modifie le vhost tout seul et installe le renouvellement automatique ; le <b>--dry-run</b> vérifie qu'il fonctionnera.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 2. SÉCURISER UN SERVEUR ═══ -->
+    <details class="sc" style="--c:#DA4E2B">
+      <summary>
+        <span class="sc-ico">🔐</span>
+        <div class="sc-head">
+          <div class="sc-name">Sécuriser un serveur Linux fraîchement installé</div>
+          <div class="sc-meta">Debian/Ubuntu · SSH · ufw · fail2ban — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Les 20 premières minutes d'un serveur exposé sur Internet : compte admin, connexion par clé, SSH durci, pare-feu et bannissement automatique des attaquants.</p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Tout mettre à jour</div>
+            <code>sudo apt update &amp;&amp; sudo apt full-upgrade</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer un utilisateur admin (on ne travaille jamais en root)</div>
+            <code>sudo adduser tom</code>
+            <code>sudo usermod -aG sudo tom</code>
+          </li>
+          <li>
+            <div class="st-desc">Générer une clé SSH — sur TON poste, pas sur le serveur</div>
+            <code>ssh-keygen -t ed25519 -C "tom@poste"</code>
+            <code>ssh-copy-id tom@ip-du-serveur</code>
+            <p class="st-note">Teste la connexion par clé (<b>ssh tom@ip-du-serveur</b>) avant l'étape suivante, sinon tu risques de t'enfermer dehors.</p>
+          </li>
+          <li>
+            <div class="st-desc">Durcir la config SSH</div>
+            <code>sudo nano /etc/ssh/sshd_config</code>
+            <pre>PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes</pre>
+            <code>sudo systemctl restart ssh</code>
+          </li>
+          <li>
+            <div class="st-desc">Activer le pare-feu (SSH d'abord !)</div>
+            <code>sudo ufw default deny incoming</code>
+            <code>sudo ufw allow OpenSSH</code>
+            <code>sudo ufw enable</code>
+          </li>
+          <li>
+            <div class="st-desc">Bannir les attaques par force brute</div>
+            <code>sudo apt install fail2ban</code>
+            <code>sudo systemctl enable --now fail2ban</code>
+            <code>sudo fail2ban-client status sshd</code>
+          </li>
+          <li>
+            <div class="st-desc">Mises à jour de sécurité automatiques</div>
+            <code>sudo apt install unattended-upgrades</code>
+            <code>sudo dpkg-reconfigure -plow unattended-upgrades</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 3. VLAN CISCO ═══ -->
+    <details class="sc" style="--c:#049FD9">
+      <summary>
+        <span class="sc-ico">🔀</span>
+        <div class="sc-head">
+          <div class="sc-name">Créer un VLAN sur un switch Cisco</div>
+          <div class="sc-meta">Cisco IOS — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Segmenter le réseau : créer un VLAN, y affecter des ports, monter un trunk vers un autre switch, puis sauvegarder pour que tout survive au redémarrage.</p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Passer en mode configuration</div>
+            <code>enable</code>
+            <code>configure terminal</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer le VLAN et le nommer</div>
+            <code>vlan 10</code>
+            <code>name BUREAU</code>
+            <code>exit</code>
+          </li>
+          <li>
+            <div class="st-desc">Affecter un port au VLAN</div>
+            <code>interface fastEthernet 0/1</code>
+            <code>switchport mode access</code>
+            <code>switchport access vlan 10</code>
+            <code>exit</code>
+          </li>
+          <li>
+            <div class="st-desc">Ou toute une plage de ports d'un coup</div>
+            <code>interface range fastEthernet 0/2 - 12</code>
+            <code>switchport mode access</code>
+            <code>switchport access vlan 10</code>
+            <code>exit</code>
+          </li>
+          <li>
+            <div class="st-desc">Monter le trunk vers l'autre switch</div>
+            <code>interface gigabitEthernet 0/1</code>
+            <code>switchport mode trunk</code>
+            <code>switchport trunk allowed vlan 10,20</code>
+            <code>end</code>
+            <p class="st-note">Le trunk transporte plusieurs VLAN sur un seul lien ; <b>allowed vlan</b> limite lesquels.</p>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier</div>
+            <code>show vlan brief</code>
+            <code>show interfaces trunk</code>
+          </li>
+          <li>
+            <div class="st-desc">Sauvegarder — sinon tout disparaît au reboot</div>
+            <code>copy running-config startup-config</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 4. VM PROXMOX ═══ -->
+    <details class="sc" style="--c:#E57000">
+      <summary>
+        <span class="sc-ico">🖥️</span>
+        <div class="sc-head">
+          <div class="sc-name">Créer puis sauvegarder une VM sur Proxmox</div>
+          <div class="sc-meta">Proxmox VE · qm · vzdump — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Tout en ligne de commande : créer une VM Debian, la démarrer, puis la sauvegarder à chaud et savoir la restaurer.</p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Repérer le stockage et les ISO disponibles</div>
+            <code>pvesm status</code>
+            <code>ls /var/lib/vz/template/iso</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer la VM (id 100)</div>
+            <code>qm create 100 --name debian-vm --memory 2048 --cores 2 --net0 virtio,bridge=vmbr0</code>
+          </li>
+          <li>
+            <div class="st-desc">Ajouter le disque et l'ISO d'installation</div>
+            <code>qm set 100 --scsi0 local-lvm:32</code>
+            <code>qm set 100 --cdrom local:iso/debian-12.iso</code>
+            <code>qm set 100 --boot order='scsi0;ide2'</code>
+          </li>
+          <li>
+            <div class="st-desc">Démarrer et suivre</div>
+            <code>qm start 100</code>
+            <code>qm status 100</code>
+            <p class="st-note">L'installation se termine dans la console de l'interface web (ou <b>qm terminal 100</b> si la VM a un port série).</p>
+          </li>
+          <li>
+            <div class="st-desc">Lister les VM du nœud</div>
+            <code>qm list</code>
+          </li>
+          <li>
+            <div class="st-desc">Sauvegarder à chaud (snapshot)</div>
+            <code>vzdump 100 --storage local --mode snapshot --compress zstd</code>
+            <p class="st-note">Le mode <b>snapshot</b> sauvegarde sans arrêter la VM.</p>
+          </li>
+          <li>
+            <div class="st-desc">Restaurer (vers un nouvel id 101)</div>
+            <code>qmrestore /var/lib/vz/dump/vzdump-qemu-100-*.vma.zst 101</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 5. DOCKER ═══ -->
+    <details class="sc" style="--c:#2496ED">
+      <summary>
+        <span class="sc-ico">🐳</span>
+        <div class="sc-head">
+          <div class="sc-name">Conteneuriser et publier une application avec Docker</div>
+          <div class="sc-meta">Docker · Docker Hub — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Du code source à l'image publiée sur Docker Hub : construire, lancer, déboguer, publier, nettoyer.</p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Écrire le Dockerfile à la racine du projet</div>
+            <pre>FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY . .
+EXPOSE 3000
+CMD ["node", "server.js"]</pre>
+          </li>
+          <li>
+            <div class="st-desc">Construire l'image</div>
+            <code>docker build -t mon-app:1.0 .</code>
+          </li>
+          <li>
+            <div class="st-desc">Lancer un conteneur</div>
+            <code>docker run -d -p 8080:3000 --name app mon-app:1.0</code>
+            <p class="st-note"><b>-p 8080:3000</b> : le port 3000 du conteneur devient le 8080 de ta machine.</p>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier que ça tourne</div>
+            <code>docker ps</code>
+            <code>docker logs -f app</code>
+            <code>curl http://localhost:8080</code>
+          </li>
+          <li>
+            <div class="st-desc">Entrer dans le conteneur pour déboguer</div>
+            <code>docker exec -it app sh</code>
+          </li>
+          <li>
+            <div class="st-desc">Publier sur Docker Hub</div>
+            <code>docker login</code>
+            <code>docker tag mon-app:1.0 monuser/mon-app:1.0</code>
+            <code>docker push monuser/mon-app:1.0</code>
+          </li>
+          <li>
+            <div class="st-desc">Nettoyer</div>
+            <code>docker stop app &amp;&amp; docker rm app</code>
+            <code>docker image prune</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 6. MYSQL + SAUVEGARDES ═══ -->
+    <details class="sc" style="--c:#4479A1">
+      <summary>
+        <span class="sc-ico">🗄️</span>
+        <div class="sc-head">
+          <div class="sc-name">Installer MySQL et automatiser les sauvegardes</div>
+          <div class="sc-meta">MySQL/MariaDB · cron — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Base de données prête pour une appli : installation sécurisée, utilisateur dédié aux droits limités, et un dump compressé chaque nuit à 3 h.</p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Installer et sécuriser</div>
+            <code>sudo apt install mysql-server</code>
+            <code>sudo mysql_secure_installation</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer la base et l'utilisateur applicatif</div>
+            <code>sudo mysql</code>
+            <pre>CREATE DATABASE boutique;
+CREATE USER 'app'@'localhost' IDENTIFIED BY 'MotDePasseFort!42';
+GRANT ALL PRIVILEGES ON boutique.* TO 'app'@'localhost';
+FLUSH PRIVILEGES;</pre>
+            <p class="st-note">L'appli n'a de droits QUE sur sa base — jamais root dans le code.</p>
+          </li>
+          <li>
+            <div class="st-desc">Tester la connexion</div>
+            <code>mysql -u app -p boutique</code>
+          </li>
+          <li>
+            <div class="st-desc">Faire un dump manuel</div>
+            <code>mysqldump -u root -p boutique &gt; boutique-$(date +%F).sql</code>
+          </li>
+          <li>
+            <div class="st-desc">Automatiser chaque nuit à 3 h avec cron</div>
+            <code>sudo crontab -e</code>
+            <pre>0 3 * * * mysqldump boutique | gzip &gt; /var/backups/boutique-$(date +\%F).sql.gz</pre>
+            <p class="st-note">Dans un crontab, le <b>%</b> doit être échappé en <b>\%</b>. Pense à créer <b>/var/backups</b> et à donner l'accès root via <b>~/.my.cnf</b>.</p>
+          </li>
+          <li>
+            <div class="st-desc">Restaurer un dump</div>
+            <code>gunzip &lt; /var/backups/boutique-2026-07-03.sql.gz | mysql -u root -p boutique</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 7. DIAGNOSTIC RÉSEAU ═══ -->
+    <details class="sc" style="--c:#3E6E93">
+      <summary>
+        <span class="sc-ico">📡</span>
+        <div class="sc-head">
+          <div class="sc-name">Diagnostiquer une panne réseau, étape par étape</div>
+          <div class="sc-meta">Linux · ip · dig · tcpdump — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">« Internet ne marche plus » : la méthode en couches, de la carte réseau jusqu'à la capture de paquets, pour localiser la panne au lieu de deviner.</p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">La machine a-t-elle une IP et une route ?</div>
+            <code>ip a</code>
+            <code>ip route</code>
+            <p class="st-note">Pas d'IP → problème DHCP/câble. Pas de <b>default via …</b> → pas de passerelle.</p>
+          </li>
+          <li>
+            <div class="st-desc">La passerelle répond-elle ?</div>
+            <code>ping -c 4 192.168.1.1</code>
+            <p class="st-note">KO → problème local (câble, Wi-Fi, box). OK → on continue vers l'extérieur.</p>
+          </li>
+          <li>
+            <div class="st-desc">Internet répond-il en IP pure ?</div>
+            <code>ping -c 4 8.8.8.8</code>
+            <p class="st-note">Si l'IP répond mais pas les sites web → c'est le DNS, pas la connexion.</p>
+          </li>
+          <li>
+            <div class="st-desc">Le DNS résout-il ?</div>
+            <code>dig monsite.fr</code>
+            <code>resolvectl status</code>
+          </li>
+          <li>
+            <div class="st-desc">Le service distant écoute-t-il ?</div>
+            <code>nc -zv monsite.fr 443</code>
+            <code>ss -tulnp</code>
+            <p class="st-note"><b>nc -zv</b> teste un port distant ; <b>ss -tulnp</b> liste ce qui écoute en local.</p>
+          </li>
+          <li>
+            <div class="st-desc">Où ça casse en chemin ?</div>
+            <code>traceroute 8.8.8.8</code>
+          </li>
+          <li>
+            <div class="st-desc">En dernier recours : voir les paquets</div>
+            <code>sudo tcpdump -i eth0 -n host 8.8.8.8</code>
+            <p class="st-note">Si les paquets partent sans réponse, la panne est en amont — pas sur ta machine.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+  </div>
+
+  <div class="sc-toast" id="scToast">✓ Copié !</div>
+
+  <script>
+    (function() {
+      // Copie au clic sur n'importe quelle commande
+      var toast = document.getElementById('scToast');
+      var timer = null;
+      document.addEventListener('click', function(e) {
+        var code = e.target.closest('.sc-body code, .sc-body pre');
+        if (!code) return;
+        navigator.clipboard.writeText(code.textContent).then(function() {
+          code.classList.add('flash');
+          toast.textContent = '✓ Copié !';
+          toast.classList.add('show');
+          clearTimeout(timer);
+          timer = setTimeout(function() {
+            toast.classList.remove('show');
+            code.classList.remove('flash');
+          }, 1500);
+        });
+      });
+
+      // Thème
+      var html = document.documentElement;
+      var btn = document.getElementById('themeToggle');
+      if (btn) {
+        btn.addEventListener('click', function() {
+          var current = html.getAttribute('data-theme') || 'dark';
+          var next = current === 'dark' ? 'light' : 'dark';
+          html.setAttribute('data-theme', next);
+          localStorage.setItem('mpx-theme', next);
+        });
+      }
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('sw.js').catch(function() {});
+        });
+      }
+    })();
+  </script>
+  <script src="arcade-fun.js"></script>
+</body>
+</html>

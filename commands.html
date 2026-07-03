@@ -12,6 +12,7 @@
   <link rel="icon" href="icons/favicon-32.png"/>
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
   <meta name="theme-color" content="#0f0820"/>
+  <script>/* Thème : préférence sauvegardée, sinon réglage système */(function(){var t=localStorage.getItem('mpx-theme');if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
 
@@ -52,6 +53,7 @@
       </button>
       <a href="quiz.html" class="nav-back" style="border-color:#1BB91F;color:#1BB91F">🎓 Quiz</a>
       <a href="cheatsheet.html" class="nav-back" style="border-color:#d4a843;color:#d4a843">⚡ Cheatsheet</a>
+      <a href="scenarios.html" class="nav-back" style="border-color:#c77dff;color:#c77dff">🧭 Scénarios</a>
       <a href="packages.html" class="nav-back" style="border-color:var(--accent-3);color:var(--accent-3)">📦 Paquets</a>
       <a href="index.html" class="nav-back">← Accueil</a>
     </div>

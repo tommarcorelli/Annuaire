@@ -10,6 +10,7 @@
   <link rel="manifest" href="manifest.json"/>
   <link rel="icon" href="icons/favicon-32.png"/>
   <meta name="theme-color" content="#0f0820"/>
+  <script>/* Thème : préférence sauvegardée, sinon réglage système */(function(){var t=localStorage.getItem('mpx-theme');if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
   <style>
     :root,[data-theme="dark"]{
       --bg:#0f0820;--bg2:#160d2e;--bg3:#1f1340;
@@ -167,6 +168,7 @@
     <a href="packages.html" class="nav-tab active">📦 Paquets</a>
     <a href="quiz.html" class="nav-tab" style="color:#1BB91F">🎓 Quiz</a>
     <a href="cheatsheet.html" class="nav-tab" style="color:#d4a843">⚡ Cheatsheet</a>
+    <a href="scenarios.html" class="nav-tab" style="color:#c77dff">🧭 Scénarios</a>
   </div>
   <input class="nav-search" id="search" type="text" placeholder="Rechercher... ( / )" autocomplete="off"/>
   <button class="theme-btn" id="themeBtn">

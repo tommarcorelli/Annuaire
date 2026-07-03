@@ -34,5 +34,31 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Explorer l'annuaire",
+      "short_name": "Annuaire",
+      "url": "./commands.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Lancer le quiz",
+      "short_name": "Quiz",
+      "url": "./quiz.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Ouvrir la cheatsheet",
+      "short_name": "Cheatsheet",
+      "url": "./cheatsheet.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Guides pas-à-pas",
+      "short_name": "Scénarios",
+      "url": "./scenarios.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
   ]
 }
