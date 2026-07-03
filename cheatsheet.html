@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MANPAGES.EXE — Cheatsheet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=VT323&family=Honk&family=Noto+Sans+JP:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="commands.css"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="icons/favicon-32.png"/>
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+  <meta name="theme-color" content="#0f0820"/>
+  <style>
+    .cs-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 90px 20px 60px;
+    }
+    .cs-eye {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+    .cs-title {
+      font-family: 'VT323', monospace;
+      font-size: clamp(34px, 6vw, 52px);
+      line-height: 1;
+      margin: 0 0 10px;
+      color: var(--text);
+    }
+    .cs-title span { color: var(--accent); }
+    .cs-sub { color: var(--text); opacity: 0.75; margin-bottom: 34px; font-size: 14px; }
+    .cs-sub code {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      padding: 1px 6px;
+      font-size: 12px;
+    }
+
+    .cs-section { margin-bottom: 46px; }
+    .cs-h {
+      font-family: 'VT323', monospace;
+      font-size: 30px;
+      color: var(--text);
+      margin: 0 0 4px;
+      border-bottom: 2px solid var(--border2);
+      padding-bottom: 6px;
+    }
+    .cs-h span { color: var(--accent-2); }
+    .cs-note {
+      font-size: 12px;
+      color: var(--text);
+      opacity: 0.6;
+      margin: 6px 0 14px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .cs-scroll { overflow-x: auto; border: 2px solid var(--border2); }
+    table.cs {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 900px;
+      background: var(--bg2);
+      font-size: 12.5px;
+    }
+    table.cs th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 10px 12px;
+      text-align: left;
+      background: var(--bg3);
+      border-bottom: 2px solid var(--border2);
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+    }
+    table.cs th .dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    table.cs td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--text);
+    }
+    table.cs tr:hover td { background: color-mix(in srgb, var(--bg3) 60%, transparent); }
+    table.cs td.action {
+      font-weight: 600;
+      white-space: nowrap;
+      color: var(--accent-3);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+    }
+    table.cs code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      cursor: copy;
+      display: inline-block;
+      padding: 1px 4px;
+      border-radius: 2px;
+      transition: background 0.15s;
+      word-break: break-word;
+    }
+    table.cs code:hover { background: var(--accent-glow); color: var(--accent); }
+    table.cs code.flash { background: #2ecc71; color: #08210f; }
+    table.cs .na { opacity: 0.35; }
+
+    .cs-toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--accent);
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      padding: 10px 22px;
+      box-shadow: 4px 4px 0 var(--accent-2);
+      transition: transform 0.25s;
+      z-index: 200;
+    }
+    .cs-toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 640px) { .cs-wrap { padding-top: 80px; } }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">MAN<span>//</span>PAGES.EXE</a>
+    <div class="nav-right" style="margin-left:auto">
+      <button class="theme-toggle" id="themeToggle" title="Changer le thème">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <a href="commands.html" class="nav-back">⌘ Annuaire</a>
+      <a href="packages.html" class="nav-back" style="border-color:var(--accent-3);color:var(--accent-3)">📦 Paquets</a>
+      <a href="quiz.html" class="nav-back" style="border-color:#1BB91F;color:#1BB91F">🎓 Quiz</a>
+      <a href="index.html" class="nav-back">← Accueil</a>
+    </div>
+  </nav>
+
+  <div class="cs-wrap">
+    <div class="cs-eye">// TRADUCTEUR MULTI-OS</div>
+    <h1 class="cs-title">CHEAT<span>//</span>SHEET</h1>
+    <p class="cs-sub">La même action sur chaque système, côte à côte. Clique sur n'importe quelle <code>commande</code> pour la copier.</p>
+
+    <!-- ═══ PAQUETS ═══ -->
+    <section class="cs-section">
+      <h2 class="cs-h">📦 Gestionnaires de <span>paquets</span></h2>
+      <p class="cs-note">// apt · apk · pacman · dnf · pkg · brew · winget</p>
+      <div class="cs-scroll">
+        <table class="cs">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th><span class="dot" style="background:#D70A53"></span>Debian/Ubuntu</th>
+              <th><span class="dot" style="background:#0D597F"></span>Alpine</th>
+              <th><span class="dot" style="background:#1793D1"></span>Arch</th>
+              <th><span class="dot" style="background:#EE0000"></span>RHEL/Fedora</th>
+              <th><span class="dot" style="background:#AB2B28"></span>FreeBSD</th>
+              <th><span class="dot" style="background:#A8A8A8"></span>macOS</th>
+              <th><span class="dot" style="background:#0078D4"></span>Windows</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="action">MAJ de l'index</td>
+              <td><code>apt update</code></td>
+              <td><code>apk update</code></td>
+              <td><code>pacman -Sy</code></td>
+              <td><code>dnf check-update</code></td>
+              <td><code>pkg update</code></td>
+              <td><code>brew update</code></td>
+              <td><code>winget source update</code></td>
+            </tr>
+            <tr>
+              <td class="action">Installer</td>
+              <td><code>apt install nginx</code></td>
+              <td><code>apk add nginx</code></td>
+              <td><code>pacman -S nginx</code></td>
+              <td><code>dnf install nginx</code></td>
+              <td><code>pkg install nginx</code></td>
+              <td><code>brew install nginx</code></td>
+              <td><code>winget install nginx</code></td>
+            </tr>
+            <tr>
+              <td class="action">Rechercher</td>
+              <td><code>apt search motif</code></td>
+              <td><code>apk search motif</code></td>
+              <td><code>pacman -Ss motif</code></td>
+              <td><code>dnf search motif</code></td>
+              <td><code>pkg search motif</code></td>
+              <td><code>brew search motif</code></td>
+              <td><code>winget search motif</code></td>
+            </tr>
+            <tr>
+              <td class="action">MAJ du système</td>
+              <td><code>apt upgrade</code></td>
+              <td><code>apk upgrade</code></td>
+              <td><code>pacman -Syu</code></td>
+              <td><code>dnf upgrade</code></td>
+              <td><code>pkg upgrade</code></td>
+              <td><code>brew upgrade</code></td>
+              <td><code>winget upgrade --all</code></td>
+            </tr>
+            <tr>
+              <td class="action">Supprimer</td>
+              <td><code>apt remove nginx</code></td>
+              <td><code>apk del nginx</code></td>
+              <td><code>pacman -Rs nginx</code></td>
+              <td><code>dnf remove nginx</code></td>
+              <td><code>pkg delete nginx</code></td>
+              <td><code>brew uninstall nginx</code></td>
+              <td><code>winget uninstall nginx</code></td>
+            </tr>
+            <tr>
+              <td class="action">Nettoyer</td>
+              <td><code>apt autoremove</code></td>
+              <td><code>apk cache clean</code></td>
+              <td><code>pacman -Sc</code></td>
+              <td><code>dnf autoremove</code></td>
+              <td><code>pkg autoremove</code></td>
+              <td><code>brew cleanup</code></td>
+              <td class="na">—</td>
+            </tr>
+            <tr>
+              <td class="action">Infos d'un paquet</td>
+              <td><code>apt show nginx</code></td>
+              <td><code>apk info nginx</code></td>
+              <td><code>pacman -Si nginx</code></td>
+              <td><code>dnf info nginx</code></td>
+              <td><code>pkg info nginx</code></td>
+              <td><code>brew info nginx</code></td>
+              <td><code>winget show nginx</code></td>
+            </tr>
+            <tr>
+              <td class="action">Lister installés</td>
+              <td><code>apt list --installed</code></td>
+              <td><code>apk list --installed</code></td>
+              <td><code>pacman -Q</code></td>
+              <td><code>dnf list installed</code></td>
+              <td><code>pkg info</code></td>
+              <td><code>brew list</code></td>
+              <td><code>winget list</code></td>
+            </tr>
+            <tr>
+              <td class="action">Qui fournit ce fichier ?</td>
+              <td><code>dpkg -S /bin/ls</code></td>
+              <td><code>apk info --who-owns /bin/ls</code></td>
+              <td><code>pacman -Qo /bin/ls</code></td>
+              <td><code>rpm -qf /bin/ls</code></td>
+              <td><code>pkg which /bin/ls</code></td>
+              <td class="na">—</td>
+              <td class="na">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ SERVICES ═══ -->
+    <section class="cs-section">
+      <h2 class="cs-h">⚙️ Gestion des <span>services</span></h2>
+      <p class="cs-note">// systemd · OpenRC · rc.d · launchd · Windows</p>
+      <div class="cs-scroll">
+        <table class="cs">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th><span class="dot" style="background:#D70A53"></span>Linux (systemd)</th>
+              <th><span class="dot" style="background:#0D597F"></span>Alpine (OpenRC)</th>
+              <th><span class="dot" style="background:#AB2B28"></span>FreeBSD (rc.d)</th>
+              <th><span class="dot" style="background:#A8A8A8"></span>macOS (launchd)</th>
+              <th><span class="dot" style="background:#0078D4"></span>Windows</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="action">Démarrer</td>
+              <td><code>systemctl start sshd</code></td>
+              <td><code>rc-service sshd start</code></td>
+              <td><code>service sshd start</code></td>
+              <td><code>launchctl start com.openssh.sshd</code></td>
+              <td><code>Start-Service sshd</code></td>
+            </tr>
+            <tr>
+              <td class="action">Arrêter</td>
+              <td><code>systemctl stop sshd</code></td>
+              <td><code>rc-service sshd stop</code></td>
+              <td><code>service sshd stop</code></td>
+              <td><code>launchctl stop com.openssh.sshd</code></td>
+              <td><code>Stop-Service sshd</code></td>
+            </tr>
+            <tr>
+              <td class="action">Redémarrer</td>
+              <td><code>systemctl restart sshd</code></td>
+              <td><code>rc-service sshd restart</code></td>
+              <td><code>service sshd restart</code></td>
+              <td><code>launchctl kickstart -k system/com.openssh.sshd</code></td>
+              <td><code>Restart-Service sshd</code></td>
+            </tr>
+            <tr>
+              <td class="action">Statut</td>
+              <td><code>systemctl status sshd</code></td>
+              <td><code>rc-service sshd status</code></td>
+              <td><code>service sshd status</code></td>
+              <td><code>launchctl list | grep ssh</code></td>
+              <td><code>Get-Service sshd</code></td>
+            </tr>
+            <tr>
+              <td class="action">Activer au boot</td>
+              <td><code>systemctl enable sshd</code></td>
+              <td><code>rc-update add sshd default</code></td>
+              <td><code>sysrc sshd_enable=YES</code></td>
+              <td><code>launchctl load -w /Library/LaunchDaemons/ssh.plist</code></td>
+              <td><code>Set-Service sshd -StartupType Automatic</code></td>
+            </tr>
+            <tr>
+              <td class="action">Lister les services</td>
+              <td><code>systemctl list-units --type=service</code></td>
+              <td><code>rc-status</code></td>
+              <td><code>service -e</code></td>
+              <td><code>launchctl list</code></td>
+              <td><code>Get-Service</code></td>
+            </tr>
+            <tr>
+              <td class="action">Logs d'un service</td>
+              <td><code>journalctl -u sshd -f</code></td>
+              <td><code>tail -f /var/log/messages</code></td>
+              <td><code>tail -f /var/log/auth.log</code></td>
+              <td><code>log stream --predicate 'process == "sshd"'</code></td>
+              <td><code>Get-WinEvent -LogName System -MaxEvents 50</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ RÉSEAU ═══ -->
+    <section class="cs-section">
+      <h2 class="cs-h">🌐 Diagnostic <span>réseau</span></h2>
+      <p class="cs-note">// ip · ifconfig · netstat/ss · PowerShell</p>
+      <div class="cs-scroll">
+        <table class="cs">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th><span class="dot" style="background:#D70A53"></span>Linux moderne</th>
+              <th><span class="dot" style="background:#AB2B28"></span>BSD / macOS</th>
+              <th><span class="dot" style="background:#0078D4"></span>Windows (cmd)</th>
+              <th><span class="dot" style="background:#5391FE"></span>PowerShell</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="action">Adresses IP</td>
+              <td><code>ip a</code></td>
+              <td><code>ifconfig</code></td>
+              <td><code>ipconfig /all</code></td>
+              <td><code>Get-NetIPAddress</code></td>
+            </tr>
+            <tr>
+              <td class="action">Table de routage</td>
+              <td><code>ip route</code></td>
+              <td><code>netstat -rn</code></td>
+              <td><code>route print</code></td>
+              <td><code>Get-NetRoute</code></td>
+            </tr>
+            <tr>
+              <td class="action">Ports en écoute</td>
+              <td><code>ss -tulnp</code></td>
+              <td><code>sockstat -l</code></td>
+              <td><code>netstat -ano</code></td>
+              <td><code>Get-NetTCPConnection -State Listen</code></td>
+            </tr>
+            <tr>
+              <td class="action">Résolution DNS</td>
+              <td><code>dig monsite.fr</code></td>
+              <td><code>dig monsite.fr</code></td>
+              <td><code>nslookup monsite.fr</code></td>
+              <td><code>Resolve-DnsName monsite.fr</code></td>
+            </tr>
+            <tr>
+              <td class="action">Tester un port</td>
+              <td><code>nc -zv 10.0.0.5 443</code></td>
+              <td><code>nc -zv 10.0.0.5 443</code></td>
+              <td class="na">—</td>
+              <td><code>Test-NetConnection 10.0.0.5 -Port 443</code></td>
+            </tr>
+            <tr>
+              <td class="action">Traceroute</td>
+              <td><code>traceroute 8.8.8.8</code></td>
+              <td><code>traceroute 8.8.8.8</code></td>
+              <td><code>tracert 8.8.8.8</code></td>
+              <td><code>Test-NetConnection 8.8.8.8 -TraceRoute</code></td>
+            </tr>
+            <tr>
+              <td class="action">Table ARP</td>
+              <td><code>ip neigh</code></td>
+              <td><code>arp -a</code></td>
+              <td><code>arp -a</code></td>
+              <td><code>Get-NetNeighbor</code></td>
+            </tr>
+            <tr>
+              <td class="action">Vider le cache DNS</td>
+              <td><code>resolvectl flush-caches</code></td>
+              <td><code>dscacheutil -flushcache</code></td>
+              <td><code>ipconfig /flushdns</code></td>
+              <td><code>Clear-DnsClientCache</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ PARE-FEU ═══ -->
+    <section class="cs-section">
+      <h2 class="cs-h">🧱 <span>Pare-feu</span></h2>
+      <p class="cs-note">// ufw · firewalld · iptables · nftables · pf · Windows Defender</p>
+      <div class="cs-scroll">
+        <table class="cs">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th><span class="dot" style="background:#D70A53"></span>ufw (Debian)</th>
+              <th><span class="dot" style="background:#EE0000"></span>firewalld (RHEL)</th>
+              <th><span class="dot" style="background:#DA4E2B"></span>iptables</th>
+              <th><span class="dot" style="background:#DA4E2B"></span>nftables</th>
+              <th><span class="dot" style="background:#AB2B28"></span>pf (FreeBSD)</th>
+              <th><span class="dot" style="background:#0078D4"></span>Windows</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="action">Statut / règles actives</td>
+              <td><code>sudo ufw status verbose</code></td>
+              <td><code>sudo firewall-cmd --list-all</code></td>
+              <td><code>sudo iptables -L -n -v</code></td>
+              <td><code>sudo nft list ruleset</code></td>
+              <td><code>sudo pfctl -sr</code></td>
+              <td><code>Get-NetFirewallProfile</code></td>
+            </tr>
+            <tr>
+              <td class="action">Autoriser un port (443)</td>
+              <td><code>sudo ufw allow 443/tcp</code></td>
+              <td><code>sudo firewall-cmd --add-port=443/tcp --permanent</code></td>
+              <td><code>sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT</code></td>
+              <td><code>sudo nft add rule inet filter input tcp dport 443 accept</code></td>
+              <td><code>pass in proto tcp to port 443</code></td>
+              <td><code>New-NetFirewallRule -DisplayName web -Direction Inbound -LocalPort 443 -Protocol TCP -Action Allow</code></td>
+            </tr>
+            <tr>
+              <td class="action">Bloquer une IP</td>
+              <td><code>sudo ufw deny from 203.0.113.7</code></td>
+              <td><code>sudo firewall-cmd --add-rich-rule='rule family=ipv4 source address=203.0.113.7 drop'</code></td>
+              <td><code>sudo iptables -A INPUT -s 203.0.113.7 -j DROP</code></td>
+              <td><code>sudo nft add rule inet filter input ip saddr 203.0.113.7 drop</code></td>
+              <td><code>block in from 203.0.113.7</code></td>
+              <td><code>New-NetFirewallRule -DisplayName bloc -RemoteAddress 203.0.113.7 -Action Block</code></td>
+            </tr>
+            <tr>
+              <td class="action">Supprimer une règle</td>
+              <td><code>sudo ufw delete allow 443/tcp</code></td>
+              <td><code>sudo firewall-cmd --remove-port=443/tcp --permanent</code></td>
+              <td><code>sudo iptables -D INPUT -p tcp --dport 443 -j ACCEPT</code></td>
+              <td><code>sudo nft delete rule inet filter input handle 4</code></td>
+              <td class="na">éditer pf.conf</td>
+              <td><code>Remove-NetFirewallRule -DisplayName web</code></td>
+            </tr>
+            <tr>
+              <td class="action">Recharger / persister</td>
+              <td class="na">automatique</td>
+              <td><code>sudo firewall-cmd --reload</code></td>
+              <td><code>sudo netfilter-persistent save</code></td>
+              <td><code>sudo nft list ruleset &gt; /etc/nftables.conf</code></td>
+              <td><code>sudo pfctl -f /etc/pf.conf</code></td>
+              <td class="na">automatique</td>
+            </tr>
+            <tr>
+              <td class="action">Activer au démarrage</td>
+              <td><code>sudo ufw enable</code></td>
+              <td><code>sudo systemctl enable --now firewalld</code></td>
+              <td><code>sudo systemctl enable netfilter-persistent</code></td>
+              <td><code>sudo systemctl enable --now nftables</code></td>
+              <td><code>sudo pfctl -e</code></td>
+              <td><code>Set-NetFirewallProfile -All -Enabled True</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ LINUX ↔ WINDOWS ═══ -->
+    <section class="cs-section">
+      <h2 class="cs-h">🔁 Linux <span>↔</span> PowerShell</h2>
+      <p class="cs-note">// le dictionnaire de survie quand on change de monde</p>
+      <div class="cs-scroll">
+        <table class="cs" style="min-width:680px">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th><span class="dot" style="background:#D70A53"></span>Linux / bash</th>
+              <th><span class="dot" style="background:#5391FE"></span>PowerShell</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="action">Lister les fichiers</td><td><code>ls -la</code></td><td><code>Get-ChildItem -Force</code></td></tr>
+            <tr><td class="action">Afficher un fichier</td><td><code>cat fichier.txt</code></td><td><code>Get-Content fichier.txt</code></td></tr>
+            <tr><td class="action">Suivre un log en direct</td><td><code>tail -f app.log</code></td><td><code>Get-Content app.log -Wait</code></td></tr>
+            <tr><td class="action">Chercher dans du texte</td><td><code>grep 'error' app.log</code></td><td><code>Select-String 'error' app.log</code></td></tr>
+            <tr><td class="action">Trouver un fichier</td><td><code>find / -name '*.conf'</code></td><td><code>Get-ChildItem -Recurse -Filter *.conf</code></td></tr>
+            <tr><td class="action">Où est ce programme ?</td><td><code>which nginx</code></td><td><code>Get-Command nginx</code></td></tr>
+            <tr><td class="action">Processus en cours</td><td><code>ps aux</code></td><td><code>Get-Process</code></td></tr>
+            <tr><td class="action">Tuer un processus</td><td><code>kill -9 1234</code></td><td><code>Stop-Process -Id 1234 -Force</code></td></tr>
+            <tr><td class="action">Espace disque</td><td><code>df -h</code></td><td><code>Get-PSDrive -PSProvider FileSystem</code></td></tr>
+            <tr><td class="action">Variables d'environnement</td><td><code>env</code></td><td><code>Get-ChildItem Env:</code></td></tr>
+            <tr><td class="action">Historique</td><td><code>history</code></td><td><code>Get-History</code></td></tr>
+            <tr><td class="action">Télécharger un fichier</td><td><code>curl -O https://site.fr/f.iso</code></td><td><code>Invoke-WebRequest https://site.fr/f.iso -OutFile f.iso</code></td></tr>
+            <tr><td class="action">Redémarrer la machine</td><td><code>sudo reboot</code></td><td><code>Restart-Computer</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="cs-toast" id="csToast">✓ Copié !</div>
+
+  <script>
+    // Copie au clic sur n'importe quelle commande du tableau
+    (function() {
+      var toast = document.getElementById('csToast');
+      var timer = null;
+      document.addEventListener('click', function(e) {
+        var code = e.target.closest('table.cs code');
+        if (!code) return;
+        navigator.clipboard.writeText(code.textContent).then(function() {
+          code.classList.add('flash');
+          toast.textContent = '✓ Copié : ' + code.textContent;
+          toast.classList.add('show');
+          clearTimeout(timer);
+          timer = setTimeout(function() {
+            toast.classList.remove('show');
+            code.classList.remove('flash');
+          }, 1500);
+        });
+      });
+
+      // Thème
+      var html = document.documentElement;
+      var btn = document.getElementById('themeToggle');
+      var saved = localStorage.getItem('mpx-theme');
+      if (saved) html.setAttribute('data-theme', saved);
+      if (btn) {
+        btn.addEventListener('click', function() {
+          var current = html.getAttribute('data-theme') || 'dark';
+          var next = current === 'dark' ? 'light' : 'dark';
+          html.setAttribute('data-theme', next);
+          localStorage.setItem('mpx-theme', next);
+        });
+      }
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('sw.js').catch(function() {});
+        });
+      }
+    })();
+  </script>
+  <script src="arcade-fun.js"></script>
+</body>
+</html>

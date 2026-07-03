@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MANPAGES.EXE — Paquets</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=VT323&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="icons/favicon-32.png"/>
+  <meta name="theme-color" content="#0f0820"/>
+  <style>
+    :root,[data-theme="dark"]{
+      --bg:#0f0820;--bg2:#160d2e;--bg3:#1f1340;
+      --border:#2d1f5a;--border2:#3d2a73;
+      --accent:#ff2e88;--accent2:#5ce1ff;--accent3:#ffd60a;
+      --text:#d9d2e8;--ink:#f5f0e1;--muted:#8576b8;
+      --mono:'JetBrains Mono',monospace;--pixel:'VT323','JetBrains Mono',monospace;
+      --nav-h:54px;
+    }
+    [data-theme="light"]{
+      --bg:#f5f1e6;--bg2:#ecdfc8;--bg3:#fffaf0;
+      --border:#1a1a24;--border2:#3a3a44;
+      --accent:#e63946;--accent2:#2a6df4;--accent3:#ffba08;
+      --text:#1a1a24;--ink:#0e0e16;--muted:#5a5a6a;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{overflow-x:hidden;}
+    body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden;}
+
+    /* NAV */
+    .nav{
+      height:var(--nav-h);display:flex;align-items:center;gap:12px;
+      padding:0 16px;background:var(--bg2);border-bottom:2px solid var(--border2);
+      position:sticky;top:0;z-index:50;
+    }
+    .nav-logo{font-family:var(--pixel);font-size:20px;color:var(--ink);text-decoration:none;white-space:nowrap;}
+    .nav-logo span{color:var(--accent);}
+    .nav-tabs{display:flex;gap:4px;}
+    .nav-tab{
+      padding:5px 12px;font-family:var(--pixel);font-size:14px;
+      border:2px solid var(--border2);background:transparent;
+      color:var(--muted);cursor:pointer;text-decoration:none;transition:all .15s;white-space:nowrap;
+    }
+    .nav-tab:hover,.nav-tab.active{border-color:var(--accent2);color:var(--accent2);}
+    .nav-tab.active{background:rgba(92,225,255,.08);}
+    .nav-search{
+      margin-left:auto;background:var(--bg3);border:2px solid var(--border2);
+      color:var(--text);font-family:var(--mono);font-size:12px;
+      padding:5px 10px;outline:none;width:200px;transition:border-color .15s;
+    }
+    .nav-search:focus{border-color:var(--accent2);}
+    .nav-search::placeholder{color:var(--muted);}
+    .theme-btn{
+      background:transparent;border:2px solid var(--border2);color:var(--muted);
+      width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+      cursor:pointer;flex-shrink:0;transition:all .15s;
+    }
+    .theme-btn:hover{border-color:var(--accent3);color:var(--accent3);}
+    .theme-btn svg{width:14px;height:14px;}
+    [data-theme="dark"] .i-sun{display:none;}
+    [data-theme="light"] .i-moon{display:none;}
+
+    /* HERO */
+    .hero{padding:28px 20px 20px;text-align:center;border-bottom:2px solid var(--border);}
+    .eyebrow{font-family:var(--pixel);font-size:14px;color:var(--accent);letter-spacing:.12em;margin-bottom:8px;}
+    .hero-title{font-family:var(--pixel);font-size:clamp(26px,4vw,42px);color:var(--ink);letter-spacing:.06em;}
+    .hero-title span{color:var(--accent2);}
+    .hero-sub{color:var(--muted);font-size:11px;margin-top:6px;}
+
+    /* FILTRES */
+    .cat-bar{
+      display:flex;gap:4px;flex-wrap:wrap;padding:10px 16px;
+      border-bottom:2px solid var(--border);background:var(--bg2);
+      position:sticky;top:var(--nav-h);z-index:40;
+    }
+    .cat-btn{
+      padding:3px 10px;font-family:var(--pixel);font-size:13px;
+      border:2px solid var(--border2);background:transparent;
+      color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap;
+    }
+    .cat-btn:hover{border-color:var(--accent3);color:var(--accent3);}
+    .cat-btn.active{border-color:var(--accent3);color:var(--accent3);background:rgba(255,214,10,.08);}
+
+    /* STATS */
+    .stats-bar{
+      padding:5px 16px;font-size:11px;color:var(--muted);
+      border-bottom:1px solid var(--border);background:var(--bg);
+    }
+    .stats-bar span{color:var(--accent3);}
+
+    /* TABLEAU SCROLL */
+    .tbl-scroll{overflow-x:auto;padding:16px;}
+
+    /* TABLEAU */
+    table{border-collapse:collapse;width:100%;table-layout:fixed;}
+
+    /* EN-TÊTE */
+    thead th{
+      background:var(--bg2);border:1px solid var(--border2);
+      padding:6px 8px;text-align:center;white-space:nowrap;
+    }
+    thead th:first-child{text-align:left;width:150px;}
+    .th-inner{display:flex;flex-direction:column;align-items:center;gap:3px;}
+    .th-icon{
+      width:20px;height:20px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .th-icon img,.th-icon svg{width:11px;height:11px;filter:brightness(0) invert(1);}
+    .th-label{font-family:var(--pixel);font-size:9px;color:var(--muted);}
+
+    /* LIGNE GROUPE */
+    .row-group td{
+      background:var(--bg2);font-family:var(--pixel);font-size:11px;
+      padding:3px 8px;border-top:2px solid var(--border2);
+      letter-spacing:.1em;
+    }
+
+    /* LIGNE PAQUET */
+    tbody tr{border-bottom:1px solid var(--border);}
+    tbody tr:hover{background:var(--bg3);}
+    tbody td{padding:5px 6px;border-right:1px solid var(--border);vertical-align:middle;}
+    tbody td:last-child{border-right:none;}
+
+    /* CELLULE NOM */
+    .td-name{width:150px;min-width:150px;}
+    .pkg-name{font-family:var(--pixel);font-size:14px;color:var(--ink);display:block;}
+    .pkg-desc{color:var(--muted);font-size:9px;line-height:1.3;margin-top:1px;display:block;}
+    .pkg-badge{
+      display:inline-block;margin-top:2px;
+      padding:0 4px;font-size:8px;font-family:var(--pixel);
+      border:1px solid;letter-spacing:.04em;
+    }
+
+    /* CELLULE COMMANDE */
+    .td-cmd{min-width:130px;}
+    .cmd-btn{
+      display:flex;align-items:center;gap:4px;width:100%;
+      background:var(--bg3);border:1px solid var(--border2);
+      padding:3px 6px;cursor:pointer;transition:border-color .12s;
+    }
+    .cmd-btn:hover{border-color:var(--accent2);}
+    .cmd-btn code{
+      flex:1;font-family:var(--mono);font-size:10px;color:var(--accent2);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;
+    }
+    .cmd-btn .ico{flex-shrink:0;color:var(--muted);}
+    .cmd-btn .ico svg{width:9px;height:9px;display:block;}
+    .cmd-btn.copied{border-color:var(--accent3);}
+    .cmd-btn.copied code{color:var(--accent3);}
+
+    /* CELLULE N/A */
+    .td-na{text-align:center;color:var(--border2);font-size:12px;}
+
+    /* VIDE */
+    .empty{display:none;text-align:center;padding:50px;color:var(--muted);font-family:var(--pixel);font-size:16px;}
+    .empty.show{display:block;}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">MAN<span>//</span>PAGES.EXE</a>
+  <div class="nav-tabs">
+    <a href="commands.html" class="nav-tab">⌘ Commandes</a>
+    <a href="packages.html" class="nav-tab active">📦 Paquets</a>
+    <a href="quiz.html" class="nav-tab" style="color:#1BB91F">🎓 Quiz</a>
+    <a href="cheatsheet.html" class="nav-tab" style="color:#d4a843">⚡ Cheatsheet</a>
+  </div>
+  <input class="nav-search" id="search" type="text" placeholder="Rechercher... ( / )" autocomplete="off"/>
+  <button class="theme-btn" id="themeBtn">
+    <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">// PAQUETS INSTALLABLES</div>
+  <h1 class="hero-title">PACKAGES<span>.DB</span></h1>
+  <p class="hero-sub">Cliquer sur une cellule pour copier la commande d'installation</p>
+</div>
+
+<div class="cat-bar" id="catBar">
+  <button class="cat-btn active" data-cat="all">Tous</button>
+  <button class="cat-btn" data-cat="Web">🌐 Web</button>
+  <button class="cat-btn" data-cat="BDD">🗄️ BDD</button>
+  <button class="cat-btn" data-cat="Sécurité">🔒 Sécurité</button>
+  <button class="cat-btn" data-cat="Système">⚙️ Système</button>
+  <button class="cat-btn" data-cat="DevOps">🛠️ DevOps</button>
+  <button class="cat-btn" data-cat="Réseau">🌍 Réseau</button>
+  <button class="cat-btn" data-cat="Langage">💻 Langages</button>
+  <button class="cat-btn" data-cat="Monitoring">📊 Monitoring</button>
+</div>
+
+<div class="stats-bar"><span id="count">—</span> paquets affichés</div>
+
+<div class="tbl-scroll">
+  <table id="tbl">
+    <thead>
+      <tr>
+        <th>Paquet</th>
+        <th><div class="th-inner"><span class="th-icon" style="background:#A81D33"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/debian.svg"/></span><span class="th-label">Debian/Ubuntu</span></div></th>
+        <th><div class="th-inner"><span class="th-icon" style="background:#0D597F"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/alpinelinux.svg"/></span><span class="th-label">Alpine</span></div></th>
+        <th><div class="th-inner"><span class="th-icon" style="background:#1793D1"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/archlinux.svg"/></span><span class="th-label">Arch</span></div></th>
+        <th><div class="th-inner"><span class="th-icon" style="background:#EE0000"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/redhat.svg"/></span><span class="th-label">RHEL/Fedora</span></div></th>
+        <th><div class="th-inner"><span class="th-icon" style="background:#AB2B28"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/freebsd.svg"/></span><span class="th-label">FreeBSD</span></div></th>
+        <th><div class="th-inner"><span class="th-icon" style="background:#555"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/apple.svg"/></span><span class="th-label">macOS</span></div></th>
+        <th><div class="th-inner"><span class="th-icon" style="background:#0078D4"><svg viewBox="0 0 24 24" width="11" height="11"><rect x="0" y="0" width="11" height="11" fill="white"/><rect x="13" y="0" width="11" height="11" fill="white"/><rect x="0" y="13" width="11" height="11" fill="white"/><rect x="13" y="13" width="11" height="11" fill="white"/></svg></span><span class="th-label">Windows</span></div></th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div class="empty" id="empty">⌀ Aucun paquet trouvé</div>
+</div>
+
+<script>
+var OS = ['debian','alpine','arch','rhel','freebsd','macos','windows'];
+var CAT_COLOR = {
+  'Web':'#ff2e88','BDD':'#5ce1ff','Sécurité':'#ffd60a',
+  'Système':'#a855f7','DevOps':'#22d3ee','Réseau':'#34d399',
+  'Langage':'#fb923c','Monitoring':'#94a3b8'
+};
+
+var PACKAGES = [
+  // WEB
+  {name:"nginx",cat:"Web",desc:"Serveur web / reverse proxy haute performance",debian:"apt install nginx",alpine:"apk add nginx",arch:"pacman -S nginx",rhel:"dnf install nginx",freebsd:"pkg install nginx",macos:"brew install nginx",windows:"winget install nginx"},
+  {name:"apache2",cat:"Web",desc:"Serveur HTTP Apache — le plus utilisé au monde",debian:"apt install apache2",alpine:"apk add apache2",arch:"pacman -S apache",rhel:"dnf install httpd",freebsd:"pkg install apache24",macos:"brew install httpd",windows:"winget install Apache.ApacheHTTPServer"},
+  {name:"php",cat:"Web",desc:"Langage côté serveur — WordPress, Laravel...",debian:"apt install php",alpine:"apk add php83",arch:"pacman -S php",rhel:"dnf install php",freebsd:"pkg install php83",macos:"brew install php",windows:"winget install PHP.PHP"},
+  {name:"php-fpm",cat:"Web",desc:"PHP FastCGI Process Manager — PHP avec nginx",debian:"apt install php-fpm",alpine:"apk add php83-fpm",arch:"pacman -S php-fpm",rhel:"dnf install php-fpm",freebsd:"pkg install php83-fpm",macos:"brew install php",windows:null},
+  {name:"nodejs",cat:"Web",desc:"Runtime JavaScript serveur — npm, Express, Next.js",debian:"apt install nodejs npm",alpine:"apk add nodejs npm",arch:"pacman -S nodejs npm",rhel:"dnf install nodejs",freebsd:"pkg install node",macos:"brew install node",windows:"winget install OpenJS.NodeJS"},
+  {name:"certbot",cat:"Web",desc:"Certificats SSL/TLS Let's Encrypt automatiques",debian:"apt install certbot",alpine:"apk add certbot",arch:"pacman -S certbot",rhel:"dnf install certbot",freebsd:"pkg install py39-certbot",macos:"brew install certbot",windows:null},
+  {name:"traefik",cat:"Web",desc:"Reverse proxy moderne avec gestion auto des certs",debian:"apt install traefik",alpine:"apk add traefik",arch:null,rhel:null,freebsd:"pkg install traefik",macos:"brew install traefik",windows:null},
+  {name:"haproxy",cat:"Web",desc:"Load balancer TCP/HTTP haute disponibilité",debian:"apt install haproxy",alpine:"apk add haproxy",arch:"pacman -S haproxy",rhel:"dnf install haproxy",freebsd:"pkg install haproxy",macos:"brew install haproxy",windows:null},
+  {name:"varnish",cat:"Web",desc:"Cache HTTP accélérateur devant nginx/apache",debian:"apt install varnish",alpine:"apk add varnish",arch:null,rhel:"dnf install varnish",freebsd:"pkg install varnish7",macos:"brew install varnish",windows:null},
+  {name:"lighttpd",cat:"Web",desc:"Serveur web léger pour environnements contraints",debian:"apt install lighttpd",alpine:"apk add lighttpd",arch:"pacman -S lighttpd",rhel:"dnf install lighttpd",freebsd:"pkg install lighttpd",macos:"brew install lighttpd",windows:null},
+  // BDD
+  {name:"mariadb",cat:"BDD",desc:"Fork MySQL communautaire — référence sur Linux",debian:"apt install mariadb-server",alpine:"apk add mariadb",arch:"pacman -S mariadb",rhel:"dnf install mariadb-server",freebsd:"pkg install mariadb106-server",macos:"brew install mariadb",windows:"winget install MariaDB.Server"},
+  {name:"mysql",cat:"BDD",desc:"Base de données relationnelle Oracle",debian:"apt install mysql-server",alpine:"apk add mysql",arch:null,rhel:"dnf install mysql-server",freebsd:"pkg install mysql80-server",macos:"brew install mysql",windows:"winget install Oracle.MySQL"},
+  {name:"postgresql",cat:"BDD",desc:"BDD relationnelle avancée — JSON, extensions",debian:"apt install postgresql",alpine:"apk add postgresql",arch:"pacman -S postgresql",rhel:"dnf install postgresql-server",freebsd:"pkg install postgresql16-server",macos:"brew install postgresql",windows:"winget install PostgreSQL.PostgreSQL"},
+  {name:"redis",cat:"BDD",desc:"Base en mémoire — cache, sessions, pub/sub",debian:"apt install redis-server",alpine:"apk add redis",arch:"pacman -S redis",rhel:"dnf install redis",freebsd:"pkg install redis",macos:"brew install redis",windows:"winget install Redis.Redis"},
+  {name:"mongodb",cat:"BDD",desc:"Base NoSQL orientée documents JSON",debian:"apt install mongodb",alpine:null,arch:"yay -S mongodb-bin",rhel:"dnf install mongodb-org",freebsd:"pkg install mongodb60",macos:"brew install mongodb-community",windows:"winget install MongoDB.Server"},
+  {name:"sqlite3",cat:"BDD",desc:"BDD SQL embarquée dans un fichier — zéro config",debian:"apt install sqlite3",alpine:"apk add sqlite",arch:"pacman -S sqlite",rhel:"dnf install sqlite",freebsd:"pkg install sqlite3",macos:"brew install sqlite",windows:"winget install SQLite.SQLite"},
+  {name:"elasticsearch",cat:"BDD",desc:"Moteur de recherche distribué — stack ELK",debian:"apt install elasticsearch",alpine:null,arch:"yay -S elasticsearch",rhel:"dnf install elasticsearch",freebsd:null,macos:"brew install elasticsearch",windows:null},
+  {name:"influxdb",cat:"BDD",desc:"BDD séries temporelles — métriques, IoT",debian:"apt install influxdb2",alpine:"apk add influxdb",arch:"yay -S influxdb",rhel:"dnf install influxdb2",freebsd:"pkg install influxdb",macos:"brew install influxdb",windows:null},
+  // SÉCURITÉ
+  {name:"fail2ban",cat:"Sécurité",desc:"Bannit les IP après des tentatives échouées",debian:"apt install fail2ban",alpine:"apk add fail2ban",arch:"pacman -S fail2ban",rhel:"dnf install fail2ban",freebsd:"pkg install py39-fail2ban",macos:null,windows:null},
+  {name:"ufw",cat:"Sécurité",desc:"Pare-feu simplifié Ubuntu/Debian (iptables)",debian:"apt install ufw",alpine:null,arch:"pacman -S ufw",rhel:null,freebsd:null,macos:null,windows:null},
+  {name:"openssh",cat:"Sécurité",desc:"Serveur et client SSH sécurisé",debian:"apt install openssh-server",alpine:"apk add openssh",arch:"pacman -S openssh",rhel:"dnf install openssh-server",freebsd:"pkg install openssh-portable",macos:"brew install openssh",windows:"winget install Microsoft.OpenSSH.Beta"},
+  {name:"openssl",cat:"Sécurité",desc:"Boîte à outils crypto — TLS, certificats",debian:"apt install openssl",alpine:"apk add openssl",arch:"pacman -S openssl",rhel:"dnf install openssl",freebsd:"pkg install openssl",macos:"brew install openssl",windows:"winget install ShiningLight.OpenSSL"},
+  {name:"gnupg",cat:"Sécurité",desc:"Chiffrement et signature PGP",debian:"apt install gnupg",alpine:"apk add gnupg",arch:"pacman -S gnupg",rhel:"dnf install gnupg2",freebsd:"pkg install gnupg",macos:"brew install gnupg",windows:"winget install GnuPG.Gpg4win"},
+  {name:"crowdsec",cat:"Sécurité",desc:"IPS collaboratif — blocage en temps réel",debian:"apt install crowdsec",alpine:"apk add crowdsec",arch:"yay -S crowdsec",rhel:"dnf install crowdsec",freebsd:"pkg install crowdsec",macos:"brew install crowdsec",windows:null},
+  {name:"wireguard",cat:"Sécurité",desc:"VPN moderne intégré au noyau Linux",debian:"apt install wireguard",alpine:"apk add wireguard-tools",arch:"pacman -S wireguard-tools",rhel:"dnf install wireguard-tools",freebsd:"pkg install wireguard-tools",macos:"brew install wireguard-tools",windows:"winget install WireGuard.WireGuard"},
+  {name:"openvpn",cat:"Sécurité",desc:"Solution VPN open source mature",debian:"apt install openvpn",alpine:"apk add openvpn",arch:"pacman -S openvpn",rhel:"dnf install openvpn",freebsd:"pkg install openvpn",macos:"brew install openvpn",windows:"winget install OpenVPNTechnologies.OpenVPN"},
+  {name:"clamav",cat:"Sécurité",desc:"Antivirus open source — scan fichiers et emails",debian:"apt install clamav",alpine:"apk add clamav",arch:"pacman -S clamav",rhel:"dnf install clamav",freebsd:"pkg install clamav",macos:"brew install clamav",windows:"winget install Cisco.ClamAV"},
+  // SYSTÈME
+  {name:"vim",cat:"Système",desc:"Éditeur de texte en terminal — référence",debian:"apt install vim",alpine:"apk add vim",arch:"pacman -S vim",rhel:"dnf install vim",freebsd:"pkg install vim",macos:"brew install vim",windows:"winget install vim.vim"},
+  {name:"nano",cat:"Système",desc:"Éditeur simple en terminal — idéal pour débuter",debian:"apt install nano",alpine:"apk add nano",arch:"pacman -S nano",rhel:"dnf install nano",freebsd:"pkg install nano",macos:"brew install nano",windows:null},
+  {name:"curl",cat:"Système",desc:"Transfert HTTP/FTP — indispensable",debian:"apt install curl",alpine:"apk add curl",arch:"pacman -S curl",rhel:"dnf install curl",freebsd:"pkg install curl",macos:"brew install curl",windows:"winget install curl.curl"},
+  {name:"wget",cat:"Système",desc:"Téléchargement de fichiers en ligne de commande",debian:"apt install wget",alpine:"apk add wget",arch:"pacman -S wget",rhel:"dnf install wget",freebsd:"pkg install wget",macos:"brew install wget",windows:"winget install GNU.Wget"},
+  {name:"htop",cat:"Système",desc:"Gestionnaire de processus interactif",debian:"apt install htop",alpine:"apk add htop",arch:"pacman -S htop",rhel:"dnf install htop",freebsd:"pkg install htop",macos:"brew install htop",windows:null},
+  {name:"tmux",cat:"Système",desc:"Multiplexeur de terminal — sessions persistantes",debian:"apt install tmux",alpine:"apk add tmux",arch:"pacman -S tmux",rhel:"dnf install tmux",freebsd:"pkg install tmux",macos:"brew install tmux",windows:"winget install tmux"},
+  {name:"screen",cat:"Système",desc:"Multiplexeur de terminal classique",debian:"apt install screen",alpine:"apk add screen",arch:"pacman -S screen",rhel:"dnf install screen",freebsd:"pkg install screen",macos:"brew install screen",windows:null},
+  {name:"rsync",cat:"Système",desc:"Synchronisation de fichiers locale et distante",debian:"apt install rsync",alpine:"apk add rsync",arch:"pacman -S rsync",rhel:"dnf install rsync",freebsd:"pkg install rsync",macos:"brew install rsync",windows:"winget install rsync"},
+  {name:"zip / unzip",cat:"Système",desc:"Compression et extraction d'archives ZIP",debian:"apt install zip unzip",alpine:"apk add zip unzip",arch:"pacman -S zip unzip",rhel:"dnf install zip unzip",freebsd:"pkg install zip unzip",macos:"brew install zip",windows:"winget install 7zip.7zip"},
+  {name:"jq",cat:"Système",desc:"Processeur JSON en ligne de commande",debian:"apt install jq",alpine:"apk add jq",arch:"pacman -S jq",rhel:"dnf install jq",freebsd:"pkg install jq",macos:"brew install jq",windows:"winget install jqlang.jq"},
+  {name:"tree",cat:"Système",desc:"Affiche l'arborescence d'un dossier",debian:"apt install tree",alpine:"apk add tree",arch:"pacman -S tree",rhel:"dnf install tree",freebsd:"pkg install tree",macos:"brew install tree",windows:"winget install tree"},
+  {name:"lsof",cat:"Système",desc:"Liste les fichiers ouverts et sockets réseau",debian:"apt install lsof",alpine:"apk add lsof",arch:"pacman -S lsof",rhel:"dnf install lsof",freebsd:"pkg install lsof",macos:"brew install lsof",windows:null},
+  {name:"strace",cat:"Système",desc:"Trace les appels système — debug avancé",debian:"apt install strace",alpine:"apk add strace",arch:"pacman -S strace",rhel:"dnf install strace",freebsd:null,macos:null,windows:null},
+  // DEVOPS
+  {name:"git",cat:"DevOps",desc:"Système de contrôle de version distribué",debian:"apt install git",alpine:"apk add git",arch:"pacman -S git",rhel:"dnf install git",freebsd:"pkg install git",macos:"brew install git",windows:"winget install Git.Git"},
+  {name:"docker",cat:"DevOps",desc:"Plateforme de conteneurisation",debian:"curl -fsSL https://get.docker.com | sh",alpine:"apk add docker",arch:"pacman -S docker",rhel:"dnf install docker",freebsd:"pkg install docker",macos:"brew install --cask docker",windows:"winget install Docker.DockerDesktop"},
+  {name:"docker-compose",cat:"DevOps",desc:"Orchestration multi-conteneurs YAML",debian:"apt install docker-compose-plugin",alpine:"apk add docker-compose",arch:"pacman -S docker-compose",rhel:"dnf install docker-compose",freebsd:"pkg install docker-compose",macos:"brew install docker-compose",windows:"winget install Docker.DockerDesktop"},
+  {name:"kubectl",cat:"DevOps",desc:"CLI pour piloter Kubernetes",debian:"apt install kubectl",alpine:"apk add kubectl",arch:"pacman -S kubectl",rhel:"dnf install kubectl",freebsd:"pkg install kubectl",macos:"brew install kubectl",windows:"winget install Kubernetes.kubectl"},
+  {name:"helm",cat:"DevOps",desc:"Gestionnaire de paquets pour Kubernetes",debian:"apt install helm",alpine:"apk add helm",arch:"pacman -S helm",rhel:"dnf install helm",freebsd:"pkg install helm",macos:"brew install helm",windows:"winget install Helm.Helm"},
+  {name:"terraform",cat:"DevOps",desc:"Infrastructure as Code — cloud provider",debian:"apt install terraform",alpine:"apk add terraform",arch:"yay -S terraform",rhel:"dnf install terraform",freebsd:"pkg install terraform",macos:"brew install terraform",windows:"winget install Hashicorp.Terraform"},
+  {name:"ansible",cat:"DevOps",desc:"Automatisation de serveurs sans agent",debian:"apt install ansible",alpine:"apk add ansible",arch:"pacman -S ansible",rhel:"dnf install ansible",freebsd:"pkg install ansible",macos:"brew install ansible",windows:null},
+  {name:"vagrant",cat:"DevOps",desc:"VMs de développement reproductibles",debian:"apt install vagrant",alpine:null,arch:"yay -S vagrant",rhel:"dnf install vagrant",freebsd:"pkg install vagrant",macos:"brew install --cask vagrant",windows:"winget install Hashicorp.Vagrant"},
+  {name:"make",cat:"DevOps",desc:"Automatisation de compilation et tâches",debian:"apt install make",alpine:"apk add make",arch:"pacman -S make",rhel:"dnf install make",freebsd:"pkg install gmake",macos:"brew install make",windows:"winget install GnuWin32.Make"},
+  {name:"act",cat:"DevOps",desc:"Exécute GitHub Actions localement",debian:null,alpine:null,arch:"yay -S act",rhel:null,freebsd:null,macos:"brew install act",windows:"winget install nektos.act"},
+  // RÉSEAU
+  {name:"nmap",cat:"Réseau",desc:"Scanner de ports et inventaire réseau",debian:"apt install nmap",alpine:"apk add nmap",arch:"pacman -S nmap",rhel:"dnf install nmap",freebsd:"pkg install nmap",macos:"brew install nmap",windows:"winget install Insecure.Nmap"},
+  {name:"wireshark",cat:"Réseau",desc:"Analyseur de paquets réseau (GUI + tshark)",debian:"apt install wireshark",alpine:"apk add wireshark",arch:"pacman -S wireshark-qt",rhel:"dnf install wireshark",freebsd:"pkg install wireshark",macos:"brew install --cask wireshark",windows:"winget install WiresharkFoundation.Wireshark"},
+  {name:"tcpdump",cat:"Réseau",desc:"Capture trafic réseau en ligne de commande",debian:"apt install tcpdump",alpine:"apk add tcpdump",arch:"pacman -S tcpdump",rhel:"dnf install tcpdump",freebsd:"pkg install tcpdump",macos:"brew install tcpdump",windows:null},
+  {name:"netcat (nc)",cat:"Réseau",desc:"Couteau suisse TCP/UDP",debian:"apt install netcat-openbsd",alpine:"apk add netcat-openbsd",arch:"pacman -S gnu-netcat",rhel:"dnf install nmap-ncat",freebsd:"pkg install netcat",macos:"brew install netcat",windows:null},
+  {name:"traceroute",cat:"Réseau",desc:"Trace le chemin réseau saut par saut",debian:"apt install traceroute",alpine:"apk add traceroute",arch:"pacman -S traceroute",rhel:"dnf install traceroute",freebsd:"pkg install traceroute",macos:"brew install traceroute",windows:null},
+  {name:"iperf3",cat:"Réseau",desc:"Mesure bande passante et latence réseau",debian:"apt install iperf3",alpine:"apk add iperf3",arch:"pacman -S iperf3",rhel:"dnf install iperf3",freebsd:"pkg install iperf3",macos:"brew install iperf3",windows:"winget install iperf3"},
+  {name:"dnsmasq",cat:"Réseau",desc:"Serveur DNS/DHCP léger pour labos",debian:"apt install dnsmasq",alpine:"apk add dnsmasq",arch:"pacman -S dnsmasq",rhel:"dnf install dnsmasq",freebsd:"pkg install dnsmasq",macos:"brew install dnsmasq",windows:null},
+  {name:"bind9",cat:"Réseau",desc:"Serveur DNS BIND — le plus utilisé sur Internet",debian:"apt install bind9",alpine:"apk add bind",arch:"pacman -S bind",rhel:"dnf install bind",freebsd:"pkg install bind918",macos:"brew install bind",windows:null},
+  {name:"samba",cat:"Réseau",desc:"Partage SMB/CIFS — Linux/Windows",debian:"apt install samba",alpine:"apk add samba",arch:"pacman -S samba",rhel:"dnf install samba",freebsd:"pkg install samba419",macos:"brew install samba",windows:null},
+  // LANGAGES
+  {name:"python3",cat:"Langage",desc:"Scripting, data science, web",debian:"apt install python3",alpine:"apk add python3",arch:"pacman -S python",rhel:"dnf install python3",freebsd:"pkg install python3",macos:"brew install python",windows:"winget install Python.Python.3"},
+  {name:"python3-pip",cat:"Langage",desc:"Gestionnaire de paquets Python",debian:"apt install python3-pip",alpine:"apk add py3-pip",arch:"pacman -S python-pip",rhel:"dnf install python3-pip",freebsd:"pkg install py39-pip",macos:"brew install python",windows:"winget install Python.Python.3"},
+  {name:"ruby",cat:"Langage",desc:"Rails, Jekyll, scripting orienté objet",debian:"apt install ruby",alpine:"apk add ruby",arch:"pacman -S ruby",rhel:"dnf install ruby",freebsd:"pkg install ruby",macos:"brew install ruby",windows:"winget install RubyInstallerTeam.Ruby"},
+  {name:"golang",cat:"Langage",desc:"Langage compilé Google — CLI tools, microservices",debian:"apt install golang-go",alpine:"apk add go",arch:"pacman -S go",rhel:"dnf install golang",freebsd:"pkg install go",macos:"brew install go",windows:"winget install GoLang.Go"},
+  {name:"rust",cat:"Langage",desc:"Langage système sûr et performant",debian:"curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh",alpine:"apk add rust cargo",arch:"pacman -S rust",rhel:"dnf install rust cargo",freebsd:"pkg install rust",macos:"brew install rust",windows:"winget install Rustlang.Rust.MSVC"},
+  {name:"java (openjdk)",cat:"Langage",desc:"Spring Boot, Kafka, Elasticsearch...",debian:"apt install default-jdk",alpine:"apk add openjdk17",arch:"pacman -S jdk-openjdk",rhel:"dnf install java-17-openjdk",freebsd:"pkg install openjdk17",macos:"brew install openjdk",windows:"winget install Microsoft.OpenJDK.17"},
+  {name:"perl",cat:"Langage",desc:"Regex, administration système, scripting",debian:"apt install perl",alpine:"apk add perl",arch:"pacman -S perl",rhel:"dnf install perl",freebsd:"pkg install perl5",macos:"brew install perl",windows:"winget install StrawberryPerl.StrawberryPerl"},
+  // MONITORING
+  {name:"prometheus",cat:"Monitoring",desc:"Monitoring et alertes open source",debian:"apt install prometheus",alpine:"apk add prometheus",arch:"pacman -S prometheus",rhel:"dnf install prometheus",freebsd:"pkg install prometheus",macos:"brew install prometheus",windows:null},
+  {name:"grafana",cat:"Monitoring",desc:"Tableaux de bord et visualisation métriques",debian:"apt install grafana",alpine:"apk add grafana",arch:"yay -S grafana",rhel:"dnf install grafana",freebsd:"pkg install grafana",macos:"brew install grafana",windows:"winget install GrafanaLabs.Grafana"},
+  {name:"node_exporter",cat:"Monitoring",desc:"Exporte métriques système pour Prometheus",debian:"apt install prometheus-node-exporter",alpine:"apk add prometheus-node-exporter",arch:"pacman -S prometheus-node-exporter",rhel:"dnf install golang-github-prometheus-node-exporter",freebsd:"pkg install node_exporter",macos:"brew install node_exporter",windows:null},
+  {name:"netdata",cat:"Monitoring",desc:"Monitoring temps réel — zéro config",debian:"apt install netdata",alpine:"apk add netdata",arch:"pacman -S netdata",rhel:"dnf install netdata",freebsd:"pkg install netdata",macos:"brew install netdata",windows:null},
+  {name:"telegraf",cat:"Monitoring",desc:"Agent de collecte — InfluxDB, Prometheus",debian:"apt install telegraf",alpine:"apk add telegraf",arch:"yay -S telegraf",rhel:"dnf install telegraf",freebsd:"pkg install telegraf",macos:"brew install telegraf",windows:null},
+  {name:"logstash",cat:"Monitoring",desc:"Pipeline d'ingestion de logs — stack ELK",debian:"apt install logstash",alpine:null,arch:"yay -S logstash",rhel:"dnf install logstash",freebsd:null,macos:"brew install logstash",windows:null},
+  {name:"kibana",cat:"Monitoring",desc:"Visualisation Elasticsearch — stack ELK",debian:"apt install kibana",alpine:null,arch:"yay -S kibana",rhel:"dnf install kibana",freebsd:null,macos:"brew install kibana",windows:null},
+  {name:"zabbix",cat:"Monitoring",desc:"Monitoring d'infrastructure complet avec alertes",debian:"apt install zabbix-server-mysql",alpine:"apk add zabbix",arch:"yay -S zabbix",rhel:"dnf install zabbix-server-mysql",freebsd:"pkg install zabbix6-server",macos:null,windows:null}
+];
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function copy(text, btn){
+  navigator.clipboard.writeText(text).then(function(){
+    btn.classList.add('copied');
+    var c = btn.querySelector('code');
+    var orig = c.textContent;
+    c.textContent = '✓ Copié !';
+    setTimeout(function(){ btn.classList.remove('copied'); c.textContent = orig; }, 1500);
+  });
+}
+
+function makeCell(cmd){
+  var td = document.createElement('td');
+  if(!cmd){ td.className='td-na'; td.textContent='—'; return td; }
+  td.className='td-cmd';
+  var btn = document.createElement('button');
+  btn.className='cmd-btn';
+  btn.innerHTML='<code>'+esc(cmd)+'</code><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></span>';
+  btn.addEventListener('click', function(){ copy(cmd, btn); });
+  td.appendChild(btn);
+  return td;
+}
+
+var activeCat='all', q='';
+
+function render(){
+  var tbody = document.getElementById('tbody');
+  var empty = document.getElementById('empty');
+  var count = document.getElementById('count');
+  tbody.innerHTML='';
+
+  var filtered = PACKAGES.filter(function(p){
+    if(activeCat!=='all' && p.cat!==activeCat) return false;
+    if(q){
+      var hay = p.name+' '+p.desc+' '+p.cat;
+      OS.forEach(function(o){ if(p[o]) hay+=' '+p[o]; });
+      if(hay.toLowerCase().indexOf(q)===-1) return false;
+    }
+    return true;
+  });
+
+  if(!filtered.length){ empty.classList.add('show'); count.textContent='0'; return; }
+  empty.classList.remove('show');
+  count.textContent = filtered.length;
+
+  // Grouper par cat
+  var seen={}, cats=[];
+  filtered.forEach(function(p){ if(!seen[p.cat]){ seen[p.cat]=true; cats.push(p.cat); } });
+
+  cats.forEach(function(cat){
+    var color = CAT_COLOR[cat]||'var(--accent)';
+    var gr = document.createElement('tr');
+    gr.className='row-group';
+    var td = document.createElement('td');
+    td.colSpan=OS.length+1;
+    td.textContent='// '+cat.toUpperCase();
+    td.style.color=color;
+    gr.appendChild(td);
+    tbody.appendChild(gr);
+
+    filtered.filter(function(p){ return p.cat===cat; }).forEach(function(pkg){
+      var tr = document.createElement('tr');
+      var nameTd = document.createElement('td');
+      nameTd.className='td-name';
+      var col = CAT_COLOR[pkg.cat]||'var(--accent)';
+      nameTd.innerHTML =
+        '<span class="pkg-name">'+esc(pkg.name)+'</span>'+
+        '<span class="pkg-desc">'+esc(pkg.desc)+'</span>'+
+        '<span class="pkg-badge" style="color:'+col+';border-color:'+col+'">'+esc(pkg.cat)+'</span>';
+      tr.appendChild(nameTd);
+      OS.forEach(function(os){ tr.appendChild(makeCell(pkg[os]||null)); });
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+document.getElementById('catBar').addEventListener('click', function(e){
+  var btn=e.target.closest('[data-cat]'); if(!btn) return;
+  document.querySelectorAll('.cat-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  activeCat=btn.dataset.cat; render();
+});
+
+document.getElementById('search').addEventListener('input', function(){
+  q=this.value.trim().toLowerCase(); render();
+});
+
+document.addEventListener('keydown', function(e){
+  var tag=document.activeElement&&document.activeElement.tagName;
+  if(e.key==='/'&&tag!=='INPUT'){ e.preventDefault(); document.getElementById('search').focus(); }
+  if(e.key==='Escape'&&tag==='INPUT') document.activeElement.blur();
+});
+
+// Thème
+(function(){
+  var html=document.documentElement;
+  var s=localStorage.getItem('mpx-theme'); if(s) html.setAttribute('data-theme',s);
+  document.getElementById('themeBtn').addEventListener('click',function(){
+    var n=(html.getAttribute('data-theme')||'dark')==='dark'?'light':'dark';
+    html.setAttribute('data-theme',n); localStorage.setItem('mpx-theme',n);
+  });
+})();
+
+render();
+</script>
+</body>
+</html>

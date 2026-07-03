@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MANPAGES.EXE — Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=VT323&family=Honk&family=Noto+Sans+JP:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="commands.css"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="icons/favicon-32.png"/>
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+  <meta name="theme-color" content="#0f0820"/>
+  <style>
+    /* ── QUIZ ─────────────────────────────────────────────── */
+    .quiz-wrap {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 90px 20px 60px;
+      min-height: 100vh;
+    }
+    .quiz-panel {
+      background: var(--bg2);
+      border: 2px solid var(--border2);
+      box-shadow: 6px 6px 0 var(--accent-glow);
+      padding: 28px;
+      position: relative;
+    }
+    .quiz-panel::before {
+      content: '';
+      position: absolute; inset: -2px;
+      border: 1px solid var(--accent);
+      opacity: 0.25;
+      pointer-events: none;
+    }
+    .quiz-eye {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+    .quiz-title {
+      font-family: 'VT323', monospace;
+      font-size: clamp(34px, 6vw, 52px);
+      line-height: 1;
+      margin: 0 0 18px;
+      color: var(--text);
+    }
+    .quiz-title span { color: var(--accent); }
+    .quiz-sub { color: var(--text); opacity: 0.75; margin-bottom: 24px; font-size: 14px; }
+
+    .quiz-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--accent-2);
+      margin: 18px 0 8px;
+      text-transform: uppercase;
+    }
+    .quiz-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+    .quiz-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 7px 12px;
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .quiz-chip:hover { border-color: var(--border2); transform: translateY(-1px); }
+    .chip-best {
+      margin-left: 7px;
+      font-size: 10px;
+      padding: 1px 6px;
+      border: 1px solid var(--accent-3);
+      color: var(--accent-3);
+      border-radius: 10px;
+    }
+    .chip-best.gold { border-color: #ffd60a; color: #ffd60a; }
+    .quiz-chip.active {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 3px 3px 0 var(--accent-2);
+    }
+    .quiz-start {
+      margin-top: 26px;
+      width: 100%;
+      font-family: 'VT323', monospace;
+      font-size: 26px;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: 2px solid var(--accent);
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: all 0.15s;
+    }
+    .quiz-start:hover { box-shadow: 6px 6px 0 var(--accent-2); transform: translate(-2px,-2px); }
+
+    /* HUD */
+    .quiz-hud {
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      margin-bottom: 18px;
+      gap: 10px; flex-wrap: wrap;
+    }
+    .hud-item { color: var(--text); opacity: 0.85; }
+    .hud-item b { color: var(--accent-3); font-size: 15px; }
+    .hud-streak b { color: #ff6b35; }
+    .quiz-bar {
+      height: 8px; background: var(--bg3);
+      border: 1px solid var(--border2);
+      margin-bottom: 22px; overflow: hidden;
+    }
+    .quiz-bar-fill {
+      height: 100%; width: 0%;
+      background: repeating-linear-gradient(45deg, var(--accent), var(--accent) 8px, var(--accent-dim) 8px, var(--accent-dim) 16px);
+      transition: width 0.3s;
+    }
+
+    .q-badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 3px 10px;
+      border: 1px solid var(--q-color, var(--accent-2));
+      color: var(--q-color, var(--accent-2));
+      margin-bottom: 14px;
+      letter-spacing: 1px;
+    }
+    .q-text {
+      font-size: 17px;
+      line-height: 1.55;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .q-code {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-left: 3px solid var(--accent-2);
+      padding: 10px 14px;
+      margin: 10px 0 4px;
+      color: var(--accent-2);
+      font-size: 15px;
+      word-break: break-all;
+    }
+    .q-options { display: grid; gap: 10px; margin-top: 20px; }
+    .q-opt {
+      text-align: left;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      line-height: 1.5;
+      padding: 13px 16px;
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.12s;
+      position: relative;
+    }
+    .q-opt:hover:not(:disabled) {
+      border-color: var(--accent);
+      transform: translateX(4px);
+      box-shadow: -4px 0 0 var(--accent);
+    }
+    .q-opt:disabled { cursor: default; }
+    .q-opt.correct {
+      border-color: #2ecc71 !important;
+      background: rgba(46,204,113,0.12);
+      color: #2ecc71;
+      box-shadow: 3px 3px 0 rgba(46,204,113,0.4);
+    }
+    .q-opt.wrong {
+      border-color: #e74c3c !important;
+      background: rgba(231,76,60,0.12);
+      color: #e74c3c;
+    }
+    .q-opt .opt-key {
+      color: var(--accent);
+      margin-right: 10px;
+      opacity: 0.7;
+    }
+    .q-feedback {
+      margin-top: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      min-height: 22px;
+    }
+    .q-feedback.good { color: #2ecc71; }
+    .q-feedback.bad  { color: #e74c3c; }
+    .q-next {
+      margin-top: 14px;
+      font-family: 'VT323', monospace;
+      font-size: 22px;
+      padding: 9px 26px;
+      background: transparent;
+      border: 2px solid var(--accent-2);
+      color: var(--accent-2);
+      cursor: pointer;
+      letter-spacing: 2px;
+      display: none;
+    }
+    .q-next:hover { background: var(--accent-2); color: var(--bg); }
+
+    /* Résultat */
+    .result-rank {
+      font-family: 'VT323', monospace;
+      font-size: 110px;
+      line-height: 1;
+      text-align: center;
+      margin: 10px 0;
+      text-shadow: 4px 4px 0 var(--accent-glow);
+    }
+    .result-score {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .result-msg {
+      text-align: center;
+      color: var(--text);
+      opacity: 0.75;
+      margin-bottom: 8px;
+    }
+    .result-best {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--accent-3);
+      margin-bottom: 22px;
+    }
+    .hidden { display: none !important; }
+
+    @media (max-width: 640px) {
+      .quiz-wrap { padding-top: 80px; }
+      .quiz-panel { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">MAN<span>//</span>PAGES.EXE</a>
+    <div class="nav-right" style="margin-left:auto">
+      <button class="theme-toggle" id="themeToggle" title="Changer le thème">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <a href="commands.html" class="nav-back">⌘ Annuaire</a>
+      <a href="packages.html" class="nav-back" style="border-color:var(--accent-3);color:var(--accent-3)">📦 Paquets</a>
+      <a href="cheatsheet.html" class="nav-back" style="border-color:#d4a843;color:#d4a843">⚡ Cheatsheet</a>
+      <a href="index.html" class="nav-back">← Accueil</a>
+    </div>
+  </nav>
+
+  <div class="quiz-wrap">
+
+    <!-- ÉCRAN 1 : CONFIGURATION -->
+    <div class="quiz-panel" id="setupScreen">
+      <div class="quiz-eye">// MODE RÉVISION</div>
+      <h1 class="quiz-title">QUIZ<span>//</span>ARCADE</h1>
+      <p class="quiz-sub">Teste tes connaissances : retrouve la bonne commande à partir de sa description (et inversement). 10 questions, un rang à la fin — vise le rang <b style="color:var(--accent-3)">S</b>.</p>
+
+      <div class="quiz-label">// Domaine</div>
+      <div class="quiz-choices" id="osChoices">
+        <button class="quiz-chip active" data-os="all">🌐 Tout mélangé</button>
+      </div>
+
+      <div class="quiz-label">// Nombre de questions</div>
+      <div class="quiz-choices" id="countChoices">
+        <button class="quiz-chip" data-count="5">5 — éclair</button>
+        <button class="quiz-chip active" data-count="10">10 — classique</button>
+        <button class="quiz-chip" data-count="20">20 — marathon</button>
+      </div>
+
+      <button class="quiz-start" id="startBtn">▶ INSERT COIN — START</button>
+    </div>
+
+    <!-- ÉCRAN 2 : QUESTION -->
+    <div class="quiz-panel hidden" id="gameScreen">
+      <div class="quiz-hud">
+        <span class="hud-item">Question <b id="hudQ">1</b>/<span id="hudTotal">10</span></span>
+        <span class="hud-item hud-streak">🔥 Série <b id="hudStreak">0</b></span>
+        <span class="hud-item">Score <b id="hudScore">0</b></span>
+      </div>
+      <div class="quiz-bar"><div class="quiz-bar-fill" id="barFill"></div></div>
+
+      <span class="q-badge" id="qBadge">—</span>
+      <div class="q-text" id="qText"></div>
+      <code class="q-code hidden" id="qCode"></code>
+
+      <div class="q-options" id="qOptions"></div>
+      <div class="q-feedback" id="qFeedback"></div>
+      <button class="q-next" id="nextBtn">SUIVANT →</button>
+    </div>
+
+    <!-- ÉCRAN 3 : RÉSULTAT -->
+    <div class="quiz-panel hidden" id="resultScreen">
+      <div class="quiz-eye">// GAME OVER</div>
+      <div class="result-rank" id="resultRank">S</div>
+      <div class="result-score" id="resultScore"></div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="result-best" id="resultBest"></div>
+      <button class="quiz-start" id="replayBtn">↻ CONTINUE ? — REJOUER</button>
+    </div>
+
+  </div>
+
+  <script src="data.js"></script>
+  <script src="data-extra.js"></script>
+  <script src="quiz.js"></script>
+  <script src="arcade-fun.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js').catch(function(err) {
+          console.log('Service worker non enregistré :', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

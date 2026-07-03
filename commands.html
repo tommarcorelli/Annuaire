@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MANPAGES.EXE — Annuaire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=VT323&family=Honk&family=Noto+Sans+JP:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="commands.css"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="icons/favicon-32.png"/>
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+  <meta name="theme-color" content="#0f0820"/>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">MAN<span>//</span>PAGES.EXE</a>
+    <div class="search-wrap">      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input id="searchInput" type="text" placeholder="Rechercher une commande... ( / )" autocomplete="off"/>
+      <span id="resultCount"></span>
+      <div id="searchHistory" class="search-history"></div>
+    </div>
+    <div class="nav-right">
+      <button class="burger-btn" id="burgerBtn" title="Filtres" aria-label="Ouvrir les filtres">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <button class="fav-toggle" id="randomBtn" title="Commande aléatoire" style="font-size:15px">🎲</button>
+      <button class="fav-toggle" id="favToggle" title="Afficher uniquement mes favoris">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        <span id="favCount">0</span>
+      </button>
+      <button class="print-btn" id="printBtn" title="Imprimer / exporter en PDF la sélection affichée">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"/>
+          <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+          <rect x="6" y="14" width="12" height="8"/>
+        </svg>
+      </button>
+      <button class="theme-toggle" id="themeToggle" title="Changer le thème">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <a href="quiz.html" class="nav-back" style="border-color:#1BB91F;color:#1BB91F">🎓 Quiz</a>
+      <a href="cheatsheet.html" class="nav-back" style="border-color:#d4a843;color:#d4a843">⚡ Cheatsheet</a>
+      <a href="packages.html" class="nav-back" style="border-color:var(--accent-3);color:var(--accent-3)">📦 Paquets</a>
+      <a href="index.html" class="nav-back">← Accueil</a>
+    </div>
+  </nav>
+
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">// OS</div>
+        <div class="os-list" id="osFilters">
+
+          <button class="os-pill active" data-os="all">
+            <span class="os-icon-wrap" style="background:#d4a843">
+              <svg viewBox="0 0 24 24" fill="white" width="13" height="13"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </span>
+            <span class="os-pill-name">Tous</span>
+            <span class="os-pill-count" id="count-all">—</span>
+          </button>
+
+          <button class="os-pill" data-os="universal">
+            <span class="os-icon-wrap" style="background:#555">
+              <svg viewBox="0 0 24 24" fill="white" width="13" height="13"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm6.93 6h-2.95a15.65 15.65 0 00-1.38-3.56A8.03 8.03 0 0118.93 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14a7.82 7.82 0 010-4h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.81 2h2.95c.32 1.25.78 2.45 1.38 3.56A8.03 8.03 0 015.07 16zm2.95-8H5.07a8.03 8.03 0 014.33-3.56A15.65 15.65 0 008.02 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 01-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38a7.82 7.82 0 010 4h-3.38z"/></svg>
+            </span>
+            <span class="os-pill-name">Universel</span>
+            <span class="os-pill-count" id="count-universal">—</span>
+          </button>
+
+          <button class="os-pill" data-os="debian">
+            <span class="os-icon-wrap" style="background:#A81D33">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/debian.svg" alt="Debian"/>
+            </span>
+            <span class="os-pill-name">Debian/Ubuntu</span>
+            <span class="os-pill-count" id="count-debian">—</span>
+          </button>
+
+          <button class="os-pill" data-os="alpine">
+            <span class="os-icon-wrap" style="background:#0D597F">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/alpinelinux.svg" alt="Alpine"/>
+            </span>
+            <span class="os-pill-name">Alpine Linux</span>
+            <span class="os-pill-count" id="count-alpine">—</span>
+          </button>
+
+          <button class="os-pill" data-os="arch">
+            <span class="os-icon-wrap" style="background:#1793D1">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/archlinux.svg" alt="Arch"/>
+            </span>
+            <span class="os-pill-name">Arch Linux</span>
+            <span class="os-pill-count" id="count-arch">—</span>
+          </button>
+
+          <button class="os-pill" data-os="rhel">
+            <span class="os-icon-wrap" style="background:#EE0000">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/redhat.svg" alt="RHEL"/>
+            </span>
+            <span class="os-pill-name">RHEL/Fedora</span>
+            <span class="os-pill-count" id="count-rhel">—</span>
+          </button>
+
+          <button class="os-pill" data-os="freebsd">
+            <span class="os-icon-wrap" style="background:#AB2B28">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/freebsd.svg" alt="FreeBSD"/>
+            </span>
+            <span class="os-pill-name">FreeBSD</span>
+            <span class="os-pill-count" id="count-freebsd">—</span>
+          </button>
+
+          <button class="os-pill" data-os="macos">
+            <span class="os-icon-wrap" style="background:#3a3a3a">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/apple.svg" alt="macOS"/>
+            </span>
+            <span class="os-pill-name">macOS</span>
+            <span class="os-pill-count" id="count-macos">—</span>
+          </button>
+
+          <button class="os-pill" data-os="windows">
+            <span class="os-icon-wrap" style="background:#0078D4">
+              <svg viewBox="0 0 24 24" width="13" height="13"><rect x="0" y="0" width="11" height="11" fill="white"/><rect x="13" y="0" width="11" height="11" fill="white"/><rect x="0" y="13" width="11" height="11" fill="white"/><rect x="13" y="13" width="11" height="11" fill="white"/></svg>
+            </span>
+            <span class="os-pill-name">Windows</span>
+            <span class="os-pill-count" id="count-windows">—</span>
+          </button>
+
+          <button class="os-pill" data-os="windows-server">
+            <span class="os-icon-wrap" style="background:#0a2a4d">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="white"><rect x="2" y="3" width="20" height="5" rx="1"/><rect x="2" y="10" width="20" height="5" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/><circle cx="6" cy="5.5" r="0.9"/><circle cx="6" cy="12.5" r="0.9"/></svg>
+            </span>
+            <span class="os-pill-name">Windows Server</span>
+            <span class="os-pill-count" id="count-windows-server">—</span>
+          </button>
+
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">// OUTILS</div>
+        <div class="os-list" id="toolFilters">
+
+          <button class="os-pill" data-os="powershell">
+            <span class="os-icon-wrap" style="background:#012456">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="white"><path d="M22.5 4H1.5C1.22 4 1 4.22 1 4.5v15c0 .28.22.5.5.5h21c.28 0 .5-.22.5-.5v-15c0-.28-.22-.5-.5-.5zM7.5 16l-1.4-1.4L9.7 11l-3.6-3.6L7.5 6l5 5-5 5zM18 16h-6v-2h6v2z"/></svg>
+            </span>
+            <span class="os-pill-name">PowerShell</span>
+            <span class="os-pill-count" id="count-powershell">—</span>
+          </button>
+
+          <button class="os-pill" data-os="docker">
+            <span class="os-icon-wrap" style="background:#2496ED">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/docker.svg" alt="Docker"/>
+            </span>
+            <span class="os-pill-name">Docker</span>
+            <span class="os-pill-count" id="count-docker">—</span>
+          </button>
+
+          <button class="os-pill" data-os="ansible">
+            <span class="os-icon-wrap" style="background:#EE0000">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/ansible.svg" alt="Ansible"/>
+            </span>
+            <span class="os-pill-name">Ansible</span>
+            <span class="os-pill-count" id="count-ansible">—</span>
+          </button>
+
+          <button class="os-pill" data-os="git">
+            <span class="os-icon-wrap" style="background:#F05032">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/git.svg" alt="Git"/>
+            </span>
+            <span class="os-pill-name">Git</span>
+            <span class="os-pill-count" id="count-git">—</span>
+          </button>
+
+          <button class="os-pill" data-os="kubectl">
+            <span class="os-icon-wrap" style="background:#326CE5">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/kubernetes.svg" alt="Kubernetes"/>
+            </span>
+            <span class="os-pill-name">Kubectl</span>
+            <span class="os-pill-count" id="count-kubectl">—</span>
+          </button>
+
+          <button class="os-pill" data-os="terraform">
+            <span class="os-icon-wrap" style="background:#7B42BC">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/terraform.svg" alt="Terraform"/>
+            </span>
+            <span class="os-pill-name">Terraform</span>
+            <span class="os-pill-count" id="count-terraform">—</span>
+          </button>
+
+          <button class="os-pill" data-os="vagrant">
+            <span class="os-icon-wrap" style="background:#1868F2">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/vagrant.svg" alt="Vagrant"/>
+            </span>
+            <span class="os-pill-name">Vagrant</span>
+            <span class="os-pill-count" id="count-vagrant">—</span>
+          </button>
+
+          <button class="os-pill" data-os="nmap">
+            <span class="os-icon-wrap" style="background:#4682B4">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/nmap.svg" alt="Nmap"/>
+            </span>
+            <span class="os-pill-name">Nmap</span>
+            <span class="os-pill-count" id="count-nmap">—</span>
+          </button>
+
+          <button class="os-pill" data-os="tshark">
+            <span class="os-icon-wrap" style="background:#1679A7">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/wireshark.svg" alt="Wireshark"/>
+            </span>
+            <span class="os-pill-name">Wireshark/tshark</span>
+            <span class="os-pill-count" id="count-tshark">—</span>
+          </button>
+
+          <button class="os-pill" data-os="helm">
+            <span class="os-icon-wrap" style="background:#0F1689">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/helm.svg" alt="Helm"/>
+            </span>
+            <span class="os-pill-name">Helm</span>
+            <span class="os-pill-count" id="count-helm">—</span>
+          </button>
+
+          <button class="os-pill" data-os="awscli">
+            <span class="os-icon-wrap" style="background:#FF9900">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/amazonaws.svg" alt="AWS CLI"/>
+            </span>
+            <span class="os-pill-name">AWS CLI</span>
+            <span class="os-pill-count" id="count-awscli">—</span>
+          </button>
+
+          <button class="os-pill" data-os="azurecli">
+            <span class="os-icon-wrap" style="background:#0078D4">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/microsoftazure.svg" alt="Azure CLI"/>
+            </span>
+            <span class="os-pill-name">Azure CLI</span>
+            <span class="os-pill-count" id="count-azurecli">—</span>
+          </button>
+
+          <button class="os-pill" data-os="cisco">
+            <span class="os-icon-wrap" style="background:#049FD9">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><line x1="3" y1="15" x2="3" y2="11"/><line x1="7" y1="15" x2="7" y2="7"/><line x1="12" y1="15" x2="12" y2="4"/><line x1="17" y1="15" x2="17" y2="7"/><line x1="21" y1="15" x2="21" y2="11"/></svg>
+            </span>
+            <span class="os-pill-name">Cisco IOS</span>
+            <span class="os-pill-count" id="count-cisco">—</span>
+          </button>
+
+          <button class="os-pill" data-os="proxmox">
+            <span class="os-icon-wrap" style="background:#E57000">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/proxmox.svg" alt="Proxmox"/>
+            </span>
+            <span class="os-pill-name">Proxmox VE</span>
+            <span class="os-pill-count" id="count-proxmox">—</span>
+          </button>
+
+          <button class="os-pill" data-os="mysql">
+            <span class="os-icon-wrap" style="background:#4479A1">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/mysql.svg" alt="MySQL"/>
+            </span>
+            <span class="os-pill-name">MySQL/MariaDB</span>
+            <span class="os-pill-count" id="count-mysql">—</span>
+          </button>
+
+          <button class="os-pill" data-os="nginx">
+            <span class="os-icon-wrap" style="background:#009639">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/nginx.svg" alt="Nginx"/>
+            </span>
+            <span class="os-pill-name">Nginx</span>
+            <span class="os-pill-count" id="count-nginx">—</span>
+          </button>
+
+          <button class="os-pill" data-os="openssl">
+            <span class="os-icon-wrap" style="background:#8F1D14">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/openssl.svg" alt="OpenSSL"/>
+            </span>
+            <span class="os-pill-name">OpenSSL/SSH</span>
+            <span class="os-pill-count" id="count-openssl">—</span>
+          </button>
+
+          <button class="os-pill" data-os="tcpdump">
+            <span class="os-icon-wrap" style="background:#3E6E93">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><polyline points="2,12 6,12 9,5 13,19 16,12 22,12"/></svg>
+            </span>
+            <span class="os-pill-name">tcpdump</span>
+            <span class="os-pill-count" id="count-tcpdump">—</span>
+          </button>
+
+          <button class="os-pill" data-os="iptables">
+            <span class="os-icon-wrap" style="background:#DA4E2B">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="white"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+            </span>
+            <span class="os-pill-name">iptables/nft</span>
+            <span class="os-pill-count" id="count-iptables">—</span>
+          </button>
+
+          <button class="os-pill" data-os="tmux">
+            <span class="os-icon-wrap" style="background:#1BB91F">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/tmux.svg" alt="tmux"/>
+            </span>
+            <span class="os-pill-name">tmux</span>
+            <span class="os-pill-count" id="count-tmux">—</span>
+          </button>
+
+          <button class="os-pill" data-os="vim">
+            <span class="os-icon-wrap" style="background:#019733">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/vim.svg" alt="Vim"/>
+            </span>
+            <span class="os-pill-name">Vim</span>
+            <span class="os-pill-count" id="count-vim">—</span>
+          </button>
+
+          <button class="os-pill" data-os="npm">
+            <span class="os-icon-wrap" style="background:#CB3837">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/npm.svg" alt="npm"/>
+            </span>
+            <span class="os-pill-name">npm/Node</span>
+            <span class="os-pill-count" id="count-npm">—</span>
+          </button>
+
+          <button class="os-pill" data-os="python">
+            <span class="os-icon-wrap" style="background:#3776AB">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/python.svg" alt="Python"/>
+            </span>
+            <span class="os-pill-name">Python/pip</span>
+            <span class="os-pill-count" id="count-python">—</span>
+          </button>
+
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">// CATÉGORIE</div>
+        <div class="cat-list" id="catFilters">
+          <button class="cat-pill active" data-cat="all">Toutes</button>
+          <button class="cat-pill" data-cat="Navigation">Navigation</button>
+          <button class="cat-pill" data-cat="Fichiers">Fichiers</button>
+          <button class="cat-pill" data-cat="Paquets">Paquets</button>
+          <button class="cat-pill" data-cat="Réseau">Réseau</button>
+          <button class="cat-pill" data-cat="Système">Système</button>
+          <button class="cat-pill" data-cat="Permissions">Permissions</button>
+          <button class="cat-pill" data-cat="Processus">Processus</button>
+          <button class="cat-pill" data-cat="Services">Services</button>
+          <button class="cat-pill" data-cat="Archives">Archives</button>
+          <button class="cat-pill" data-cat="Utilisateurs">Utilisateurs</button>
+          <button class="cat-pill" data-cat="Conteneurs">Conteneurs</button>
+          <button class="cat-pill" data-cat="Sécurité">Sécurité</button>
+          <button class="cat-pill" data-cat="Base de données">Base de données</button>
+          <button class="cat-pill" data-cat="Virtualisation">Virtualisation</button>
+          <button class="cat-pill" data-cat="Développement">Développement</button>
+        </div>
+      </div>
+
+      <div class="sidebar-stat">
+        <span id="sidebarCount">—</span>
+        <span class="stat-label">commandes</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div id="commandGrid" class="command-grid"></div>
+      <div id="emptyState" class="empty-state">
+        <div class="empty-icon">⌀</div>
+        <p>Aucune commande trouvée</p>
+        <small>Essaie un autre terme ou change les filtres</small>
+      </div>
+    </main>
+  </div>
+
+  <template id="cardTemplate">
+    <article class="cmd-card">
+      <div class="card-header">
+        <code class="cmd-name"></code>
+        <div class="card-actions">
+          <button class="fav-btn" title="Ajouter aux favoris">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </button>
+          <button class="link-btn" title="Copier le lien direct">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07l-1.41 1.41"/>
+              <path d="M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07l1.41-1.41"/>
+            </svg>
+          </button>
+          <button class="copy-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+            </svg>
+            <span class="copy-label">Copier</span>
+          </button>
+        </div>
+      </div>
+      <div class="card-badges">
+        <span class="os-badge"></span>
+        <span class="cat-badge"></span>
+      </div>
+      <p class="cmd-desc"></p>
+      <div class="syntax-block">
+        <span class="block-label">Syntaxe</span>
+        <code class="cmd-syntax"></code>
+      </div>
+      <div class="examples-block">
+        <span class="block-label">Exemples</span>
+        <div class="examples-list"></div>
+      </div>
+      <div class="cmd-flags">
+        <span class="block-label">Options</span>
+        <ul class="flags-list"></ul>
+      </div>
+    </article>
+  </template>
+
+  <script src="data.js"></script>
+  <script src="data-extra.js"></script>
+  <script src="commands.js"></script>
+  <script src="arcade-fun.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js').catch(function(err) {
+          console.log('Service worker non enregistré :', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
