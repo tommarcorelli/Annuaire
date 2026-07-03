@@ -610,14 +610,21 @@ body::after {
 .os-cell:hover::before { transform: scaleX(1); }
 
 .os-circle {
-  width: 36px; height: 36px;
+  width: 42px; height: 42px;
   border-radius: 50%;
   background: var(--c, var(--accent));
-  opacity: 0.22;
   position: relative;
   box-shadow: 0 0 24px var(--c, var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.os-circle::after {
+.os-circle img,
+.os-circle svg { width: 20px; height: 20px; }
+.os-circle img { filter: brightness(0) invert(1); }
+/* Repli si une cellule n'a pas de logo : ancien style pastille */
+.os-circle:empty { opacity: 0.22; }
+.os-circle:empty::after {
   content: '';
   position: absolute;
   top: 50%; left: 50%;
@@ -625,7 +632,6 @@ body::after {
   width: 14px; height: 14px;
   border-radius: 50%;
   background: var(--c, var(--accent));
-  opacity: 2;
 }
 
 .os-num {
