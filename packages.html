@@ -26,6 +26,24 @@
       --accent:#e63946;--accent2:#2a6df4;--accent3:#ffba08;
       --text:#1a1a24;--ink:#0e0e16;--muted:#5a5a6a;
     }
+    [data-theme="matrix"]{
+      --bg:#020a04;--bg2:#04140a;--bg3:#082114;
+      --border:#0f3d22;--border2:#155931;
+      --accent:#00ff66;--accent2:#4dffb8;--accent3:#eaff00;
+      --text:#a8e6b8;--ink:#d8ffe0;--muted:#3f8a58;
+    }
+    [data-theme="crt"]{
+      --bg:#140b01;--bg2:#1e1204;--bg3:#2a1a08;
+      --border:#4a2e0d;--border2:#66400f;
+      --accent:#ffb000;--accent2:#ff7b26;--accent3:#ffe066;
+      --text:#f0c98d;--ink:#ffe8c2;--muted:#8f6a35;
+    }
+    [data-theme="synthwave"]{
+      --bg:#050b1e;--bg2:#0a1430;--bg3:#101d45;
+      --border:#1d3a6e;--border2:#2a4f8f;
+      --accent:#c77dff;--accent2:#00e5ff;--accent3:#ff9e00;
+      --text:#c9d8f0;--ink:#eaf2ff;--muted:#5f7bab;
+    }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html{overflow-x:hidden;}
     body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden;}
@@ -167,6 +185,7 @@
     <a href="commands.html" class="nav-tab">⌘ Commandes</a>
     <a href="packages.html" class="nav-tab active">📦 Paquets</a>
     <a href="quiz.html" class="nav-tab" style="color:#1BB91F">🎓 Quiz</a>
+    <a href="terminal.html" class="nav-tab" style="color:#00d3b8">&gt;_ Terminal</a>
     <a href="cheatsheet.html" class="nav-tab" style="color:#d4a843">⚡ Cheatsheet</a>
     <a href="scenarios.html" class="nav-tab" style="color:#c77dff">🧭 Scénarios</a>
   </div>
@@ -320,15 +339,7 @@ document.addEventListener('keydown', function(e){
   if(e.key==='Escape'&&tag==='INPUT') document.activeElement.blur();
 });
 
-// Thème
-(function(){
-  var html=document.documentElement;
-  var s=localStorage.getItem('mpx-theme'); if(s) html.setAttribute('data-theme',s);
-  document.getElementById('themeBtn').addEventListener('click',function(){
-    var n=(html.getAttribute('data-theme')||'dark')==='dark'?'light':'dark';
-    html.setAttribute('data-theme',n); localStorage.setItem('mpx-theme',n);
-  });
-})();
+// Thème : géré par theme.js (partagé par toutes les pages)
 
 // Lien profond depuis la recherche globale de l'accueil : packages.html?q=nginx
 var qParam = new URLSearchParams(location.search).get('q');
@@ -339,5 +350,6 @@ if (qParam) {
 
 render();
 </script>
+<script src="theme.js"></script>
 </body>
 </html>

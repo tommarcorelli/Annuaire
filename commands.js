@@ -111,6 +111,17 @@ function saveFavorites(set) {
 }
 var favorites = loadFavorites();
 
+// ── SCÉNARIOS : index inversé commande → scénarios ───────────
+// (SCENARIOS_DATA vient de scenarios-data.js ; noms exacts de data.js)
+var CMD_SCENARIOS = {};
+if (typeof SCENARIOS_DATA !== 'undefined') {
+  SCENARIOS_DATA.forEach(function(sc) {
+    (sc.cmds || []).forEach(function(n) {
+      (CMD_SCENARIOS[n] = CMD_SCENARIOS[n] || []).push(sc);
+    });
+  });
+}
+
 function updateFavCount() {
   var el = document.getElementById('favCount');
   if (el) el.textContent = favorites.size;
@@ -584,6 +595,27 @@ function buildCard(cmd, tpl) {
       });
     });
 
+    var scList = CMD_SCENARIOS[cmd.name];
+    if (scList && scList.length) {
+      var scBlock = document.createElement('div');
+      scBlock.className = 'cmd-scenarios';
+      var scLabel = document.createElement('span');
+      scLabel.className = 'block-label';
+      scLabel.textContent = 'Apparaît dans';
+      scBlock.appendChild(scLabel);
+      var scLinks = document.createElement('div');
+      scLinks.className = 'scenario-links';
+      scList.forEach(function(sc) {
+        var a = document.createElement('a');
+        a.className = 'scenario-link';
+        a.href = 'scenarios.html#' + sc.id;
+        a.textContent = sc.icon + ' ' + sc.title;
+        scLinks.appendChild(a);
+      });
+      scBlock.appendChild(scLinks);
+      card.appendChild(scBlock);
+    }
+
     var copyBtn = clone.querySelector('.copy-btn');
     var syntaxToCopy = cmd.syntax;
     copyBtn.addEventListener('click', function() {
@@ -603,20 +635,4 @@ function buildCard(cmd, tpl) {
 
 window.addEventListener('load', init);
 
-// ── THEME TOGGLE ──────────────────────────────────────────────
-(function() {
-  var html = document.documentElement;
-  var btn  = document.getElementById('themeToggle');
-  if (!btn) return;
-
-  // Restore saved theme
-  var saved = localStorage.getItem('mpx-theme');
-  if (saved) html.setAttribute('data-theme', saved);
-
-  btn.addEventListener('click', function() {
-    var current = html.getAttribute('data-theme') || 'dark';
-    var next    = current === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    localStorage.setItem('mpx-theme', next);
-  });
-})();
+// Le thème est géré par theme.js (partagé par toutes les pages).

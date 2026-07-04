@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MANPAGES.EXE — Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=VT323&family=Honk&family=Noto+Sans+JP:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="commands.css"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="icons/favicon-32.png"/>
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+  <meta name="theme-color" content="#0f0820"/>
+  <script>/* Thème : préférence sauvegardée, sinon réglage système */(function(){var t=localStorage.getItem('mpx-theme');if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <style>
+    .term-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 90px 20px 60px;
+      min-height: 100vh;
+    }
+    .term-eye {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+    .term-title {
+      font-family: 'VT323', monospace;
+      font-size: clamp(34px, 6vw, 52px);
+      line-height: 1;
+      margin: 0 0 8px;
+      color: var(--text);
+    }
+    .term-title span { color: var(--accent); }
+    .term-sub { color: var(--text); opacity: 0.75; margin-bottom: 22px; font-size: 14px; }
+
+    /* Fenêtre terminal */
+    .term-window {
+      background: var(--bg2);
+      border: 2px solid var(--border2);
+      box-shadow: 6px 6px 0 var(--accent-glow);
+      font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
+    }
+    .term-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 14px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border2);
+    }
+    .term-dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+    .term-dot.r { background: #ff5f56; }
+    .term-dot.y { background: #ffbd2e; }
+    .term-dot.g { background: #27c93f; }
+    .term-bar-title { margin-left: 8px; font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+
+    .term-log {
+      padding: 16px;
+      height: 52vh;
+      min-height: 320px;
+      overflow-y: auto;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+    .term-log::-webkit-scrollbar { width: 10px; }
+    .term-log::-webkit-scrollbar-thumb { background: var(--border2); }
+
+    .t-echo { color: var(--text); margin: 10px 0 2px; word-break: break-all; }
+    .t-prompt { color: var(--accent-3); }
+    .t-note { color: var(--text); opacity: 0.9; white-space: pre-wrap; }
+    .t-note.t-accent { color: var(--accent-2); }
+    .t-note.t-dim { opacity: 0.55; }
+    .t-note.t-err { color: #e67e22; }
+
+    /* Bloc fiche commande */
+    .t-block {
+      border-left: 3px solid var(--c, var(--accent));
+      background: var(--bg3);
+      padding: 12px 14px;
+      margin: 8px 0 14px;
+    }
+    .t-block-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+    .t-name { font-family: 'VT323', monospace; font-size: 24px; color: var(--c, var(--accent)); line-height: 1; }
+    .t-badge { font-size: 10.5px; padding: 2px 8px; border: 1px solid; letter-spacing: 0.5px; }
+    .t-desc { color: var(--text); margin-bottom: 8px; font-family: 'Inter', sans-serif; font-size: 13.5px; }
+    .t-syntax {
+      background: var(--bg2); border: 1px solid var(--border2);
+      padding: 7px 11px; color: var(--accent-2); margin-bottom: 8px;
+      word-break: break-all;
+    }
+    .t-syntax::before { content: '$ '; opacity: 0.5; }
+    .t-flags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .t-flag { font-size: 11px; padding: 2px 7px; background: var(--bg2); border: 1px solid var(--border); color: var(--muted); }
+    .t-ex { margin: 3px 0; display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+    .t-ex-cmd { color: var(--accent-3); background: var(--bg2); padding: 1px 6px; word-break: break-all; }
+    .t-ex-desc { color: var(--muted); font-size: 12px; }
+    .t-link { display: inline-block; margin-top: 6px; color: var(--accent); font-size: 12px; text-decoration: none; border-bottom: 1px dotted var(--accent); }
+    .t-link:hover { opacity: 0.8; }
+
+    /* Pistes cliquables */
+    .t-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; align-items: center; }
+    .t-chips-label { font-size: 12px; color: var(--muted); }
+    .t-chip {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      padding: 4px 9px; background: var(--bg3);
+      border: 1px solid var(--border2); color: var(--text);
+      cursor: pointer; transition: all 0.12s;
+    }
+    .t-chip:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+    /* Ligne de saisie */
+    .term-input-line {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border2);
+      background: var(--bg2);
+      position: relative;
+    }
+    .term-input-line .t-prompt { flex: none; }
+    #termInput {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 14px;
+      caret-color: var(--accent);
+    }
+    #termInput::placeholder { color: var(--muted); opacity: 0.6; }
+
+    /* Dropdown de suggestions */
+    .term-suggest {
+      display: none; position: absolute;
+      bottom: calc(100% + 4px); left: 16px; right: 16px;
+      background: var(--bg3); border: 1px solid var(--border2);
+      box-shadow: 0 -6px 18px rgba(0,0,0,0.35);
+      max-height: 210px; overflow-y: auto; z-index: 5;
+    }
+    .term-suggest.show { display: block; }
+    .t-sug-item {
+      padding: 7px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+      color: var(--text); cursor: pointer;
+    }
+    .t-sug-item:hover, .t-sug-item.active { background: var(--accent-glow); color: var(--accent); }
+
+    .term-hint {
+      margin-top: 14px; font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px; color: var(--muted); opacity: 0.8;
+      display: flex; gap: 14px; flex-wrap: wrap;
+    }
+    .term-hint kbd {
+      font-family: inherit; background: var(--bg3); border: 1px solid var(--border2);
+      padding: 1px 6px; color: var(--text);
+    }
+
+    @media (max-width: 640px) {
+      .term-wrap { padding-top: 80px; }
+      .term-log { height: 58vh; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">MAN<span>//</span>PAGES.EXE</a>
+    <div class="nav-right" style="margin-left:auto">
+      <button class="theme-toggle" id="themeToggle" title="Changer le thème">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <a href="commands.html" class="nav-back">⌘ Annuaire</a>
+      <a href="packages.html" class="nav-back" style="border-color:var(--accent-3);color:var(--accent-3)">📦 Paquets</a>
+      <a href="quiz.html" class="nav-back" style="border-color:#1BB91F;color:#1BB91F">🎓 Quiz</a>
+      <a href="cheatsheet.html" class="nav-back" style="border-color:#d4a843;color:#d4a843">⚡ Cheatsheet</a>
+      <a href="scenarios.html" class="nav-back" style="border-color:#c77dff;color:#c77dff">🧭 Scénarios</a>
+      <a href="index.html" class="nav-back">← Accueil</a>
+    </div>
+  </nav>
+
+  <div class="term-wrap">
+    <div class="term-eye">// SHELL SIMULÉ · AUCUNE COMMANDE N'EST RÉELLEMENT EXÉCUTÉE</div>
+    <h1 class="term-title">TERMINAL<span>//</span>MAN</h1>
+    <p class="term-sub">Tape une commande — l'app retrouve sa fiche en direct. Autocomplétion sur les 896 commandes, historique <kbd>↑</kbd>, et méta-commandes (<code>help</code>, <code>random</code>, <code>ls docker</code>).</p>
+
+    <div class="term-window" id="termWindow">
+      <div class="term-bar">
+        <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+        <span class="term-bar-title">visitor@manpages: ~</span>
+      </div>
+      <div class="term-log" id="termLog"></div>
+      <div class="term-input-line">
+        <div class="term-suggest" id="termSuggest"></div>
+        <span class="t-prompt">visitor@manpages:~$</span>
+        <input id="termInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off"
+               spellcheck="false" aria-label="Terminal" placeholder="tape une commande… (help)"/>
+      </div>
+    </div>
+
+    <div class="term-hint">
+      <span><kbd>Tab</kbd> compléter</span>
+      <span><kbd>↑</kbd> <kbd>↓</kbd> historique / suggestions</span>
+      <span><kbd>Entrée</kbd> exécuter</span>
+      <span><code>clear</code> pour effacer</span>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="data-extra.js"></script>
+  <script src="terminal.js"></script>
+  <script src="theme.js"></script>
+  <script src="arcade-fun.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js').catch(function(err) {
+          console.log('Service worker non enregistré :', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

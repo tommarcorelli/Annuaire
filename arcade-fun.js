@@ -8,25 +8,13 @@
   'use strict';
 
   // ───────────────────────────────────────────────
-  // 1. THEME TOGGLE (landing UNIQUEMENT — commands.js gère le sien)
-  //    On détecte la page annuaire via la présence de #searchInput.
+  // 1. THEME : géré par theme.js (partagé par toutes les pages).
+  //    Ici on ajoute seulement le petit bip au changement.
   // ───────────────────────────────────────────────
-  (function initThemeToggle() {
-    var html = document.documentElement;
-    var saved = localStorage.getItem('mpx-theme');
-    if (saved) html.setAttribute('data-theme', saved);
-    else if (!html.getAttribute('data-theme')) html.setAttribute('data-theme', 'dark');
-
-    // Skip si on est sur la page annuaire (commands.js gère déjà le toggle)
-    if (document.getElementById('searchInput')) return;
-
-    var btn = document.getElementById('themeToggle');
+  (function themeSfx() {
+    var btn = document.getElementById('themeToggle') || document.getElementById('themeBtn');
     if (!btn) return;
     btn.addEventListener('click', function () {
-      var current = html.getAttribute('data-theme') || 'dark';
-      var next = current === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', next);
-      localStorage.setItem('mpx-theme', next);
       playBeep(420, 0.05, 'square');
     });
   })();
@@ -120,7 +108,8 @@
     searcher:    { icon: '🔍', title: 'Detective',       desc: 'Première recherche effectuée.' },
     konami:      { icon: '🌈', title: 'Konami Master',   desc: '↑↑↓↓←→←→BA · mode rainbow activé !' },
     night_owl:   { icon: '🦉', title: 'Night Owl',       desc: 'Mode sombre activé.' },
-    bright_side: { icon: '☀️', title: 'Bright Side',     desc: 'Mode jour activé. Shōnen vibes.' }
+    bright_side: { icon: '☀️', title: 'Bright Side',     desc: 'Mode jour activé. Shōnen vibes.' },
+    scenario_master: { icon: '🧭', title: 'Mission Master', desc: 'Tous les scénarios terminés. Respect.' }
   };
 
   function unlocked() {
@@ -216,6 +205,14 @@
   checkThemeAch();
   new MutationObserver(checkThemeAch).observe(document.documentElement, {
     attributes: true, attributeFilter: ['data-theme']
+  });
+
+  // ───────────────────────────────────────────────
+  // 8bis. SCÉNARIOS : achievement quand tout est terminé
+  //       (événement émis par scenarios.html)
+  // ───────────────────────────────────────────────
+  document.addEventListener('mpx:all-scenarios-done', function () {
+    unlock('scenario_master');
   });
 
   // ───────────────────────────────────────────────

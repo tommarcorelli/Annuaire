@@ -26,6 +26,7 @@
     <a href="commands.html" class="nav-cta">EXPLORER →</a>
     <a href="packages.html" class="nav-cta" style="background:transparent;border-color:var(--accent-3);color:var(--accent-3)">📦 Paquets</a>
     <a href="quiz.html" class="nav-cta" style="background:transparent;border-color:#1BB91F;color:#1BB91F">🎓 Quiz</a>
+    <a href="terminal.html" class="nav-cta" style="background:transparent;border-color:#00d3b8;color:#00d3b8">&gt;_ Terminal</a>
     <a href="cheatsheet.html" class="nav-cta" style="background:transparent;border-color:#d4a843;color:#d4a843">⚡ Cheatsheet</a>
     <a href="scenarios.html" class="nav-cta" style="background:transparent;border-color:#c77dff;color:#c77dff">🧭 Scénarios</a>
     <button class="theme-toggle" id="themeToggle" title="Changer le thème" data-testid="theme-toggle-btn">
@@ -75,6 +76,7 @@
       <div class="hero-btns">
         <a href="commands.html" class="btn-primary">⌘ Explorer l'annuaire</a>
         <a href="quiz.html" class="btn-outline">🎓 Mode quiz</a>
+        <a href="terminal.html" class="btn-outline">&gt;_ Terminal</a>
         <a href="cheatsheet.html" class="btn-outline">⚡ Cheatsheet</a>
         <a href="scenarios.html" class="btn-outline">🧭 Scénarios</a>
         <a href="packages.html" class="btn-outline">📦 Voir les paquets</a>
@@ -91,7 +93,7 @@
   <section class="section bg-alt" id="stats">
     <div class="section-inner">
       <div class="section-eye">// COUVERTURE</div>
-      <h2 class="section-h">32 outils · <span>887 commandes · 74 paquets</span></h2>
+      <h2 class="section-h">32 outils · <span>896 commandes · 74 paquets</span></h2>
       <div class="os-grid">
         <div class="os-cell" style="--c:#999999">
           <div class="os-circle"><svg viewBox="0 0 24 24" fill="white"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm6.93 6h-2.95a15.65 15.65 0 00-1.38-3.56A8.03 8.03 0 0118.93 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14a7.82 7.82 0 010-4h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.81 2h2.95c.32 1.25.78 2.45 1.38 3.56A8.03 8.03 0 015.07 16zm2.95-8H5.07a8.03 8.03 0 014.33-3.56A15.65 15.65 0 008.02 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 01-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38a7.82 7.82 0 010 4h-3.38z"/></svg></div>
@@ -368,7 +370,7 @@
     <div class="cta-bg" aria-hidden="true">EXEC</div>
     <div class="cta-inner">
       <h2 class="cta-title">Prêt à <span>explorer</span> ?</h2>
-      <p class="cta-sub">887 commandes · 74 paquets · 32 outils · quiz · cheatsheet · 10 scénarios · recherche floue</p>
+      <p class="cta-sub">896 commandes · 74 paquets · 32 outils · quiz · terminal interactif · cheatsheet · 32 scénarios · recherche floue</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
         <a href="commands.html" class="btn-primary btn-lg">⌘ OUVRIR L'ANNUAIRE</a>
         <a href="quiz.html" class="btn-primary btn-lg" style="background:transparent;border:2px solid #1BB91F;color:#1BB91F">🎓 LANCER LE QUIZ</a>
@@ -391,8 +393,9 @@
       'macOS · Windows · Windows Server.',
       'Git · Docker · Kubectl · Terraform · Ansible...',
       'Cisco IOS · Proxmox · MySQL · Nginx · OpenSSL...',
-      '872 commandes · 74 paquets · recherche floue.',
+      '896 commandes · 74 paquets · recherche floue.',
       'Mode quiz : révise et vise le rang S.',
+      'Terminal interactif : tape, obtiens la fiche.',
       'Cheatsheet : la même action sur 7 systèmes.',
     ];
     var pi = 0, ci = 0, deleting = false;
@@ -451,6 +454,7 @@
     });
   </script>
   <script src="global-search.js"></script>
+  <script src="theme.js"></script>
   <script src="arcade-fun.js"></script>
 </body>
 </html>

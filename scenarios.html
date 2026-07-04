@@ -156,6 +156,73 @@
     }
     .sc-links a:hover { opacity: 0.75; }
 
+    /* Liens auto-générés vers les fiches de l'annuaire (scenarios-data.js) */
+    .sc-cmds {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin: 16px 0 0;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border2);
+      line-height: 2;
+    }
+    .sc-cmds a {
+      color: var(--accent-2);
+      text-decoration: none;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      padding: 2px 7px;
+      margin: 0 3px 0 0;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .sc-cmds a:hover { border-color: var(--accent-2); }
+
+    /* Suivi de progression : barre + bouton « terminé » */
+    .sc-progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: -22px 0 30px;
+    }
+    .sc-progress-bar {
+      flex: 1;
+      height: 10px;
+      background: var(--bg3);
+      border: 2px solid var(--border2);
+    }
+    .sc-progress-fill {
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+      transition: width 0.3s;
+    }
+    .sc-progress-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .sc-done-btn {
+      margin-top: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      background: transparent;
+      border: 2px solid var(--border2);
+      color: var(--muted);
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .sc-done-btn:hover { border-color: #2ecc71; color: #2ecc71; }
+    details.sc.done .sc-done-btn {
+      border-color: #2ecc71;
+      color: #2ecc71;
+      background: rgba(46,204,113,0.08);
+    }
+    details.sc.done summary .sc-name::after { content: ' ✓'; color: #2ecc71; }
+
     .sc-toast {
       position: fixed;
       bottom: 24px; left: 50%;
@@ -190,6 +257,7 @@
       <a href="commands.html" class="nav-back">⌘ Annuaire</a>
       <a href="packages.html" class="nav-back" style="color:var(--accent-3)">📦 Paquets</a>
       <a href="quiz.html" class="nav-back" style="color:#1BB91F">🎓 Quiz</a>
+      <a href="terminal.html" class="nav-back" style="color:#00d3b8">&gt;_ Terminal</a>
       <a href="cheatsheet.html" class="nav-back" style="color:#d4a843">⚡ Cheatsheet</a>
       <a href="index.html" class="nav-back">← Accueil</a>
     </div>
@@ -780,10 +848,1275 @@ PersistentKeepalive = 25</pre>
       </div>
     </details>
 
+    <!-- ═══ 11. DISQUE PLEIN ═══ -->
+    <details class="sc" id="sc-disk" style="--c:#d4a843">
+      <summary>
+        <span class="sc-ico">💾</span>
+        <div class="sc-head">
+          <div class="sc-name">Disque plein : trouver et faire de la place</div>
+          <div class="sc-meta">Linux · df · du · find — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">« No space left on device » : la méthode pour localiser ce qui mange le disque et nettoyer sans supprimer au hasard.</p>
+        <p class="sc-links"><a href="commands.html?os=universal">⌘ commandes universelles</a> · <a href="quiz.html?os=universal">🎓 quiz</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Confirmer et localiser la partition pleine</div>
+            <code>df -h</code>
+            <p class="st-note">Repère la ligne à <b>100%</b> — c'est souvent <b>/</b> ou <b>/var</b>, pas tout le disque.</p>
+          </li>
+          <li>
+            <div class="st-desc">Descendre dossier par dossier vers le coupable</div>
+            <code>sudo du -xh / --max-depth=1 2>/dev/null | sort -rh | head -15</code>
+            <code>sudo du -sh /var/* | sort -rh | head</code>
+            <p class="st-note"><b>-x</b> reste sur la même partition (ne compte pas les autres montages).</p>
+          </li>
+          <li>
+            <div class="st-desc">Chasser les gros fichiers isolés</div>
+            <code>sudo find / -xdev -type f -size +500M -exec ls -lh {} + 2>/dev/null</code>
+          </li>
+          <li>
+            <div class="st-desc">Purger les journaux systemd</div>
+            <code>journalctl --disk-usage</code>
+            <code>sudo journalctl --vacuum-size=200M</code>
+          </li>
+          <li>
+            <div class="st-desc">Nettoyer le gestionnaire de paquets</div>
+            <code>sudo apt clean</code>
+            <code>sudo apt autoremove --purge</code>
+          </li>
+          <li>
+            <div class="st-desc">Si Docker est installé, c'est souvent lui</div>
+            <code>docker system df</code>
+            <code>docker system prune -a</code>
+            <p class="st-note"><b>prune -a</b> supprime TOUTES les images non utilisées par un conteneur — vérifie avant.</p>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier le résultat… et le piège classique</div>
+            <code>df -h</code>
+            <code>sudo lsof +L1 | head</code>
+            <p class="st-note">Si l'espace ne revient pas : un fichier supprimé est encore tenu ouvert par un processus (<b>lsof +L1</b> les liste) — redémarre le service concerné.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 12. ANALYSE DE LOGS ═══ -->
+    <details class="sc" id="sc-logs" style="--c:#9b59b6">
+      <summary>
+        <span class="sc-ico">🔎</span>
+        <div class="sc-head">
+          <div class="sc-name">Analyser les logs après un incident</div>
+          <div class="sc-meta">Linux · journalctl · grep · awk — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Le site est tombé cette nuit : reconstituer ce qui s'est passé à partir des journaux, du plus large au plus précis.</p>
+        <p class="sc-links"><a href="commands.html?os=universal">⌘ commandes universelles</a> · <a href="quiz.html?os=universal">🎓 quiz</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Vue d'ensemble : les erreurs depuis le dernier boot</div>
+            <code>journalctl -b -p err</code>
+            <p class="st-note"><b>-p err</b> filtre par priorité : seulement erreurs et pire.</p>
+          </li>
+          <li>
+            <div class="st-desc">Cibler la fenêtre de temps de l'incident</div>
+            <code>journalctl --since "2026-07-03 02:00" --until "2026-07-03 03:00"</code>
+          </li>
+          <li>
+            <div class="st-desc">Suivre le service suspect</div>
+            <code>journalctl -u nginx --since "02:00"</code>
+            <code>tail -f /var/log/nginx/error.log</code>
+            <p class="st-note"><b>tail -f</b> suit le fichier en direct — pratique pour voir si l'erreur revient.</p>
+          </li>
+          <li>
+            <div class="st-desc">Chercher un motif précis</div>
+            <code>grep -ri 'timeout' /var/log/nginx/</code>
+            <code>grep -c 'error' /var/log/nginx/error.log</code>
+          </li>
+          <li>
+            <div class="st-desc">Quelles IP frappent le plus ?</div>
+            <code>awk '{print $1}' /var/log/nginx/access.log | sort | uniq -c | sort -rn | head</code>
+            <p class="st-note">Le combo <b>sort | uniq -c | sort -rn</b> = le classement des occurrences, à connaître par cœur.</p>
+          </li>
+          <li>
+            <div class="st-desc">Extraire les erreurs serveur (5xx)</div>
+            <code>awk '$9 ~ /^5/ {print $9, $7}' /var/log/nginx/access.log | sort | uniq -c | sort -rn | head</code>
+          </li>
+          <li>
+            <div class="st-desc">Naviguer confortablement dans un gros log</div>
+            <code>less /var/log/syslog</code>
+            <p class="st-note">Dans less : <b>/motif</b> cherche, <b>G</b> va à la fin, <b>F</b> suit en direct comme tail -f.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 13. MACHINE QUI RAME ═══ -->
+    <details class="sc" id="sc-process" style="--c:#e67e22">
+      <summary>
+        <span class="sc-ico">🐌</span>
+        <div class="sc-head">
+          <div class="sc-name">La machine rame : trouver le coupable</div>
+          <div class="sc-meta">Linux · top · ps · lsof — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">CPU, mémoire, disque ou réseau ? La démarche pour identifier le processus qui plombe la machine, puis s'en débarrasser proprement.</p>
+        <p class="sc-links"><a href="commands.html?os=universal">⌘ commandes universelles</a> · <a href="quiz.html?os=universal">🎓 quiz</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Vue temps réel</div>
+            <code>htop</code>
+            <p class="st-note">Pas de htop ? <b>top</b> fait l'affaire : <b>Maj+P</b> trie par CPU, <b>Maj+M</b> par mémoire.</p>
+          </li>
+          <li>
+            <div class="st-desc">Photographier les plus gourmands</div>
+            <code>ps aux --sort=-%cpu | head -10</code>
+            <code>ps aux --sort=-%mem | head -10</code>
+          </li>
+          <li>
+            <div class="st-desc">Regarder ce qui sort sur le réseau</div>
+            <code>ss -tunap | head -20</code>
+          </li>
+          <li>
+            <div class="st-desc">Qui tient ce port ou ce fichier ?</div>
+            <code>sudo lsof -i :8080</code>
+            <code>sudo lsof +D /var/log</code>
+          </li>
+          <li>
+            <div class="st-desc">Le noyau a-t-il quelque chose à dire ?</div>
+            <code>sudo dmesg | tail -20</code>
+            <p class="st-note">Cherche les <b>Out of memory: Killed process</b> — l'OOM killer laisse toujours une trace.</p>
+          </li>
+          <li>
+            <div class="st-desc">Tuer proprement (puis fermement)</div>
+            <code>kill -15 1234</code>
+            <code>kill -9 1234</code>
+            <p class="st-note"><b>-15</b> (TERM) demande poliment au programme de quitter ; <b>-9</b> (KILL) l'abat sans lui laisser sauvegarder. Toujours essayer -15 d'abord.</p>
+          </li>
+          <li>
+            <div class="st-desc">Surveiller que ça ne revient pas</div>
+            <code>watch -n 2 'ps aux --sort=-%cpu | head -5'</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 14. SAUVEGARDE RSYNC + CRON ═══ -->
+    <details class="sc" id="sc-backup" style="--c:#16a085">
+      <summary>
+        <span class="sc-ico">🗃️</span>
+        <div class="sc-head">
+          <div class="sc-name">Automatiser ses sauvegardes avec rsync + cron</div>
+          <div class="sc-meta">Linux · rsync · tar · cron — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Une copie miroir chaque nuit, une archive datée chaque semaine, une rotation automatique — et surtout : un test de restauration.</p>
+        <p class="sc-links"><a href="commands.html?os=universal">⌘ commandes universelles</a> · <a href="quiz.html?os=universal">🎓 quiz</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Répétition générale (rien n'est copié)</div>
+            <code>rsync -avn --delete ~/Documents/ /mnt/backup/documents/</code>
+            <p class="st-note"><b>-n</b> = dry-run : montre ce qui serait copié/supprimé. <b>--delete</b> supprime côté backup ce qui n'existe plus côté source — d'où l'intérêt de simuler d'abord.</p>
+          </li>
+          <li>
+            <div class="st-desc">Première vraie copie</div>
+            <code>rsync -a --delete ~/Documents/ /mnt/backup/documents/</code>
+            <p class="st-note">Le slash final sur <b>Documents/</b> compte : avec, on copie le contenu ; sans, le dossier lui-même.</p>
+          </li>
+          <li>
+            <div class="st-desc">Une archive datée et compressée</div>
+            <code>tar -czf /mnt/backup/docs-$(date +%F).tar.gz ~/Documents</code>
+          </li>
+          <li>
+            <div class="st-desc">Planifier : miroir chaque nuit, archive le dimanche</div>
+            <code>crontab -e</code>
+            <pre>0 2 * * * rsync -a --delete /home/tom/Documents/ /mnt/backup/documents/
+0 3 * * 0 tar -czf /mnt/backup/docs-$(date +\%F).tar.gz /home/tom/Documents</pre>
+          </li>
+          <li>
+            <div class="st-desc">Rotation : supprimer les archives de plus de 30 jours</div>
+            <code>find /mnt/backup -name 'docs-*.tar.gz' -mtime +30 -delete</code>
+          </li>
+          <li>
+            <div class="st-desc">Tester la restauration — l'étape que tout le monde saute</div>
+            <code>mkdir /tmp/restore-test && rsync -a /mnt/backup/documents/ /tmp/restore-test/</code>
+            <code>diff -r ~/Documents /tmp/restore-test</code>
+            <p class="st-note">Une sauvegarde jamais restaurée n'est pas une sauvegarde : c'est un espoir.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 15. UTILISATEURS & PERMISSIONS ═══ -->
+    <details class="sc" id="sc-users" style="--c:#2980b9">
+      <summary>
+        <span class="sc-ico">👥</span>
+        <div class="sc-head">
+          <div class="sc-name">Utilisateurs, groupes et permissions propres</div>
+          <div class="sc-meta">Linux · adduser · chmod · chown — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Un collègue rejoint le projet : lui créer un compte, un dossier d'équipe partagé, et comprendre enfin ce que veut dire <b>rwxr-xr--</b>.</p>
+        <p class="sc-links"><a href="commands.html?os=universal">⌘ commandes universelles</a> · <a href="quiz.html?os=universal">🎓 quiz</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Créer l'utilisateur</div>
+            <code>sudo adduser alice</code>
+          </li>
+          <li>
+            <div class="st-desc">L'ajouter aux bons groupes</div>
+            <code>sudo usermod -aG sudo,www-data alice</code>
+            <code>groups alice</code>
+            <p class="st-note">Sans <b>-a</b>, usermod REMPLACE les groupes au lieu d'ajouter — l'erreur classique.</p>
+          </li>
+          <li>
+            <div class="st-desc">Savoir lire les permissions</div>
+            <code>ls -l /srv</code>
+            <p class="st-note"><b>rwxr-xr--</b> = propriétaire : lire/écrire/exécuter · groupe : lire/exécuter · autres : lire. En octal : <b>754</b>.</p>
+          </li>
+          <li>
+            <div class="st-desc">Créer un dossier d'équipe partagé</div>
+            <code>sudo mkdir -p /srv/partage</code>
+            <code>sudo chown root:www-data /srv/partage</code>
+          </li>
+          <li>
+            <div class="st-desc">Permissions de groupe + héritage</div>
+            <code>sudo chmod 2775 /srv/partage</code>
+            <p class="st-note">Le <b>2</b> devant (setgid) : tout fichier créé dedans appartiendra automatiquement au groupe <b>www-data</b>.</p>
+          </li>
+          <li>
+            <div class="st-desc">Verrouiller un fichier sensible</div>
+            <code>sudo chown root:root /etc/app/secret.conf</code>
+            <code>sudo chmod 600 /etc/app/secret.conf</code>
+            <p class="st-note"><b>600</b> : seul le propriétaire lit et écrit. C'est le réglage attendu pour clés privées et fichiers de mots de passe.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 16. TRANSFERT DE FICHIERS ═══ -->
+    <details class="sc" id="sc-transfer" style="--c:#c0392b">
+      <summary>
+        <span class="sc-ico">📤</span>
+        <div class="sc-head">
+          <div class="sc-name">Transférer des fichiers entre deux machines</div>
+          <div class="sc-meta">Linux · scp · rsync · SSH — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Du petit fichier à la grosse archive : la bonne méthode selon la situation, avec vérification d'intégrité à l'arrivée.</p>
+        <p class="sc-links"><a href="commands.html?os=openssl">⌘ commandes OpenSSL/SSH</a> · <a href="quiz.html?os=openssl">🎓 quiz</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Un fichier, vite fait</div>
+            <code>scp rapport.pdf tom@serveur:/home/tom/</code>
+          </li>
+          <li>
+            <div class="st-desc">Un dossier entier, avec reprise sur coupure</div>
+            <code>rsync -avP ~/photos/ tom@serveur:photos/</code>
+            <p class="st-note"><b>-P</b> = barre de progression + reprise : si ça coupe à 80%, on ne repart pas de zéro. Pour les gros volumes, préfère toujours rsync à scp.</p>
+          </li>
+          <li>
+            <div class="st-desc">Dans l'autre sens (serveur → poste)</div>
+            <code>scp tom@serveur:/var/log/app.log .</code>
+          </li>
+          <li>
+            <div class="st-desc">Gros dossier : compresser à la volée à travers SSH</div>
+            <code>tar -czf - mondossier/ | ssh tom@serveur 'tar -xzf - -C /destination'</code>
+            <p class="st-note">Rien n'est écrit en local : l'archive voyage compressée dans le tunnel SSH et se décompresse à l'arrivée.</p>
+          </li>
+          <li>
+            <div class="st-desc">Partage express sur le réseau local</div>
+            <code>python3 -m http.server 8000</code>
+            <p class="st-note">Le dossier courant devient http://ton-ip:8000 — parfait pour dépanner, à couper juste après (aucune authentification).</p>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier l'intégrité à l'arrivée</div>
+            <code>openssl dgst -sha256 rapport.pdf</code>
+            <p class="st-note">Lance la même commande des deux côtés : si les empreintes diffèrent, le fichier est corrompu.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 17. SERVICE SYSTEMD ═══ -->
+    <details class="sc" id="sc-service" style="--c:#8e44ad">
+      <summary>
+        <span class="sc-ico">⚙️</span>
+        <div class="sc-head">
+          <div class="sc-name">Transformer son script en service systemd</div>
+          <div class="sc-meta">Linux · systemd · journalctl — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Ton appli tourne dans un terminal et meurt quand tu fermes SSH ? Un fichier unit et systemd la démarre au boot, la relance si elle plante et collecte ses logs.</p>
+        <p class="sc-links"><a href="commands.html?os=debian">⌘ commandes Debian/Ubuntu</a> · <a href="quiz.html?os=debian">🎓 quiz</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Écrire l'unité</div>
+            <code>sudo nano /etc/systemd/system/monapp.service</code>
+            <pre>[Unit]
+Description=Mon application
+After=network.target
+
+[Service]
+User=tom
+WorkingDirectory=/home/tom/monapp
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target</pre>
+            <p class="st-note"><b>Restart=on-failure</b> : systemd relance l'appli toute seule si elle plante.</p>
+          </li>
+          <li>
+            <div class="st-desc">Faire relire la configuration à systemd</div>
+            <code>sudo systemctl daemon-reload</code>
+          </li>
+          <li>
+            <div class="st-desc">Démarrer et vérifier</div>
+            <code>sudo systemctl start monapp</code>
+            <code>systemctl status monapp</code>
+            <p class="st-note">Cherche <b>active (running)</b> en vert. Sinon, le message d'erreur est juste en dessous.</p>
+          </li>
+          <li>
+            <div class="st-desc">Activer au démarrage de la machine</div>
+            <code>sudo systemctl enable monapp</code>
+          </li>
+          <li>
+            <div class="st-desc">Suivre ses logs</div>
+            <code>journalctl -u monapp -f</code>
+          </li>
+          <li>
+            <div class="st-desc">Au quotidien</div>
+            <code>sudo systemctl restart monapp</code>
+            <code>journalctl -u monapp --since today</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 18. DISQUE USB ═══ -->
+    <details class="sc" id="sc-usb" style="--c:#7f8c8d">
+      <summary>
+        <span class="sc-ico">🔌</span>
+        <div class="sc-head">
+          <div class="sc-name">Identifier, formater et monter un disque</div>
+          <div class="sc-meta">Linux · lsblk · parted · fstab — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Un disque USB ou un deuxième disque dur tout neuf : le rendre utilisable, puis le faire monter automatiquement à chaque démarrage.</p>
+        <p class="sc-links"><a href="commands.html?os=universal">⌘ commandes universelles</a> · <a href="quiz.html?os=universal">🎓 quiz</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">L'identifier SANS se tromper</div>
+            <code>lsblk</code>
+            <code>sudo dmesg | tail -10</code>
+            <p class="st-note">Se tromper de disque à l'étape 4 = tout perdre. Vérifie la taille et l'absence de partitions montées. Ici on suppose que c'est <b>/dev/sdb</b>.</p>
+          </li>
+          <li>
+            <div class="st-desc">Voir ce qu'il contient déjà</div>
+            <code>sudo parted /dev/sdb print</code>
+            <code>blkid</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer la table de partitions et une partition</div>
+            <code>sudo parted /dev/sdb mklabel gpt</code>
+            <code>sudo parted -a optimal /dev/sdb mkpart primary ext4 0% 100%</code>
+          </li>
+          <li>
+            <div class="st-desc">Formater en ext4</div>
+            <code>sudo mkfs.ext4 -L DATA /dev/sdb1</code>
+            <p class="st-note"><b>-L DATA</b> donne un nom (label) — pratique pour s'y retrouver dans lsblk.</p>
+          </li>
+          <li>
+            <div class="st-desc">Monter</div>
+            <code>sudo mkdir -p /mnt/data</code>
+            <code>sudo mount /dev/sdb1 /mnt/data</code>
+            <code>df -h /mnt/data</code>
+          </li>
+          <li>
+            <div class="st-desc">Montage automatique au boot</div>
+            <code>blkid /dev/sdb1</code>
+            <code>sudo nano /etc/fstab</code>
+            <pre>UUID=xxxx-xxxx  /mnt/data  ext4  defaults  0  2</pre>
+            <p class="st-note">Toujours utiliser l'<b>UUID</b> (donné par blkid), jamais /dev/sdb1 : l'ordre des disques peut changer au boot.</p>
+          </li>
+          <li>
+            <div class="st-desc">Débrancher proprement</div>
+            <code>sudo umount /mnt/data</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 19. GIT : PREMIER PROJET ═══ -->
+    <details class="sc" id="sc-gitstart" style="--c:#F05032">
+      <summary>
+        <span class="sc-ico">🌿</span>
+        <div class="sc-head">
+          <div class="sc-name">Publier son premier projet sur GitHub</div>
+          <div class="sc-meta">Git · GitHub — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Du dossier local au dépôt en ligne : initialiser, ignorer ce qui doit l'être, faire un premier commit propre et pousser sur GitHub.</p>
+        <p class="sc-links"><a href="commands.html?os=git">⌘ commandes Git</a> · <a href="quiz.html?os=git">🎓 quiz Git</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Initialiser le dépôt dans le dossier du projet</div>
+            <code>git init</code>
+            <code>git status</code>
+          </li>
+          <li>
+            <div class="st-desc">Dire à Git ce qu'il doit IGNORER — avant le premier commit</div>
+            <code>nano .gitignore</code>
+            <pre>node_modules/
+.env
+*.log
+dist/</pre>
+            <p class="st-note">Un <b>.env</b> avec des mots de passe déjà commité reste dans l'historique même après suppression — d'où l'ordre des étapes.</p>
+          </li>
+          <li>
+            <div class="st-desc">Ajouter les fichiers au suivi</div>
+            <code>git add .</code>
+            <code>git status</code>
+          </li>
+          <li>
+            <div class="st-desc">Premier commit</div>
+            <code>git commit -m "Premier commit : structure du projet"</code>
+          </li>
+          <li>
+            <div class="st-desc">Relier au dépôt GitHub (créé vide sur le site)</div>
+            <code>git branch -M main</code>
+            <code>git remote add origin git@github.com:tonuser/monprojet.git</code>
+          </li>
+          <li>
+            <div class="st-desc">Pousser</div>
+            <code>git push -u origin main</code>
+            <p class="st-note"><b>-u</b> mémorise le lien : ensuite un simple <b>git push</b> suffit.</p>
+          </li>
+          <li>
+            <div class="st-desc">La routine quotidienne</div>
+            <code>git add -p</code>
+            <code>git commit -m "Message clair de ce que change ce commit"</code>
+            <code>git push</code>
+            <p class="st-note"><b>add -p</b> te montre chaque modification une par une : des commits propres, pas des fourre-tout.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 20. GIT : RÉPARER ═══ -->
+    <details class="sc" id="sc-gitfix" style="--c:#d35400">
+      <summary>
+        <span class="sc-ico">🚑</span>
+        <div class="sc-head">
+          <div class="sc-name">Réparer ses bêtises Git (sans tout casser)</div>
+          <div class="sc-meta">Git · restore · revert · reflog — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Mauvais fichier ajouté, commit raté, branche supprimée : pour chaque bêtise classique, la commande qui répare — de la plus douce à l'arme lourde.</p>
+        <p class="sc-links"><a href="commands.html?os=git">⌘ commandes Git</a> · <a href="quiz.html?os=git">🎓 quiz Git</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">D'abord : respirer et regarder où on en est</div>
+            <code>git status</code>
+            <code>git log --oneline -5</code>
+          </li>
+          <li>
+            <div class="st-desc">Annuler des modifications pas encore ajoutées</div>
+            <code>git restore fichier.txt</code>
+            <p class="st-note">Irréversible pour les modifs non commitées — c'est la seule commande de cette liste qui perd vraiment du travail.</p>
+          </li>
+          <li>
+            <div class="st-desc">Retirer un fichier ajouté par erreur (avant commit)</div>
+            <code>git restore --staged secret.env</code>
+          </li>
+          <li>
+            <div class="st-desc">Corriger le dernier commit (message oublié, fichier manquant)</div>
+            <code>git add fichier-oublie.js</code>
+            <code>git commit --amend</code>
+            <p class="st-note">Jamais <b>--amend</b> sur un commit déjà poussé : ça réécrit l'historique que les autres ont déjà.</p>
+          </li>
+          <li>
+            <div class="st-desc">Mettre de côté un travail en cours</div>
+            <code>git stash</code>
+            <code>git stash pop</code>
+            <p class="st-note">Parfait quand on doit changer de branche en urgence sans commiter du travail à moitié fait.</p>
+          </li>
+          <li>
+            <div class="st-desc">Annuler un commit déjà poussé</div>
+            <code>git revert abc123</code>
+            <p class="st-note"><b>revert</b> crée un commit inverse — l'historique reste intact. <b>reset</b> réécrit l'historique : réservé à ce qui n'est pas encore poussé.</p>
+          </li>
+          <li>
+            <div class="st-desc">Le filet de sécurité ultime : reflog</div>
+            <code>git reflog</code>
+            <code>git reset --hard HEAD@{2}</code>
+            <p class="st-note">Le reflog garde la trace de TOUT (même les commits « perdus ») pendant ~90 jours. Presque rien n'est vraiment perdu avec Git.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 21. NMAP ═══ -->
+    <details class="sc" id="sc-nmap" style="--c:#4682B4">
+      <summary>
+        <span class="sc-ico">🛰️</span>
+        <div class="sc-head">
+          <div class="sc-name">Cartographier son propre réseau avec Nmap</div>
+          <div class="sc-meta">Nmap · audit — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Savoir ce qui est connecté chez toi et ce que chaque machine expose. Règle d'or : on ne scanne QUE les réseaux qu'on administre — scanner celui des autres est illégal.</p>
+        <p class="sc-links"><a href="commands.html?os=nmap">⌘ commandes Nmap</a> · <a href="quiz.html?os=nmap">🎓 quiz Nmap</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Qui est connecté sur mon réseau ?</div>
+            <code>nmap -sn 192.168.1.0/24</code>
+            <p class="st-note"><b>-sn</b> = découverte seule, aucun port scanné. Tu devrais reconnaître chaque appareil listé — sinon, enquête !</p>
+          </li>
+          <li>
+            <div class="st-desc">Quels ports ouverts sur une machine ?</div>
+            <code>nmap 192.168.1.50</code>
+          </li>
+          <li>
+            <div class="st-desc">Identifier les services et leurs versions</div>
+            <code>nmap -sV -p 22,80,443 192.168.1.50</code>
+            <p class="st-note">La version révèle les logiciels obsolètes — c'est la base d'un audit de sécurité.</p>
+          </li>
+          <li>
+            <div class="st-desc">Les 100 ports les plus courants, rapidement</div>
+            <code>nmap --top-ports 100 192.168.1.50</code>
+          </li>
+          <li>
+            <div class="st-desc">Le scan complet du dimanche</div>
+            <code>sudo nmap -A 192.168.1.50</code>
+            <p class="st-note"><b>-A</b> = détection d'OS + versions + scripts + traceroute. Long et bruyant, mais exhaustif.</p>
+          </li>
+          <li>
+            <div class="st-desc">Garder une trace pour comparer plus tard</div>
+            <code>nmap -oN scan-$(date +%F).txt 192.168.1.0/24</code>
+            <p class="st-note">Relance le même scan chaque mois et compare : un nouveau port ouvert = une question à se poser.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 22. WINDOWS LENT ═══ -->
+    <details class="sc" id="sc-winclean" style="--c:#0078D4">
+      <summary>
+        <span class="sc-ico">🪟</span>
+        <div class="sc-head">
+          <div class="sc-name">Windows lent : diagnostic et réparation</div>
+          <div class="sc-meta">Windows · sfc · DISM · chkdsk — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Le PC familial « qui rame depuis la mise à jour » : la trousse de premiers secours Windows, dans l'ordre. Terminal en administrateur pour tout ce qui suit.</p>
+        <p class="sc-links"><a href="commands.html?os=windows">⌘ commandes Windows</a> · <a href="quiz.html?os=windows">🎓 quiz Windows</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">État général de la machine</div>
+            <code>systeminfo</code>
+            <p class="st-note">Regarde la RAM disponible et la date d'installation — un Windows de 8 ans a le droit d'être fatigué.</p>
+          </li>
+          <li>
+            <div class="st-desc">Qui mange le CPU en ce moment ?</div>
+            <code>Get-Process | Sort-Object CPU -Descending | Select-Object -First 10</code>
+          </li>
+          <li>
+            <div class="st-desc">Tuer un processus bloqué</div>
+            <code>tasklist | findstr chrome</code>
+            <code>taskkill /PID 1234 /F</code>
+          </li>
+          <li>
+            <div class="st-desc">Réparer les fichiers système</div>
+            <code>sfc /scannow</code>
+          </li>
+          <li>
+            <div class="st-desc">Si sfc trouve des erreurs qu'il ne répare pas</div>
+            <code>DISM /Online /Cleanup-Image /RestoreHealth</code>
+            <code>sfc /scannow</code>
+            <p class="st-note">L'ordre : <b>DISM</b> répare l'image de référence, puis on relance <b>sfc</b> qui s'appuie dessus.</p>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier le disque</div>
+            <code>chkdsk C: /f</code>
+            <p class="st-note">Sur C:, la vérification se fera au prochain redémarrage — c'est normal.</p>
+          </li>
+          <li>
+            <div class="st-desc">Jeter un œil aux erreurs récentes</div>
+            <code>Get-WinEvent -LogName System -MaxEvents 200 | Where-Object LevelDisplayName -eq 'Erreur' | Select-Object -First 10</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 23. POWERSHELL AUTO ═══ -->
+    <details class="sc" id="sc-psauto" style="--c:#5391FE">
+      <summary>
+        <span class="sc-ico">⚡</span>
+        <div class="sc-head">
+          <div class="sc-name">Automatiser un nettoyage avec PowerShell</div>
+          <div class="sc-meta">PowerShell · schtasks — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Archiver puis supprimer les vieux fichiers d'un dossier, chaque semaine, tout seul : ton premier vrai script PowerShell planifié.</p>
+        <p class="sc-links"><a href="commands.html?os=powershell">⌘ commandes PowerShell</a> · <a href="quiz.html?os=powershell">🎓 quiz PowerShell</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Autoriser ses propres scripts (une seule fois)</div>
+            <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>
+          </li>
+          <li>
+            <div class="st-desc">Repérer les fichiers de plus de 30 jours</div>
+            <code>Get-ChildItem C:\Temp -Recurse -File | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-30) }</code>
+          </li>
+          <li>
+            <div class="st-desc">Les archiver avant d'y toucher</div>
+            <code>Compress-Archive -Path C:\Temp\* -DestinationPath C:\Archives\temp-2026-07.zip</code>
+          </li>
+          <li>
+            <div class="st-desc">Écrire le script complet</div>
+            <code>notepad nettoyage.ps1</code>
+            <pre>$vieux = Get-ChildItem C:\Temp -Recurse -File |
+  Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-30) }
+$zip = "C:\Archives\temp-$(Get-Date -Format 'yyyy-MM').zip"
+if ($vieux) {
+  Compress-Archive -Path $vieux.FullName -DestinationPath $zip -Update
+  $vieux | Remove-Item
+  "$(Get-Date) : $($vieux.Count) fichiers archives" |
+    Out-File C:\Archives\nettoyage.log -Append
+}</pre>
+          </li>
+          <li>
+            <div class="st-desc">Tester à blanc, puis pour de vrai</div>
+            <code>Get-ChildItem C:\Temp -Recurse -File | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-30) } | Remove-Item -WhatIf</code>
+            <p class="st-note"><b>-WhatIf</b> affiche ce qui serait supprimé sans rien toucher — le dry-run de PowerShell.</p>
+          </li>
+          <li>
+            <div class="st-desc">Planifier chaque dimanche à 9 h</div>
+            <code>schtasks /Create /TN "Nettoyage Temp" /TR "pwsh -File C:\Scripts\nettoyage.ps1" /SC WEEKLY /D SUN /ST 09:00</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 24. TMUX ═══ -->
+    <details class="sc" id="sc-tmux" style="--c:#1BB91F">
+      <summary>
+        <span class="sc-ico">🧵</span>
+        <div class="sc-head">
+          <div class="sc-name">Survivre en SSH avec tmux</div>
+          <div class="sc-meta">tmux · sessions — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">La connexion SSH saute et ta compilation de 2 h meurt avec elle ? Plus jamais : tmux fait tourner tes programmes dans une session qui survit à tout.</p>
+        <p class="sc-links"><a href="commands.html?os=tmux">⌘ commandes tmux</a> · <a href="quiz.html?os=tmux">🎓 quiz tmux</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Démarrer une session nommée</div>
+            <code>tmux new -s travail</code>
+          </li>
+          <li>
+            <div class="st-desc">Le réflexe vital : se détacher</div>
+            <code>tmux detach</code>
+            <p class="st-note">Ou le raccourci : <b>Ctrl+b</b> puis <b>d</b>. La session continue de tourner en arrière-plan, programmes compris.</p>
+          </li>
+          <li>
+            <div class="st-desc">Revenir — même après une déconnexion brutale</div>
+            <code>tmux attach -t travail</code>
+            <p class="st-note">Le Wi-Fi a sauté pendant la nuit ? Reconnecte-toi en SSH, attach, et tout est encore là.</p>
+          </li>
+          <li>
+            <div class="st-desc">Diviser l'écran</div>
+            <p class="st-note"><b>Ctrl+b %</b> coupe verticalement, <b>Ctrl+b "</b> horizontalement, <b>Ctrl+b flèches</b> pour naviguer entre les panneaux.</p>
+            <code>tmux split-window -h</code>
+          </li>
+          <li>
+            <div class="st-desc">Plusieurs fenêtres, comme des onglets</div>
+            <p class="st-note"><b>Ctrl+b c</b> crée une fenêtre, <b>Ctrl+b n</b> / <b>Ctrl+b p</b> pour passer de l'une à l'autre, <b>Ctrl+b 0-9</b> pour sauter directement.</p>
+          </li>
+          <li>
+            <div class="st-desc">Remonter dans l'historique, puis tout fermer</div>
+            <p class="st-note"><b>Ctrl+b [</b> passe en mode défilement (flèches/PgUp), <b>q</b> pour en sortir.</p>
+            <code>tmux kill-session -t travail</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 25. VIM ═══ -->
+    <details class="sc" id="sc-vim" style="--c:#019733">
+      <summary>
+        <span class="sc-ico">✏️</span>
+        <div class="sc-head">
+          <div class="sc-name">S'en sortir dans Vim (et finir par l'aimer)</div>
+          <div class="sc-meta">Vim · survie → confort — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Coincé dans Vim après un <b>git commit</b> ou un <b>crontab -e</b> ? De la survie immédiate aux commandes qui rendent accro.</p>
+        <p class="sc-links"><a href="commands.html?os=vim">⌘ commandes Vim</a> · <a href="quiz.html?os=vim">🎓 quiz Vim</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Comprendre les modes — 90 % de la confusion vient de là</div>
+            <p class="st-note"><b>Échap</b> = mode normal (on navigue, on commande). <b>i</b> = mode insertion (on tape du texte). Perdu ? Tape Échap deux fois, tu es en terrain connu.</p>
+          </li>
+          <li>
+            <div class="st-desc">Sauver et quitter (la question à 1 million de vues)</div>
+            <code>:wq</code>
+            <code>:q!</code>
+            <p class="st-note"><b>:wq</b> = sauver puis quitter · <b>:q!</b> = quitter SANS sauver.</p>
+          </li>
+          <li>
+            <div class="st-desc">Se déplacer sans les flèches</div>
+            <p class="st-note"><b>h j k l</b> = ← ↓ ↑ → · <b>gg</b> = début du fichier · <b>G</b> = fin · <b>0</b> = début de ligne · <b>$</b> = fin de ligne.</p>
+          </li>
+          <li>
+            <div class="st-desc">Supprimer, copier, coller</div>
+            <p class="st-note"><b>dd</b> supprime la ligne, <b>yy</b> la copie, <b>p</b> colle en dessous. <b>5dd</b> supprime 5 lignes — les nombres multiplient tout.</p>
+          </li>
+          <li>
+            <div class="st-desc">Chercher</div>
+            <code>/erreur</code>
+            <p class="st-note"><b>n</b> = occurrence suivante, <b>N</b> = précédente.</p>
+          </li>
+          <li>
+            <div class="st-desc">Remplacer dans tout le fichier</div>
+            <code>:%s/ancien/nouveau/g</code>
+            <p class="st-note">Ajoute <b>c</b> à la fin (<b>/gc</b>) pour confirmer chaque remplacement un par un.</p>
+          </li>
+          <li>
+            <div class="st-desc">Le petit confort qui change tout</div>
+            <code>vim ~/.vimrc</code>
+            <pre>set number
+syntax on
+set tabstop=4 shiftwidth=4 expandtab</pre>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 26. PYTHON VENV ═══ -->
+    <details class="sc" id="sc-python" style="--c:#3776AB">
+      <summary>
+        <span class="sc-ico">🐍</span>
+        <div class="sc-head">
+          <div class="sc-name">Un environnement Python propre pour chaque projet</div>
+          <div class="sc-meta">Python · venv · pip — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Fini les <b>pip install</b> qui cassent le système et les « ça marche chez moi » : un environnement virtuel isolé par projet, reproductible partout.</p>
+        <p class="sc-links"><a href="commands.html?os=python">⌘ commandes Python/pip</a> · <a href="quiz.html?os=python">🎓 quiz Python</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Créer le venv à la racine du projet</div>
+            <code>python3 -m venv .venv</code>
+          </li>
+          <li>
+            <div class="st-desc">L'activer</div>
+            <code>source .venv/bin/activate</code>
+            <p class="st-note">Sous Windows : <b>.venv\Scripts\activate</b>. Le nom du venv apparaît dans le prompt — tu sais toujours où tu installes.</p>
+          </li>
+          <li>
+            <div class="st-desc">Installer les dépendances DANS le venv</div>
+            <code>pip install requests flask</code>
+            <code>pip list</code>
+          </li>
+          <li>
+            <div class="st-desc">Figer les versions pour l'équipe</div>
+            <code>pip freeze > requirements.txt</code>
+            <p class="st-note">Ce fichier se commite avec le projet ; le dossier <b>.venv/</b>, lui, va dans le .gitignore.</p>
+          </li>
+          <li>
+            <div class="st-desc">Reproduire l'environnement ailleurs</div>
+            <code>python3 -m venv .venv && source .venv/bin/activate</code>
+            <code>pip install -r requirements.txt</code>
+          </li>
+          <li>
+            <div class="st-desc">Et pour les outils globaux (CLI) : pipx</div>
+            <code>pipx install httpie</code>
+            <p class="st-note">pipx isole chaque outil dans son propre venv, sans polluer le système. Alternative moderne tout-en-un : <b>uv</b>.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 27. REVERSE PROXY NGINX ═══ -->
+    <details class="sc" id="sc-proxy" style="--c:#00b894">
+      <summary>
+        <span class="sc-ico">🔁</span>
+        <div class="sc-head">
+          <div class="sc-name">Un seul serveur, plusieurs applis : reverse proxy Nginx</div>
+          <div class="sc-meta">Nginx · proxy_pass — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Une appli Node sur le port 3000, une API Python sur le 8001, un seul serveur et une seule IP : Nginx reçoit tout sur le port 80/443 et distribue selon le domaine.</p>
+        <p class="sc-links"><a href="commands.html?os=nginx">⌘ commandes Nginx</a> · <a href="quiz.html?os=nginx">🎓 quiz Nginx</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Vérifier que les applis tournent en local</div>
+            <code>curl http://localhost:3000</code>
+            <code>ss -tulnp | grep -E '3000|8001'</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer le vhost de la première appli</div>
+            <code>sudo nano /etc/nginx/sites-available/app1</code>
+            <pre>server {
+    listen 80;
+    server_name app1.monsite.fr;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}</pre>
+            <p class="st-note">Les <b>proxy_set_header</b> transmettent le vrai domaine et la vraie IP du visiteur à l'appli — sinon elle croit que tout vient de 127.0.0.1.</p>
+          </li>
+          <li>
+            <div class="st-desc">Même chose pour la deuxième, autre domaine</div>
+            <pre>server {
+    listen 80;
+    server_name api.monsite.fr;
+
+    location / {
+        proxy_pass http://127.0.0.1:8001;
+        proxy_set_header Host $host;
+    }
+}</pre>
+          </li>
+          <li>
+            <div class="st-desc">Activer les deux et recharger</div>
+            <code>sudo ln -s /etc/nginx/sites-available/app1 /etc/nginx/sites-enabled/</code>
+            <code>sudo nginx -t &amp;&amp; sudo systemctl reload nginx</code>
+          </li>
+          <li>
+            <div class="st-desc">HTTPS pour tout le monde d'un coup</div>
+            <code>sudo certbot --nginx -d app1.monsite.fr -d api.monsite.fr</code>
+          </li>
+          <li>
+            <div class="st-desc">Si un domaine renvoie 502 : lire les logs</div>
+            <code>sudo tail -f /var/log/nginx/error.log</code>
+            <p class="st-note"><b>502 Bad Gateway</b> = Nginx va bien mais l'appli derrière ne répond pas — vérifie qu'elle tourne (étape 1).</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 28. WORDPRESS CASSÉ ═══ -->
+    <details class="sc" id="sc-wordpress" style="--c:#21759B">
+      <summary>
+        <span class="sc-ico">🩹</span>
+        <div class="sc-head">
+          <div class="sc-name">Réparer un site WordPress cassé</div>
+          <div class="sc-meta">WordPress · Nginx · MySQL · PHP — 8 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Page blanche, erreur 500 ou « Error establishing a database connection » : la méthode pour diagnostiquer la chaîne complète (serveur web → PHP → base) au lieu de réinstaller au hasard.</p>
+        <p class="sc-links"><a href="commands.html?os=nginx">⌘ Nginx</a> · <a href="commands.html?os=mysql">⌘ MySQL</a> · <a href="quiz.html?os=mysql">🎓 quiz</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Identifier le symptôme exact</div>
+            <code>curl -I https://monsite.fr</code>
+            <p class="st-note"><b>502</b> = PHP-FPM mort · <b>500</b> = erreur PHP (souvent un plugin) · <b>200</b> mais page blanche = erreur masquée.</p>
+          </li>
+          <li>
+            <div class="st-desc">Lire les logs — la réponse y est presque toujours</div>
+            <code>sudo tail -50 /var/log/nginx/error.log</code>
+            <code>sudo journalctl -u php8.2-fpm --since "1 hour ago"</code>
+          </li>
+          <li>
+            <div class="st-desc">Toute la chaîne est-elle debout ?</div>
+            <code>systemctl status nginx php8.2-fpm mysql</code>
+            <code>sudo systemctl restart php8.2-fpm</code>
+          </li>
+          <li>
+            <div class="st-desc">La base répond-elle avec les identifiants du site ?</div>
+            <code>mysql -u wpuser -p wordpress</code>
+            <p class="st-note">Les identifiants sont dans <b>wp-config.php</b> (DB_USER / DB_PASSWORD). S'ils ne passent plus ici, WordPress n'a aucune chance.</p>
+          </li>
+          <li>
+            <div class="st-desc">Rendre les erreurs visibles</div>
+            <code>sudo nano /var/www/monsite/wp-config.php</code>
+            <pre>define('WP_DEBUG', true);
+define('WP_DEBUG_LOG', true);
+define('WP_DEBUG_DISPLAY', false);</pre>
+            <code>tail -f /var/www/monsite/wp-content/debug.log</code>
+          </li>
+          <li>
+            <div class="st-desc">Coupable n°1 : un plugin — le neutraliser sans admin</div>
+            <code>mv wp-content/plugins/plugin-suspect wp-content/plugins/plugin-suspect.off</code>
+            <p class="st-note">Renommer le dossier désactive le plugin. Renomme tout <b>plugins/</b> pour tout couper d'un coup, puis réactive un par un.</p>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier les permissions</div>
+            <code>sudo chown -R www-data:www-data /var/www/monsite</code>
+            <code>sudo find /var/www/monsite -type d -exec chmod 755 {} + -o -type f -exec chmod 644 {} +</code>
+          </li>
+          <li>
+            <div class="st-desc">Et la prochaine fois : un plan B AVANT de bidouiller</div>
+            <code>mysqldump wordpress | gzip &gt; wp-db-$(date +%F).sql.gz</code>
+            <code>tar -czf wp-files-$(date +%F).tar.gz /var/www/monsite</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 29. MIGRATION SERVEUR ═══ -->
+    <details class="sc" id="sc-migrate" style="--c:#f39c12">
+      <summary>
+        <span class="sc-ico">🚚</span>
+        <div class="sc-head">
+          <div class="sc-name">Migrer un serveur vers une nouvelle machine</div>
+          <div class="sc-meta">Linux · rsync · mysqldump · DNS — 8 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Le VPS arrive en fin de vie ou tu changes d'hébergeur : déménager données, base et services vers la nouvelle machine avec un minimum de coupure.</p>
+        <p class="sc-links"><a href="commands.html?os=universal">⌘ commandes universelles</a> · <a href="quiz.html?os=universal">🎓 quiz</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Inventaire de l'ancien serveur</div>
+            <code>ss -tulnp</code>
+            <code>df -h</code>
+            <p class="st-note">Note tout ce qui écoute (services à réinstaller) et le volume de données à déplacer.</p>
+          </li>
+          <li>
+            <div class="st-desc">Sauvegarder base et configuration</div>
+            <code>mysqldump --all-databases | gzip &gt; bases-$(date +%F).sql.gz</code>
+            <code>tar -czf configs.tar.gz /etc/nginx /etc/php /var/spool/cron</code>
+          </li>
+          <li>
+            <div class="st-desc">Transférer les données vers la nouvelle machine</div>
+            <code>rsync -avP /var/www/ tom@nouvelle-ip:/var/www/</code>
+            <code>rsync -avP bases-*.sql.gz configs.tar.gz tom@nouvelle-ip:~/</code>
+          </li>
+          <li>
+            <div class="st-desc">Installer les mêmes services sur la neuve</div>
+            <code>sudo apt install nginx mysql-server php-fpm</code>
+          </li>
+          <li>
+            <div class="st-desc">Restaurer base et config</div>
+            <code>gunzip &lt; bases-2026-07-03.sql.gz | sudo mysql</code>
+            <code>sudo tar -xzf configs.tar.gz -C /</code>
+            <code>sudo nginx -t &amp;&amp; sudo systemctl restart nginx</code>
+          </li>
+          <li>
+            <div class="st-desc">Tester AVANT de basculer le DNS</div>
+            <code>curl -I --resolve monsite.fr:443:NOUVELLE-IP https://monsite.fr</code>
+            <p class="st-note"><b>--resolve</b> force curl à interroger la nouvelle machine comme si le DNS pointait déjà dessus — le site se teste sans toucher à rien.</p>
+          </li>
+          <li>
+            <div class="st-desc">Basculer le DNS et vérifier la propagation</div>
+            <code>dig +short monsite.fr</code>
+            <p class="st-note">Baisse le TTL de l'enregistrement à 300 s la veille : la bascule se propage en minutes au lieu d'heures.</p>
+          </li>
+          <li>
+            <div class="st-desc">Surveiller la nouvelle, garder l'ancienne en vie quelques jours</div>
+            <code>sudo tail -f /var/log/nginx/access.log</code>
+            <p class="st-note">Tant que du trafic arrive encore sur l'ancienne (caches DNS), ne l'éteins pas.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 30. ACL CISCO ═══ -->
+    <details class="sc" id="sc-acl" style="--c:#049FD9">
+      <summary>
+        <span class="sc-ico">🚧</span>
+        <div class="sc-head">
+          <div class="sc-name">Filtrer le trafic avec une ACL Cisco</div>
+          <div class="sc-meta">Cisco IOS · access-list — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Autoriser le web, bloquer le reste : écrire une liste de contrôle d'accès, l'appliquer au bon endroit, et surtout la tester sans se couper la main.</p>
+        <p class="sc-links"><a href="commands.html?os=cisco">⌘ commandes Cisco IOS</a> · <a href="quiz.html?os=cisco">🎓 quiz Cisco IOS</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Passer en configuration</div>
+            <code>enable</code>
+            <code>configure terminal</code>
+          </li>
+          <li>
+            <div class="st-desc">Écrire l'ACL étendue</div>
+            <pre>access-list 100 permit tcp 192.168.10.0 0.0.0.255 any eq 443
+access-list 100 permit tcp 192.168.10.0 0.0.0.255 any eq 80
+access-list 100 permit udp 192.168.10.0 0.0.0.255 any eq 53</pre>
+            <p class="st-note">Un <b>deny ip any any</b> implicite termine TOUTE ACL : ce qui n'est pas explicitement permis est bloqué. Et 0.0.0.255 est un masque inversé (wildcard), pas un masque de sous-réseau.</p>
+          </li>
+          <li>
+            <div class="st-desc">L'appliquer sur l'interface, dans le bon sens</div>
+            <code>interface gigabitEthernet 0/1</code>
+            <code>ip access-group 100 in</code>
+            <code>exit</code>
+            <p class="st-note"><b>in</b> = trafic qui ENTRE dans le routeur par cette interface. Se tromper de sens est l'erreur classique.</p>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier ce qui est réellement appliqué</div>
+            <code>show running-config | section access-list</code>
+          </li>
+          <li>
+            <div class="st-desc">Tester depuis un poste du VLAN</div>
+            <code>ping 8.8.8.8</code>
+            <p class="st-note">Le ping doit ÉCHOUER (ICMP n'est pas dans l'ACL) mais le web doit passer — c'est exactement ce qu'on a écrit.</p>
+          </li>
+          <li>
+            <div class="st-desc">Sauvegarder</div>
+            <code>copy running-config startup-config</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 31. CI GITHUB ACTIONS ═══ -->
+    <details class="sc" id="sc-ci" style="--c:#2088FF">
+      <summary>
+        <span class="sc-ico">🏗️</span>
+        <div class="sc-head">
+          <div class="sc-name">Ton premier pipeline CI avec GitHub Actions</div>
+          <div class="sc-meta">Git · GitHub Actions · YAML — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">À chaque push, GitHub lance tes tests tout seul et t'affiche un ✓ vert ou un ✗ rouge. Fini le « ça marchait chez moi » : la machine vérifie avant les humains.</p>
+        <p class="sc-links"><a href="commands.html?os=git">⌘ commandes Git</a> · <a href="quiz.html?os=git">🎓 quiz Git</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Créer le dossier des workflows</div>
+            <code>mkdir -p .github/workflows</code>
+          </li>
+          <li>
+            <div class="st-desc">Écrire le pipeline</div>
+            <code>nano .github/workflows/ci.yml</code>
+            <pre>name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm test</pre>
+            <p class="st-note">Adapte les deux dernières lignes à ton langage : <b>pip install -r requirements.txt</b> + <b>pytest</b> pour Python, etc.</p>
+          </li>
+          <li>
+            <div class="st-desc">Pousser — c'est tout ce qu'il faut pour l'activer</div>
+            <code>git add .github/workflows/ci.yml</code>
+            <code>git commit -m "CI : tests automatiques à chaque push"</code>
+            <code>git push</code>
+          </li>
+          <li>
+            <div class="st-desc">Suivre l'exécution</div>
+            <p class="st-note">Onglet <b>Actions</b> du dépôt GitHub : chaque étape a ses logs. Un run rouge se lit comme un log d'erreur classique — l'étape en échec est dépliée automatiquement.</p>
+          </li>
+          <li>
+            <div class="st-desc">Afficher le badge dans le README</div>
+            <pre>![CI](https://github.com/tonuser/tonrepo/actions/workflows/ci.yml/badge.svg)</pre>
+          </li>
+          <li>
+            <div class="st-desc">Verrouiller : pas de merge si c'est rouge</div>
+            <p class="st-note">Sur GitHub : <b>Settings → Branches → Add branch ruleset</b> → exige que le statut CI passe avant de merger sur main. La CI devient un vrai garde-fou.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 32. LUKS ═══ -->
+    <details class="sc" id="sc-luks" style="--c:#34495e">
+      <summary>
+        <span class="sc-ico">🔒</span>
+        <div class="sc-head">
+          <div class="sc-name">Chiffrer un disque avec LUKS</div>
+          <div class="sc-meta">Linux · cryptsetup — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Un disque externe volé ou perdu ne doit rien révéler : LUKS chiffre toute la partition, déverrouillable par phrase de passe. Standard sur Linux, intégré au noyau.</p>
+        <p class="sc-links"><a href="commands.html?os=universal">⌘ commandes universelles</a> · <a href="quiz.html?os=universal">🎓 quiz</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Identifier le disque (et vérifier trois fois)</div>
+            <code>lsblk</code>
+            <p class="st-note">L'étape suivante EFFACE tout le contenu de la partition choisie. On suppose /dev/sdb1.</p>
+          </li>
+          <li>
+            <div class="st-desc">Chiffrer la partition</div>
+            <code>sudo cryptsetup luksFormat /dev/sdb1</code>
+            <p class="st-note">Il faut taper <b>YES</b> en majuscules, puis choisir une phrase de passe longue — c'est elle qui protège tout.</p>
+          </li>
+          <li>
+            <div class="st-desc">Déverrouiller (ouvrir le coffre)</div>
+            <code>sudo cryptsetup open /dev/sdb1 coffre</code>
+            <p class="st-note">La version déchiffrée apparaît sous <b>/dev/mapper/coffre</b> — c'est elle qu'on formate et qu'on monte, jamais /dev/sdb1 directement.</p>
+          </li>
+          <li>
+            <div class="st-desc">Formater l'intérieur du coffre</div>
+            <code>sudo mkfs.ext4 -L COFFRE /dev/mapper/coffre</code>
+          </li>
+          <li>
+            <div class="st-desc">Monter et utiliser normalement</div>
+            <code>sudo mkdir -p /mnt/coffre</code>
+            <code>sudo mount /dev/mapper/coffre /mnt/coffre</code>
+            <code>df -h /mnt/coffre</code>
+          </li>
+          <li>
+            <div class="st-desc">Refermer proprement (les données redeviennent illisibles)</div>
+            <code>sudo umount /mnt/coffre</code>
+            <code>sudo cryptsetup close coffre</code>
+          </li>
+          <li>
+            <div class="st-desc">Sauvegarder l'en-tête LUKS — ta ceinture de sécurité</div>
+            <code>sudo cryptsetup luksHeaderBackup /dev/sdb1 --header-backup-file luks-header-sdb1.img</code>
+            <p class="st-note">Si l'en-tête est corrompu, les données sont perdues MÊME avec la phrase de passe. Ce fichier (à stocker ailleurs que sur le disque !) permet de le restaurer.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
   </div>
 
   <div class="sc-toast" id="scToast">✓ Copié !</div>
 
+  <script src="scenarios-data.js"></script>
+  <script>
+    /* Maillage scénario → annuaire : sous chaque scénario, des liens
+       vers les fiches des commandes utilisées (source : scenarios-data.js). */
+    (function() {
+      if (typeof SCENARIOS_DATA === 'undefined') return;
+      function slugify(name) {
+        return name.toLowerCase()
+          .normalize('NFD').replace(/[̀-ͯ]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+      }
+      SCENARIOS_DATA.forEach(function(sc) {
+        if (!sc.cmds || !sc.cmds.length) return;
+        var details = document.getElementById(sc.id);
+        if (!details) return;
+        var body = details.querySelector('.sc-body');
+        if (!body) return;
+        var p = document.createElement('p');
+        p.className = 'sc-cmds';
+        p.appendChild(document.createTextNode('⌘ Les fiches de ce scénario : '));
+        sc.cmds.forEach(function(name) {
+          var a = document.createElement('a');
+          a.href = 'commands.html#cmd-' + slugify(name);
+          a.textContent = name;
+          p.appendChild(a);
+        });
+        body.appendChild(p);
+      });
+    })();
+  </script>
+  <script>
+    /* Suivi de progression : barre X/26 + bouton « terminé » par scénario.
+       Stocké dans localStorage (mpx-scenarios-done), exportable via le quiz. */
+    (function() {
+      var KEY = 'mpx-scenarios-done';
+      var all = Array.prototype.slice.call(document.querySelectorAll('details.sc'));
+      if (!all.length) return;
+
+      function load() {
+        try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; }
+      }
+      function save(arr) {
+        try { localStorage.setItem(KEY, JSON.stringify(arr)); } catch (e) {}
+      }
+
+      // Barre de progression sous le sous-titre
+      var sub = document.querySelector('.sc-sub');
+      var prog = document.createElement('div');
+      prog.className = 'sc-progress';
+      prog.innerHTML =
+        '<div class="sc-progress-bar"><div class="sc-progress-fill" id="scProgressFill"></div></div>' +
+        '<span class="sc-progress-label" id="scProgressLabel"></span>';
+      sub.insertAdjacentElement('afterend', prog);
+
+      // Un bouton « terminé » à la fin de chaque scénario
+      all.forEach(function(d) {
+        var btn = document.createElement('button');
+        btn.className = 'sc-done-btn';
+        d.querySelector('.sc-body').appendChild(btn);
+        btn.addEventListener('click', function() {
+          var done = load();
+          var i = done.indexOf(d.id);
+          if (i === -1) done.push(d.id);
+          else done.splice(i, 1);
+          save(done);
+          refresh();
+        });
+      });
+
+      function refresh() {
+        var done = load();
+        var n = 0;
+        all.forEach(function(d) {
+          var isDone = done.indexOf(d.id) !== -1;
+          if (isDone) n++;
+          d.classList.toggle('done', isDone);
+          var btn = d.querySelector('.sc-done-btn');
+          if (btn) btn.textContent = isDone
+            ? '✓ Terminé — cliquer pour décocher'
+            : '☐ Marquer ce scénario comme terminé';
+        });
+        document.getElementById('scProgressFill').style.width = (n / all.length * 100) + '%';
+        document.getElementById('scProgressLabel').textContent =
+          n + '/' + all.length + ' terminé' + (n > 1 ? 's' : '');
+        if (n === all.length) {
+          // Asynchrone : laisse arcade-fun.js (chargé après) poser son écouteur
+          setTimeout(function() {
+            document.dispatchEvent(new CustomEvent('mpx:all-scenarios-done'));
+          }, 0);
+        }
+      }
+
+      refresh();
+    })();
+  </script>
   <script>
     (function() {
       // Copie au clic sur n'importe quelle commande
@@ -804,17 +2137,7 @@ PersistentKeepalive = 25</pre>
         });
       });
 
-      // Thème
-      var html = document.documentElement;
-      var btn = document.getElementById('themeToggle');
-      if (btn) {
-        btn.addEventListener('click', function() {
-          var current = html.getAttribute('data-theme') || 'dark';
-          var next = current === 'dark' ? 'light' : 'dark';
-          html.setAttribute('data-theme', next);
-          localStorage.setItem('mpx-theme', next);
-        });
-      }
+      // Thème : géré par theme.js (partagé par toutes les pages)
 
       // Lien profond depuis la recherche globale : scenarios.html#sc-xxx
       function openFromHash() {
@@ -835,6 +2158,7 @@ PersistentKeepalive = 25</pre>
       }
     })();
   </script>
+  <script src="theme.js"></script>
   <script src="arcade-fun.js"></script>
 </body>
 </html>

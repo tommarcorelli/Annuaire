@@ -52,6 +52,60 @@
   --shadow-hard: 4px 4px 0 #1a1a24;
 }
 
+[data-theme="matrix"] {
+  --bg:        #020a04;
+  --bg2:       #04140a;
+  --bg3:       #082114;
+  --border:    #0f3d22;
+  --border2:   #155931;
+
+  --accent:    #00ff66;
+  --accent-2:  #4dffb8;
+  --accent-3:  #eaff00;
+  --accent-dim:#00993d;
+  --accent-glow: rgba(0,255,102,0.15);
+
+  --ink:       #d8ffe0;
+  --text:      #a8e6b8;
+  --muted:     #3f8a58;
+}
+
+[data-theme="crt"] {
+  --bg:        #140b01;
+  --bg2:       #1e1204;
+  --bg3:       #2a1a08;
+  --border:    #4a2e0d;
+  --border2:   #66400f;
+
+  --accent:    #ffb000;
+  --accent-2:  #ff7b26;
+  --accent-3:  #ffe066;
+  --accent-dim:#a06e00;
+  --accent-glow: rgba(255,176,0,0.16);
+
+  --ink:       #ffe8c2;
+  --text:      #f0c98d;
+  --muted:     #8f6a35;
+}
+
+[data-theme="synthwave"] {
+  --bg:        #050b1e;
+  --bg2:       #0a1430;
+  --bg3:       #101d45;
+  --border:    #1d3a6e;
+  --border2:   #2a4f8f;
+
+  --accent:    #c77dff;
+  --accent-2:  #00e5ff;
+  --accent-3:  #ff9e00;
+  --accent-dim:#7b3fbf;
+  --accent-glow: rgba(199,125,255,0.18);
+
+  --ink:       #eaf2ff;
+  --text:      #c9d8f0;
+  --muted:     #5f7bab;
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
@@ -570,6 +624,26 @@ body::after {
   left: 0;
   color: var(--accent-2);
 }
+
+/* ── Scénarios liés (maillage fiches ↔ guides) ───────────────── */
+.cmd-scenarios {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border2);
+}
+.scenario-links { display: flex; flex-direction: column; gap: 3px; }
+.scenario-link {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--accent-2);
+  text-decoration: none;
+  width: fit-content;
+  border-bottom: 1px dashed transparent;
+}
+.scenario-link:hover { border-bottom-color: currentColor; }
 
 /* Empty */
 .empty-state {

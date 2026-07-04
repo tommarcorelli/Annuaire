@@ -344,6 +344,120 @@ const COMMANDS = [
     ],
     flags: ["-u (format unifié)", "-r (récursif pour dossiers)"]
   },
+  {
+    name: "dig",
+    os: "universal",
+    category: "Réseau",
+    description: "Interroge les serveurs DNS : résolution de noms, types d'enregistrements, débogage.",
+    syntax: "dig [@serveur] <domaine> [type]",
+    examples: [
+      { cmd: "dig exemple.fr", desc: "Résolution A classique avec détails" },
+      { cmd: "dig +short exemple.fr", desc: "Juste l'IP, sans le verbiage" },
+      { cmd: "dig @8.8.8.8 exemple.fr MX", desc: "Enregistrements mail via le DNS de Google" },
+      { cmd: "dig -x 93.184.216.34", desc: "Résolution inverse (IP → nom)" }
+    ],
+    flags: ["+short (réponse brève)", "@serveur (DNS à interroger)", "-x (reverse DNS)", "+trace (suit la délégation depuis la racine)"]
+  },
+  {
+    name: "traceroute",
+    os: "universal",
+    category: "Réseau",
+    description: "Affiche le chemin (routeur par routeur) emprunté par les paquets vers une destination.",
+    syntax: "traceroute <hôte>",
+    examples: [
+      { cmd: "traceroute 8.8.8.8", desc: "Chemin vers le DNS de Google, saut par saut" },
+      { cmd: "traceroute -n exemple.fr", desc: "IP brutes, sans résolution DNS (plus rapide)" },
+      { cmd: "tracert 8.8.8.8", desc: "Équivalent Windows" }
+    ],
+    flags: ["-n (pas de résolution DNS)", "-m (nombre max de sauts)", "-I (utilise ICMP comme ping)"]
+  },
+  {
+    name: "nc (netcat)",
+    os: "universal",
+    category: "Réseau",
+    description: "Couteau suisse TCP/UDP : teste un port, écoute, transfère des données brutes.",
+    syntax: "nc [options] <hôte> <port>",
+    examples: [
+      { cmd: "nc -zv exemple.fr 443", desc: "Teste si le port 443 est ouvert" },
+      { cmd: "nc -l -p 9000", desc: "Écoute sur le port 9000 (serveur improvisé)" },
+      { cmd: "nc -zv 192.168.1.50 20-25", desc: "Scanne une plage de ports" }
+    ],
+    flags: ["-z (scan sans envoyer de données)", "-v (verbeux)", "-l (mode écoute)", "-u (UDP au lieu de TCP)"]
+  },
+  {
+    name: "whois",
+    os: "universal",
+    category: "Réseau",
+    description: "Affiche les informations d'enregistrement d'un domaine ou d'une IP (propriétaire, dates, DNS).",
+    syntax: "whois <domaine|ip>",
+    examples: [
+      { cmd: "whois exemple.fr", desc: "Titulaire, registrar, dates d'expiration" },
+      { cmd: "whois 8.8.8.8", desc: "À qui appartient cette plage d'IP" }
+    ],
+    flags: ["-h (serveur whois spécifique)"]
+  },
+  {
+    name: "free",
+    os: "universal",
+    category: "Système",
+    description: "Affiche la mémoire RAM et le swap : utilisés, libres, disponibles.",
+    syntax: "free [options]",
+    examples: [
+      { cmd: "free -h", desc: "Tailles lisibles (Go/Mo)" },
+      { cmd: "free -h -s 2", desc: "Rafraîchit toutes les 2 secondes" }
+    ],
+    flags: ["-h (lisible par humain)", "-s (répète toutes les n secondes)", "-t (ligne de total)"]
+  },
+  {
+    name: "uptime",
+    os: "universal",
+    category: "Système",
+    description: "Depuis combien de temps la machine tourne, et sa charge moyenne (1, 5, 15 min).",
+    syntax: "uptime",
+    examples: [
+      { cmd: "uptime", desc: "ex: up 42 days, load average: 0.52, 0.58, 0.59" },
+      { cmd: "uptime -p", desc: "Format lisible : « up 6 weeks, 2 hours »" }
+    ],
+    flags: ["-p (format lisible)", "-s (date/heure du dernier boot)"]
+  },
+  {
+    name: "mount",
+    os: "universal",
+    category: "Système",
+    description: "Attache un système de fichiers (disque, USB, partage réseau) à un dossier de l'arborescence.",
+    syntax: "mount [options] <périphérique> <point-de-montage>",
+    examples: [
+      { cmd: "sudo mount /dev/sdb1 /mnt/usb", desc: "Monte la clé USB sur /mnt/usb" },
+      { cmd: "mount | grep sdb", desc: "Vérifie ce qui est monté" },
+      { cmd: "sudo mount -a", desc: "Monte tout ce que déclare /etc/fstab" }
+    ],
+    flags: ["-t (type de système de fichiers)", "-o ro (lecture seule)", "-a (tout ce qui est dans fstab)"]
+  },
+  {
+    name: "umount",
+    os: "universal",
+    category: "Système",
+    description: "Détache proprement un système de fichiers monté — indispensable avant de débrancher.",
+    syntax: "umount <point-de-montage|périphérique>",
+    examples: [
+      { cmd: "sudo umount /mnt/usb", desc: "Démonte la clé USB" },
+      { cmd: "sudo umount -l /mnt/nfs", desc: "Démontage « paresseux » si le montage est occupé" }
+    ],
+    flags: ["-l (lazy : détache dès que possible)", "-f (force, pour NFS bloqué)"]
+  },
+  {
+    name: "mkfs",
+    os: "universal",
+    category: "Système",
+    description: "Formate une partition : crée un système de fichiers (ext4, xfs, vfat...) — efface tout !",
+    syntax: "mkfs.<type> [options] <partition>",
+    examples: [
+      { cmd: "sudo mkfs.ext4 -L DATA /dev/sdb1", desc: "Formate en ext4 avec le label DATA" },
+      { cmd: "sudo mkfs.vfat -n USB /dev/sdc1", desc: "FAT32, lisible partout (clé USB)" },
+      { cmd: "sudo mkfs.xfs /dev/sdd1", desc: "XFS, taillé pour les gros volumes" }
+    ],
+    flags: ["-L (label ext4)", "-n (label vfat)", "-t (type via mkfs -t ext4)"]
+  },
 
   // ── DEBIAN / UBUNTU ───────────────────────────────────────
   {

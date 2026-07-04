@@ -132,6 +132,17 @@
     }
     .quiz-start:hover { box-shadow: 6px 6px 0 var(--accent-2); transform: translate(-2px,-2px); }
 
+    /* Mode révision : ne rejoue que les commandes ratées */
+    .quiz-start-review {
+      margin-top: 18px;
+      font-size: 20px;
+      background: transparent;
+      color: var(--accent-3);
+      border-color: var(--accent-3);
+    }
+    .quiz-start-review:hover { box-shadow: 6px 6px 0 var(--accent); }
+    .quiz-start-review.hidden { display: none; }
+
     /* HUD */
     .quiz-hud {
       display: flex; justify-content: space-between; align-items: center;
@@ -288,6 +299,7 @@
       </button>
       <a href="commands.html" class="nav-back">⌘ Annuaire</a>
       <a href="packages.html" class="nav-back" style="border-color:var(--accent-3);color:var(--accent-3)">📦 Paquets</a>
+      <a href="terminal.html" class="nav-back" style="border-color:#00d3b8;color:#00d3b8">&gt;_ Terminal</a>
       <a href="cheatsheet.html" class="nav-back" style="border-color:#d4a843;color:#d4a843">⚡ Cheatsheet</a>
       <a href="scenarios.html" class="nav-back" style="border-color:#c77dff;color:#c77dff">🧭 Scénarios</a>
       <a href="index.html" class="nav-back">← Accueil</a>
@@ -316,6 +328,7 @@
 
       <p class="quiz-review-note" id="reviewNote"></p>
 
+      <button class="quiz-start quiz-start-review hidden" id="reviewBtn">🔁 RÉVISER MES ERREURS</button>
       <button class="quiz-start" id="startBtn">▶ INSERT COIN — START</button>
 
       <div class="quiz-io">
@@ -359,6 +372,7 @@
   <script src="data.js"></script>
   <script src="data-extra.js"></script>
   <script src="quiz.js"></script>
+  <script src="theme.js"></script>
   <script src="arcade-fun.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

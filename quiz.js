@@ -44,7 +44,9 @@
 
   var state = {
     os: 'all',
-    total: 10,
+    total: 10,        // choix de l'utilisateur (chips)
+    sessionTotal: 10, // nb réel de questions de la partie en cours
+    reviewOnly: false, // mode « réviser mes erreurs »
     current: 0,
     score: 0,
     streak: 0,
@@ -82,16 +84,22 @@
   function cmdKey(c) { return c.os + '|' + c.name; }
 
   function updateReviewNote() {
-    var el = $('reviewNote');
-    if (!el) return;
     var errs = loadErrors();
     var n = COMMANDS.filter(function(c) {
       if (state.os !== 'all' && c.os !== state.os) return false;
       return errs[cmdKey(c)];
     }).length;
-    el.textContent = n
-      ? '🔁 ' + n + ' commande' + (n > 1 ? 's' : '') + ' à revoir — elles reviendront en priorité.'
-      : '';
+    var el = $('reviewNote');
+    if (el) {
+      el.textContent = n
+        ? '🔁 ' + n + ' commande' + (n > 1 ? 's' : '') + ' à revoir — elles reviendront en priorité.'
+        : '';
+    }
+    var btn = $('reviewBtn');
+    if (btn) {
+      btn.classList.toggle('hidden', !n);
+      btn.textContent = '🔁 RÉVISER MES ERREURS (' + n + ')';
+    }
   }
 
   // Affiche le record (%) sur chaque chip de domaine
@@ -161,17 +169,24 @@
       return c.description && c.description.length > 15;
     });
 
-    // Révision espacée : ~40% des questions viennent des commandes
-    // déjà ratées, le reste est tiré au hasard.
     var errors = loadErrors();
-    var revShuffled = shuffle(pool.filter(function(c) { return errors[cmdKey(c)]; }));
-    var fresh = shuffle(pool.filter(function(c) { return !errors[cmdKey(c)]; }));
-    var nReview = Math.min(revShuffled.length, Math.ceil(state.total * 0.4));
-    var picked = revShuffled.slice(0, nReview).concat(fresh.slice(0, state.total - nReview));
-    if (picked.length < state.total) {
-      picked = picked.concat(revShuffled.slice(nReview, nReview + state.total - picked.length));
+    var picked;
+    if (state.reviewOnly) {
+      // Mode révision : UNIQUEMENT les commandes en dette d'erreur
+      picked = shuffle(pool.filter(function(c) { return errors[cmdKey(c)]; }))
+        .slice(0, state.total);
+    } else {
+      // Révision espacée : ~40% des questions viennent des commandes
+      // déjà ratées, le reste est tiré au hasard.
+      var revShuffled = shuffle(pool.filter(function(c) { return errors[cmdKey(c)]; }));
+      var fresh = shuffle(pool.filter(function(c) { return !errors[cmdKey(c)]; }));
+      var nReview = Math.min(revShuffled.length, Math.ceil(state.total * 0.4));
+      picked = revShuffled.slice(0, nReview).concat(fresh.slice(0, state.total - nReview));
+      if (picked.length < state.total) {
+        picked = picked.concat(revShuffled.slice(nReview, nReview + state.total - picked.length));
+      }
+      picked = shuffle(picked);
     }
-    picked = shuffle(picked);
 
     return picked.map(function(cmd) {
       var review = !!errors[cmdKey(cmd)];
@@ -184,14 +199,24 @@
       }
 
       var type = Math.random() < 0.5 ? 'cmd' : 'desc';
-      // Les leurres viennent en priorité du même OS/outil (plus dur)
-      var sameOs = pool.filter(function(c) { return c !== cmd && c.os === cmd.os; });
-      var others = pool.filter(function(c) { return c !== cmd && c.os !== cmd.os; });
-      var decoys = shuffle(sameOs).slice(0, 3);
-      if (decoys.length < 3) decoys = decoys.concat(shuffle(others).slice(0, 3 - decoys.length));
+      var labelOf = function(c) { return type === 'cmd' ? c.name : c.description; };
+
+      // Leurres : d'abord le même OS/outil (plus dur), puis le reste du pool.
+      // On écarte tout leurre dont le libellé est identique à la bonne réponse
+      // ou à un leurre déjà retenu, pour ne jamais afficher deux options égales.
+      var seen = [labelOf(cmd)];
+      var decoys = [];
+      shuffle(pool.filter(function(c) { return c !== cmd && c.os === cmd.os; }))
+        .concat(shuffle(pool.filter(function(c) { return c !== cmd && c.os !== cmd.os; })))
+        .forEach(function(c) {
+          var lbl = labelOf(c);
+          if (decoys.length >= 3 || seen.indexOf(lbl) !== -1) return;
+          seen.push(lbl);
+          decoys.push(c);
+        });
 
       var options = shuffle([cmd].concat(decoys)).map(function(c) {
-        return { label: type === 'cmd' ? c.name : c.description, good: c === cmd };
+        return { label: labelOf(c), good: c === cmd };
       });
       return {
         cmd: cmd, type: type, review: review, options: options,
@@ -243,10 +268,10 @@
     state.locked = false;
 
     $('hudQ').textContent = state.current + 1;
-    $('hudTotal').textContent = state.total;
+    $('hudTotal').textContent = state.sessionTotal;
     $('hudScore').textContent = state.score;
     $('hudStreak').textContent = state.streak;
-    $('barFill').style.width = (state.current / state.total * 100) + '%';
+    $('barFill').style.width = (state.current / state.sessionTotal * 100) + '%';
 
     var badge = $('qBadge');
     badge.textContent = meta.label + ' · ' + q.cmd.category + (q.review ? ' · 🔁 à revoir' : '');
@@ -323,13 +348,13 @@
     $('hudScore').textContent = state.score;
     $('hudStreak').textContent = state.streak;
     $('nextBtn').style.display = 'inline-block';
-    $('nextBtn').textContent = (state.current + 1 >= state.total) ? 'RÉSULTAT →' : 'SUIVANT →';
+    $('nextBtn').textContent = (state.current + 1 >= state.sessionTotal) ? 'RÉSULTAT →' : 'SUIVANT →';
     $('nextBtn').focus();
   }
 
   function next() {
     state.current++;
-    if (state.current >= state.total) {
+    if (state.current >= state.sessionTotal) {
       showResult();
     } else {
       showQuestion();
@@ -349,15 +374,24 @@
     $('gameScreen').classList.add('hidden');
     $('resultScreen').classList.remove('hidden');
 
-    var ratio = state.score / state.total;
+    var ratio = state.score / state.sessionTotal;
     var rank = rankFor(ratio);
     var rankEl = $('resultRank');
     rankEl.textContent = rank.r;
     rankEl.style.color = rank.c;
 
-    $('resultScore').textContent = state.score + ' / ' + state.total +
+    $('resultScore').textContent = state.score + ' / ' + state.sessionTotal +
       '  ·  meilleure série 🔥 ' + state.bestStreak;
     $('resultMsg').textContent = rank.msg;
+
+    if (state.reviewOnly) {
+      // Pas de record en mode révision : on affiche la dette restante
+      var left = Object.keys(loadErrors()).length;
+      $('resultBest').textContent = left
+        ? '🔁 Encore ' + left + ' commande' + (left > 1 ? 's' : '') + ' à revoir — remets une pièce !'
+        : '✨ Ardoise effacée : plus aucune erreur à revoir !';
+      return;
+    }
 
     // Meilleur score par domaine, en pourcentage
     var key = 'mpx-quiz-best';
@@ -374,14 +408,15 @@
     }
   }
 
-  function start() {
+  function start(reviewOnly) {
+    state.reviewOnly = !!reviewOnly;
     state.current = 0;
     state.score = 0;
     state.streak = 0;
     state.bestStreak = 0;
     state.questions = buildQuestions();
-    if (state.questions.length < state.total) state.total = state.questions.length;
-    if (!state.total) return;
+    state.sessionTotal = state.questions.length; // ≤ state.total, sans l'écraser
+    if (!state.sessionTotal) return;
 
     $('setupScreen').classList.add('hidden');
     $('resultScreen').classList.add('hidden');
@@ -404,7 +439,9 @@
     }
   });
 
-  $('startBtn').addEventListener('click', start);
+  $('startBtn').addEventListener('click', function() { start(false); });
+  var reviewBtn = $('reviewBtn');
+  if (reviewBtn) reviewBtn.addEventListener('click', function() { start(true); });
   $('nextBtn').addEventListener('click', next);
   $('replayBtn').addEventListener('click', function() {
     $('resultScreen').classList.add('hidden');
@@ -420,7 +457,7 @@
   // ── Export / import de la progression ─────────────────────
   // Tout vit dans le localStorage : un fichier JSON permet de le
   // sauvegarder ou de le transférer sur un autre appareil.
-  var IO_KEYS = ['mpx-favorites', 'mpx-quiz-best', 'mpx-quiz-errors', 'mpx-search-history', 'mpx-theme', 'mpx-sound'];
+  var IO_KEYS = ['mpx-favorites', 'mpx-quiz-best', 'mpx-quiz-errors', 'mpx-scenarios-done', 'mpx-search-history', 'mpx-theme', 'mpx-sound'];
 
   function ioStatus(msg) {
     var el = $('ioStatus');
@@ -481,17 +518,5 @@
     });
   }
 
-  // ── Thème (même mécanique que le reste du site) ──────────
-  var html = document.documentElement;
-  var themeBtn = $('themeToggle');
-  var saved = localStorage.getItem('mpx-theme');
-  if (saved) html.setAttribute('data-theme', saved);
-  if (themeBtn) {
-    themeBtn.addEventListener('click', function() {
-      var current = html.getAttribute('data-theme') || 'dark';
-      var nextTheme = current === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', nextTheme);
-      localStorage.setItem('mpx-theme', nextTheme);
-    });
-  }
+  // Le thème est géré par theme.js (partagé par toutes les pages).
 })();

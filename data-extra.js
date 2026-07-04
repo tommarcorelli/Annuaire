@@ -1290,7 +1290,7 @@ const EXTRA_COMMANDS = [
     flags: ["-f (fichier)", "-c (check seulement)"]
   },
   {
-    name: "fail2ban-client",
+    name: "fail2ban-client (jail)",
     os: "iptables",
     category: "Sécurité",
     description: "Contrôle Fail2ban, qui bannit automatiquement les IPs après des échecs de connexion répétés.",

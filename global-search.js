@@ -11,19 +11,8 @@
   var box   = document.getElementById('gsResults');
   if (!input || !box) return;
 
-  // Index des scénarios (page statique : titres + mots-clés)
-  var SCENARIOS = [
-    { id: 'sc-nginx',   title: "Déployer un site Nginx avec HTTPS",           kw: 'nginx https ssl tls certbot lets encrypt vhost site web debian' },
-    { id: 'sc-secure',  title: 'Sécuriser un serveur Linux',                  kw: 'ssh ufw fail2ban cle securite durcir root pare-feu serveur' },
-    { id: 'sc-vlan',    title: 'Créer un VLAN sur un switch Cisco',           kw: 'cisco vlan trunk switch reseau segmentation ios' },
-    { id: 'sc-proxmox', title: 'Créer puis sauvegarder une VM sur Proxmox',   kw: 'proxmox vm qm vzdump sauvegarde virtualisation snapshot' },
-    { id: 'sc-docker',  title: 'Conteneuriser une application avec Docker',   kw: 'docker conteneur image dockerfile hub build push' },
-    { id: 'sc-mysql',   title: 'Installer MySQL et automatiser les sauvegardes', kw: 'mysql mariadb dump cron base de donnees sql backup' },
-    { id: 'sc-reseau',  title: 'Diagnostiquer une panne réseau',              kw: 'reseau ping dns dig traceroute tcpdump panne internet' },
-    { id: 'sc-k8s',     title: 'Déployer une application sur Kubernetes',     kw: 'kubernetes kubectl k8s deploiement pod service rollout cluster' },
-    { id: 'sc-ansible', title: 'Automatiser avec un premier playbook Ansible', kw: 'ansible playbook yaml automatisation inventaire idempotence' },
-    { id: 'sc-wireguard', title: 'Monter un VPN WireGuard',                   kw: 'wireguard vpn tunnel wg chiffrement distant' },
-  ];
+  // Index des scénarios : chargé à la demande avec le reste
+  // (scenarios-data.js — source unique partagée avec l'annuaire)
 
   var loaded  = false;
   var loading = false;
@@ -44,10 +33,12 @@
     loadScript('data.js', function() {
       loadScript('data-extra.js', function() {
         loadScript('packages-data.js', function() {
-          loaded = true;
-          loading = false;
-          if (lastQ.trim().length >= 2) render(lastQ);
-          else box.classList.remove('show');
+          loadScript('scenarios-data.js', function() {
+            loaded = true;
+            loading = false;
+            if (lastQ.trim().length >= 2) render(lastQ);
+            else box.classList.remove('show');
+          });
         });
       });
     });
@@ -116,7 +107,7 @@
       var s = best(q, p.name, p.desc);
       if (s >= 0) pkgs.push({ s: s, v: p });
     });
-    SCENARIOS.forEach(function(sc) {
+    (typeof SCENARIOS_DATA !== 'undefined' ? SCENARIOS_DATA : []).forEach(function(sc) {
       var s = best(q, sc.title, sc.kw);
       if (s >= 0) scs.push({ s: s, v: sc });
     });

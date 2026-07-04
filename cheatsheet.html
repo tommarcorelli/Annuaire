@@ -176,6 +176,7 @@
       <a href="commands.html" class="nav-back">⌘ Annuaire</a>
       <a href="packages.html" class="nav-back" style="border-color:var(--accent-3);color:var(--accent-3)">📦 Paquets</a>
       <a href="quiz.html" class="nav-back" style="border-color:#1BB91F;color:#1BB91F">🎓 Quiz</a>
+      <a href="terminal.html" class="nav-back" style="border-color:#00d3b8;color:#00d3b8">&gt;_ Terminal</a>
       <a href="scenarios.html" class="nav-back" style="border-color:#c77dff;color:#c77dff">🧭 Scénarios</a>
       <button class="nav-back" id="printBtn" title="Imprimer ou exporter en PDF" style="background:none;border:none;cursor:pointer">🖨 PDF</button>
       <a href="index.html" class="nav-back">← Accueil</a>
@@ -593,19 +594,7 @@
       var printBtn = document.getElementById('printBtn');
       if (printBtn) printBtn.addEventListener('click', function() { window.print(); });
 
-      // Thème
-      var html = document.documentElement;
-      var btn = document.getElementById('themeToggle');
-      var saved = localStorage.getItem('mpx-theme');
-      if (saved) html.setAttribute('data-theme', saved);
-      if (btn) {
-        btn.addEventListener('click', function() {
-          var current = html.getAttribute('data-theme') || 'dark';
-          var next = current === 'dark' ? 'light' : 'dark';
-          html.setAttribute('data-theme', next);
-          localStorage.setItem('mpx-theme', next);
-        });
-      }
+      // Thème : géré par theme.js (partagé par toutes les pages)
 
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
@@ -614,6 +603,7 @@
       }
     })();
   </script>
+  <script src="theme.js"></script>
   <script src="arcade-fun.js"></script>
 </body>
 </html>
