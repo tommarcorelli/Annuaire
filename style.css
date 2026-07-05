@@ -1160,14 +1160,37 @@ body.konami::after { opacity: 0.05; }
   .steps { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
-  .nav { padding: 0 16px; }
+  .nav { padding: 0 14px; gap: 10px; }
   .nav-links { display: none; }
-  .hero, .section, .cta-section { padding-left: 16px; padding-right: 16px; }
+  .hero { padding: 84px 16px 48px; min-height: auto; }
+  .section { padding: 64px 16px; }
+  .cta-section { padding: 72px 16px; }
   .footer { padding: 22px 16px; }
-  .hero-title { font-size: clamp(54px, 18vw, 90px); }
+  .eyebrow { font-size: 14px; letter-spacing: 0.16em; margin-bottom: 18px; }
+  .eyebrow::before, .eyebrow::after { width: 26px; }
+  .hero-title { font-size: clamp(52px, 17vw, 88px); }
+  .tagline { margin: 22px 0 34px; }
+  .gsearch { margin: 0 auto 26px; }
+  .section-h { margin-bottom: 38px; }
+
+  /* Boutons hero : empilés, pleine largeur, tap-friendly */
+  .hero-btns { gap: 10px; width: 100%; }
+  .hero-btns .btn-primary,
+  .hero-btns .btn-outline { width: 100%; justify-content: center; font-size: 19px; padding: 13px 18px; }
+  .cta-section .btn-primary { width: 100%; }
+  .cta-section > .cta-inner > div { flex-direction: column; }
+  .btn-primary.btn-lg { font-size: 20px; padding: 15px 22px; }
+
+  /* OS grid plus compacte */
+  .os-cell { padding: 24px 12px; gap: 8px; }
+  .os-num { font-size: 42px; }
+  .os-circle { width: 36px; height: 36px; }
+
   .combo-badge { top: 70px; right: 12px; font-size: 14px; padding: 6px 10px; }
   .achievement-toast { right: 12px; bottom: 12px; max-width: calc(100vw - 24px); }
 }
+/* Garde-fou anti-débordement horizontal global */
+html, body { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   .hero-title .slash, .hero-title .slash::after, .scroll-line,
   .reveal, .cta-bg, body.konami { animation: none !important; transition: none !important; }

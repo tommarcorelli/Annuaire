@@ -17,6 +17,8 @@ const CORE_ASSETS = [
   './scenarios.html',
   './style.css',
   './commands.css',
+  './mobile-nav.css',
+  './mobile-nav.js',
   './data.js',
   './data-extra.js',
   './packages-data.js',
@@ -32,6 +34,7 @@ const CORE_ASSETS = [
   './icons/icon-512.png',
   './icons/favicon-32.png',
   './icons/apple-touch-icon.png',
+  './icons/logo.svg',
 ];
 
 const EXTERNAL_ASSETS = [

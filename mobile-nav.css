@@ -1,0 +1,145 @@
+/* ════════════════════════════════════════════════════════════════
+   MANPAGES.EXE — mobile-nav.css
+   Menu hamburger + drawer partagé par TOUTES les pages.
+   Se charge après style.css / commands.css / (inline packages).
+   Actif uniquement en dessous de 760px.
+   Variables tolérantes aux deux conventions (--accent-2 / --accent2).
+   ════════════════════════════════════════════════════════════════ */
+
+:root { --mnav-a2: var(--accent-2, var(--accent2, #5ce1ff));
+        --mnav-a3: var(--accent-3, var(--accent3, #ffd60a)); }
+
+/* Bouton hamburger — injecté dans la nav, masqué sur desktop */
+.mnav-toggle {
+  display: none;
+  width: 42px; height: 38px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0;
+  border-radius: 0;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  transition: background .15s, color .15s, box-shadow .15s;
+}
+.mnav-toggle svg { width: 22px; height: 22px; display: block; }
+.mnav-toggle:hover, .mnav-toggle:focus-visible {
+  background: var(--accent); color: var(--bg);
+  box-shadow: 0 0 16px var(--accent);
+  outline: none;
+}
+
+/* Overlay sombre */
+.mnav-overlay {
+  position: fixed; inset: 0;
+  background: rgba(4,2,12,0.66);
+  backdrop-filter: blur(3px);
+  opacity: 0; visibility: hidden;
+  transition: opacity .28s ease, visibility .28s;
+  z-index: 1000;
+}
+.mnav-overlay.open { opacity: 1; visibility: visible; }
+
+/* Drawer coulissant depuis la droite */
+.mnav-drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: min(340px, 86vw);
+  z-index: 1001;
+  background: var(--bg2);
+  border-left: 2px solid var(--accent);
+  box-shadow: -14px 0 46px rgba(0,0,0,0.6);
+  transform: translateX(105%);
+  transition: transform .3s cubic-bezier(.5,.05,.2,1);
+  display: flex;
+  flex-direction: column;
+  padding: calc(env(safe-area-inset-top,0px) + 16px) 0 calc(env(safe-area-inset-bottom,0px) + 20px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  font-family: var(--mono);
+}
+.mnav-overlay.open ~ .mnav-drawer,
+.mnav-drawer.open { transform: translateX(0); }
+
+/* scanlines discrètes dans le drawer */
+.mnav-drawer::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,.10) 3px 4px);
+  opacity: .5;
+}
+
+/* En-tête du drawer */
+.mnav-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 4px 20px 18px;
+  border-bottom: 2px solid var(--border2);
+  position: relative;
+}
+.mnav-head img { width: 40px; height: 40px; flex-shrink: 0; filter: drop-shadow(0 0 8px var(--accent)); }
+.mnav-title {
+  font-family: var(--mono); font-weight: 800; font-size: 15px;
+  color: var(--ink); letter-spacing: -.02em; text-transform: uppercase; line-height: 1.1;
+}
+.mnav-title b { color: var(--accent); font-weight: 800; }
+.mnav-sub { display: block; font-family: var(--pixel); font-size: 13px; color: var(--mnav-a2); letter-spacing: .12em; }
+.mnav-close {
+  margin-left: auto; width: 34px; height: 34px; flex-shrink: 0;
+  background: transparent; border: 2px solid var(--border2); color: var(--text);
+  font-family: var(--mono); font-size: 18px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.mnav-close:hover { border-color: var(--accent); color: var(--accent); transform: rotate(90deg); }
+
+/* Liens */
+.mnav-links { display: flex; flex-direction: column; padding: 12px 14px 6px; gap: 4px; position: relative; }
+.mnav-link {
+  display: flex; align-items: center; gap: 14px;
+  padding: 13px 14px;
+  font-family: var(--pixel); font-size: 22px; letter-spacing: .04em;
+  color: var(--text); text-decoration: none;
+  border: 2px solid transparent; border-left: 3px solid transparent;
+  transition: all .16s; position: relative;
+}
+.mnav-link .mnav-ico { font-size: 20px; width: 26px; text-align: center; flex-shrink: 0; filter: grayscale(.15); }
+.mnav-link:hover { color: var(--ink); background: var(--bg3); border-left-color: var(--mnav-a2); transform: translateX(3px); }
+.mnav-link.active {
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-left-color: var(--accent);
+  text-shadow: 0 0 12px var(--accent);
+}
+.mnav-link.active::after {
+  content: '◄'; margin-left: auto; font-size: 13px; color: var(--accent);
+}
+
+/* Pied : sélecteur de thème */
+.mnav-foot { margin-top: auto; padding: 16px 20px 0; border-top: 2px solid var(--border2); }
+.mnav-theme {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 12px; cursor: pointer;
+  background: var(--bg3); border: 2px solid var(--border2); color: var(--ink);
+  font-family: var(--pixel); font-size: 18px; letter-spacing: .1em; text-transform: uppercase;
+  transition: all .15s;
+}
+.mnav-theme:hover { border-color: var(--mnav-a3); color: var(--mnav-a3); }
+.mnav-tag { display: block; text-align: center; margin-top: 12px; font-family: var(--mono); font-size: 10.5px; color: var(--muted); letter-spacing: .18em; }
+
+body.mnav-lock { overflow: hidden; }
+
+/* ── Bascule responsive : on montre le hamburger, on cache les piles de liens ── */
+@media (max-width: 760px) {
+  .mnav-toggle { display: inline-flex; }
+
+  /* piles de navigation textuelles → remplacées par le drawer */
+  .nav-links, .nav-cta, .nav-back, .nav-tabs,
+  .nav .theme-toggle, .nav .theme-btn, #installBtn { display: none !important; }
+
+  /* commands.html : désencombre pour laisser la place au hamburger.
+     L'export PDF reste dispo sur desktop ; le compteur libère la barre. */
+  .print-btn { display: none !important; }
+  .nav-right { gap: 8px !important; }
+  #resultCount { display: none !important; }
+  #searchInput { padding-right: 14px !important; }
+}
