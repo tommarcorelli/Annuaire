@@ -165,3 +165,10 @@ body.mnav-lock { overflow: hidden; }
   .nav-right { gap: 6px !important; }
   .nav-logo { font-size: 10px !important; }
 }
+
+/* ── Le toast "Achievement" et le drawer de menu sont tous les deux ancrés
+   en bas à droite : sur un écran mobile un peu court, ils se chevauchent.
+   On passe le toast à gauche pour qu'il ne recouvre plus jamais le menu. ── */
+@media (max-width: 860px) {
+  .achievement-toast { left: 12px; right: auto; }
+}
