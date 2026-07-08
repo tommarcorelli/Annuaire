@@ -353,5 +353,15 @@ render();
 </script>
 <script src="js/theme.js"></script>
   <script src="js/mobile-nav.js"></script>
+  <script>
+    // ── PWA : enregistrement du Service Worker (manquait sur cette page) ──
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js').catch(function(err) {
+          console.log('Service worker non enregistré :', err);
+        });
+      });
+    }
+  </script>
 </body>
 </html>
