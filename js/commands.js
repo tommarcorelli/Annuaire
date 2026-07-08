@@ -636,3 +636,60 @@ function buildCard(cmd, tpl) {
 window.addEventListener('load', init);
 
 // Le thème est géré par theme.js (partagé par toutes les pages).
+
+// ── EXPORT / IMPORT DES FAVORIS ──────────────────────────────
+// Même format que l'export "progression" de quiz.js (clé mpx-favorites),
+// donc les deux fichiers sont interchangeables entre les pages.
+(function() {
+  function ioStatus(msg) {
+    var el = document.getElementById('favIoStatus');
+    if (!el) return;
+    el.textContent = msg;
+    setTimeout(function() { if (el.textContent === msg) el.textContent = ''; }, 4000);
+  }
+
+  var exportBtn = document.getElementById('exportFavBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', function() {
+      var raw = localStorage.getItem('mpx-favorites') || '[]';
+      var data = { app: 'manpages.exe', date: new Date().toISOString(), values: { 'mpx-favorites': raw } };
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'manpages-favoris-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      ioStatus('✓ Favoris exportés');
+    });
+  }
+
+  var importBtn = document.getElementById('importFavBtn');
+  var importFile = document.getElementById('importFavFile');
+  if (importBtn && importFile) {
+    importBtn.addEventListener('click', function() { importFile.click(); });
+    importFile.addEventListener('change', function() {
+      var file = this.files[0];
+      this.value = '';
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function() {
+        try {
+          var data = JSON.parse(reader.result);
+          var raw = data && data.values && data.values['mpx-favorites'];
+          if (data.app !== 'manpages.exe' || typeof raw !== 'string') {
+            ioStatus('✗ Fichier non reconnu');
+            return;
+          }
+          localStorage.setItem('mpx-favorites', raw);
+          favorites = loadFavorites();
+          updateFavCount();
+          if (favoritesOnly) filter();
+          ioStatus('✓ Favoris importés (' + favorites.size + ')');
+        } catch (err) {
+          ioStatus('✗ JSON invalide');
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
+})();

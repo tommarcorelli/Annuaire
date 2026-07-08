@@ -364,6 +364,26 @@ body::after {
   align-items: baseline;
   gap: 8px;
 }
+.fav-io { display: flex; flex-wrap: wrap; gap: 8px; }
+.fav-io-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px dashed var(--border2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.fav-io-btn:hover { color: var(--text); border-color: var(--text); }
+.fav-io-status {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent-3);
+  min-height: 14px;
+}
 #sidebarCount {
   font-family: var(--display);
   font-size: 38px;

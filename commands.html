@@ -371,6 +371,16 @@
         </div>
       </div>
 
+      <div class="sidebar-section">
+        <div class="sidebar-label">// FAVORIS</div>
+        <div class="fav-io">
+          <button class="fav-io-btn" id="exportFavBtn" title="Sauvegarder mes favoris dans un fichier">💾 Exporter</button>
+          <button class="fav-io-btn" id="importFavBtn" title="Restaurer des favoris depuis un fichier">📥 Importer</button>
+          <input type="file" id="importFavFile" accept="application/json" hidden/>
+        </div>
+        <span class="fav-io-status" id="favIoStatus"></span>
+      </div>
+
       <div class="sidebar-stat">
         <span id="sidebarCount">—</span>
         <span class="stat-label">commandes</span>
