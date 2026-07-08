@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Hors-ligne — MAN//PAGES.EXE</title>
+<style>
+  :root {
+    --bg: #0f0820;
+    --bg2: #160d2e;
+    --border: #3d2a73;
+    --accent: #ff2e88;
+    --accent-2: #5ce1ff;
+    --ink: #f5f0e1;
+    --text: #d9d2e8;
+    --muted: #8576b8;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Courier New', ui-monospace, monospace;
+  }
+  body {
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    max-width: 460px;
+    width: 100%;
+    background: var(--bg2);
+    border: 2px solid var(--border);
+    box-shadow: 6px 6px 0 #000;
+    padding: 32px 28px;
+    text-align: center;
+  }
+  .glitch {
+    font-size: 15px;
+    letter-spacing: .3em;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: 22px;
+    color: var(--ink);
+    margin: 0 0 14px;
+    line-height: 1.4;
+  }
+  p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0 0 26px;
+  }
+  .prompt {
+    text-align: left;
+    background: #000;
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--accent-2);
+    margin-bottom: 26px;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .prompt .err { color: var(--accent); }
+  button {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: var(--bg);
+    background: var(--accent-2);
+    border: 2px solid #000;
+    padding: 12px 22px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #000;
+    transition: transform .1s;
+  }
+  button:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #000; }
+  button:active { transform: translate(0,0); box-shadow: 2px 2px 0 #000; }
+  .tag {
+    margin-top: 22px;
+    font-size: 10.5px;
+    letter-spacing: .18em;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="glitch">// CONNEXION PERDUE</div>
+    <h1>Cette page n'est pas encore disponible hors-ligne</h1>
+    <p>Le réseau est injoignable et cette page n'a pas encore été mise en cache par ton navigateur. Reconnecte-toi puis réessaie — les pages déjà visitées, elles, restent consultables hors-ligne.</p>
+    <div class="prompt">$ ping manpages.exe
+<span class="err">Request timed out.</span>
+$ _</div>
+    <button onclick="location.reload()">↻ RÉESSAYER</button>
+    <div class="tag">MAN//PAGES.EXE · MULTI-OS</div>
+  </div>
+</body>
+</html>

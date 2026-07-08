@@ -3,7 +3,7 @@
    cache-first uniquement pour les assets externes (CDN, fonts).
    Plus besoin de changer la version manuellement à chaque déploiement. */
 
-const CACHE_SITE    = 'manpages-site-v1';   // fichiers locaux — network-first
+const CACHE_SITE    = 'manpages-site-v2';   // fichiers locaux — network-first
 const CACHE_EXTERN  = 'manpages-extern-v1'; // CDN/fonts — cache-first
 
 const CORE_ASSETS = [
@@ -15,20 +15,21 @@ const CORE_ASSETS = [
   './terminal.html',
   './cheatsheet.html',
   './scenarios.html',
-  './style.css',
-  './commands.css',
-  './mobile-nav.css',
-  './mobile-nav.js',
-  './data.js',
-  './data-extra.js',
-  './packages-data.js',
-  './scenarios-data.js',
-  './commands.js',
-  './quiz.js',
-  './terminal.js',
-  './global-search.js',
-  './theme.js',
-  './arcade-fun.js',
+  './offline.html',
+  './css/style.css',
+  './css/commands.css',
+  './css/mobile-nav.css',
+  './js/mobile-nav.js',
+  './js/data/data.js',
+  './js/data/data-extra.js',
+  './js/data/packages-data.js',
+  './js/data/scenarios-data.js',
+  './js/commands.js',
+  './js/quiz.js',
+  './js/terminal.js',
+  './js/global-search.js',
+  './js/theme.js',
+  './js/arcade-fun.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -134,9 +135,13 @@ self.addEventListener('fetch', function(event) {
         return response;
       }).catch(function() {
         return caches.match(event.request).then(function(cached) {
-          return cached || (event.request.mode === 'navigate'
-            ? caches.match('./index.html')
-            : undefined);
+          if (cached) return cached;
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html').then(function(home) {
+              return home || caches.match('./offline.html');
+            });
+          }
+          return undefined;
         });
       })
     );

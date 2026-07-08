@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=VT323&display=swap" rel="stylesheet"/>
   <link rel="manifest" href="manifest.json"/>
-  <link rel="stylesheet" href="mobile-nav.css"/>
+  <link rel="stylesheet" href="css/mobile-nav.css"/>
   <link rel="icon" href="icons/favicon-32.png"/>
   <meta name="theme-color" content="#0f0820"/>
   <script>/* Thème : préférence sauvegardée, sinon réglage système */(function(){var t=localStorage.getItem('mpx-theme');if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
@@ -236,7 +236,7 @@
   <div class="empty" id="empty">⌀ Aucun paquet trouvé</div>
 </div>
 
-<script src="packages-data.js"></script>
+<script src="js/data/packages-data.js"></script>
 <script>
 var OS = ['debian','alpine','arch','rhel','freebsd','macos','windows'];
 var CAT_COLOR = {
@@ -351,7 +351,7 @@ if (qParam) {
 
 render();
 </script>
-<script src="theme.js"></script>
-  <script src="mobile-nav.js"></script>
+<script src="js/theme.js"></script>
+  <script src="js/mobile-nav.js"></script>
 </body>
 </html>
