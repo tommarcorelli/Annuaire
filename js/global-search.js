@@ -30,10 +30,10 @@
   function ensureData() {
     if (loaded || loading) return;
     loading = true;
-    loadScript('data.js', function() {
-      loadScript('data-extra.js', function() {
-        loadScript('packages-data.js', function() {
-          loadScript('scenarios-data.js', function() {
+    loadScript('js/data/data.js', function() {
+      loadScript('js/data/data-extra.js', function() {
+        loadScript('js/data/packages-data.js', function() {
+          loadScript('js/data/scenarios-data.js', function() {
             loaded = true;
             loading = false;
             if (lastQ.trim().length >= 2) render(lastQ);
@@ -113,7 +113,7 @@
     });
 
     if (!cmds.length && !pkgs.length && !scs.length) {
-      box.innerHTML = '<div class="gs-empty">// aucun résultat — essaie l\'annuaire et sa recherche floue</div>';
+      box.innerHTML = '<div class="gs-empty">// aucun résultat — essaie l\'annuaire et sa recherche floue, ou le <a href="cheatsheet.html">Cheatsheet</a> pour les comparatifs multi-OS</div>';
       box.classList.add('show');
       return;
     }

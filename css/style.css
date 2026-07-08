@@ -561,6 +561,7 @@ body::after {
   font-size: 12px;
   color: var(--muted);
 }
+.gs-empty a { color: var(--accent-2); text-decoration: underline; }
 
 .cursor {
   display: inline-block;
