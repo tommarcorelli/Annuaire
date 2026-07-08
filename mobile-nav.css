@@ -128,8 +128,10 @@
 
 body.mnav-lock { overflow: hidden; }
 
-/* ── Bascule responsive : on montre le hamburger, on cache les piles de liens ── */
-@media (max-width: 760px) {
+/* ── Bascule responsive : on montre le hamburger, on cache les piles de liens ──
+   Aligné sur le breakpoint du burger de filtres de commands.html (860px) pour
+   éviter une zone intermédiaire (761–860px) où les deux comportements différaient. */
+@media (max-width: 860px) {
   .mnav-toggle { display: inline-flex; }
 
   /* piles de navigation textuelles → remplacées par le drawer */
@@ -139,7 +141,27 @@ body.mnav-lock { overflow: hidden; }
   /* commands.html : désencombre pour laisser la place au hamburger.
      L'export PDF reste dispo sur desktop ; le compteur libère la barre. */
   .print-btn { display: none !important; }
-  .nav-right { gap: 8px !important; }
+  .nav-right { gap: 8px !important; flex-wrap: nowrap; }
   #resultCount { display: none !important; }
   #searchInput { padding-right: 14px !important; }
+
+  /* le logo et la recherche ne doivent jamais forcer un débordement de la nav */
+  .nav-logo { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .search-wrap { min-width: 0; flex: 1 1 auto; }
+}
+
+/* ── Écrans étroits (téléphones) : commands.html a trop de boutons pour la
+   largeur disponible (filtres + aléatoire + favoris + menu du site).
+   On simplifie pour que la barre ne déborde plus. ── */
+@media (max-width: 480px) {
+  /* bouton "commande aléatoire" : agréable mais superflu sur petit écran,
+     on le masque pour éviter que les icônes débordent de la nav */
+  #randomBtn { display: none !important; }
+
+  /* favoris : on garde juste l'icône, le compteur numérique prend trop de place */
+  #favToggle #favCount { display: none; }
+  #favToggle { padding: 0 8px !important; gap: 0 !important; }
+
+  .nav-right { gap: 6px !important; }
+  .nav-logo { font-size: 10px !important; }
 }
