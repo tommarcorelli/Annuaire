@@ -222,4 +222,52 @@ const SCENARIOS_DATA = [
     kw: 'active directory ad ds ou utilisateur groupe gpo strategie de groupe powershell windows server annuaire',
     cmds: ['New-ADOrganizationalUnit', 'New-ADUser', 'Get-ADUser', 'Get-ADGroup / Add-ADGroupMember', 'New-GPO', 'gpupdate', 'dcdiag']
   },
+  {
+    id: 'sc-alpine', icon: '🏔️',
+    title: 'Configurer un serveur Alpine minimal de zéro',
+    kw: 'alpine linux musl busybox openrc apk conteneur leger docker base',
+    cmds: ['setup-alpine', 'apk update', 'apk upgrade', 'apk add', 'rc-update', 'rc-service', 'adduser', 'lbu commit', 'rc-status']
+  },
+  {
+    id: 'sc-awscli', icon: '☁️',
+    title: 'Déployer et gérer une instance EC2 avec AWS CLI',
+    kw: 'aws ec2 cloud instance ssm session manager cli amazon',
+    cmds: ['aws configure', 'aws sts get-caller-identity', 'aws ec2 create-key-pair', 'aws ec2 run-instances', 'aws ec2 describe-instances', 'aws ssm start-session', 'aws ec2 start-instances / stop-instances', 'aws ec2 terminate-instances']
+  },
+  {
+    id: 'sc-azurecli', icon: '🔷',
+    title: 'Déployer une VM et un groupe de ressources avec Azure CLI',
+    kw: 'azure cli cloud vm resource group nsg microsoft',
+    cmds: ['az login', 'az account set', 'az group create', 'az vm create', 'az network nsg rule create', 'az vm list-ip-addresses', 'az group delete']
+  },
+  {
+    id: 'sc-freebsd', icon: '😈',
+    title: 'Installer et durcir un serveur FreeBSD',
+    kw: 'freebsd bsd pf pkg jail zfs unix daemon',
+    cmds: ['bsdinstall', 'freebsd-update', 'pkg install', 'rc.conf (sysrc)', 'pw useradd', 'pfctl', 'pkg audit']
+  },
+  {
+    id: 'sc-firewall-iptables', icon: '🛡️',
+    title: 'Construire un pare-feu iptables de A à Z',
+    kw: 'iptables pare-feu firewall securite chaines policy nat',
+    cmds: ['iptables -P', 'iptables -A INPUT', 'iptables -m conntrack', 'iptables -m recent', 'iptables -j MASQUERADE', 'iptables -L', 'netfilter-persistent']
+  },
+  {
+    id: 'sc-macos', icon: '🍎',
+    title: 'Administrer un Mac en ligne de commande avec Homebrew',
+    kw: 'macos mac brew homebrew launchctl bsd apple terminal',
+    cmds: ['brew install', 'brew update', 'sw_vers', 'system_profiler', 'launchctl load/unload', 'defaults write', 'networksetup', 'tmutil']
+  },
+  {
+    id: 'sc-rhel', icon: '🎩',
+    title: 'Administrer un serveur RHEL avec dnf et SELinux',
+    kw: 'rhel centos red hat selinux firewalld dnf subscription',
+    cmds: ['dnf install', 'sestatus', 'getenforce / setenforce', 'firewall-cmd', 'semanage', 'restorecon', 'systemctl (RHEL)', 'lvextend / xfs_growfs', 'subscription-manager']
+  },
+  {
+    id: 'sc-tshark', icon: '🦈',
+    title: 'Analyser du trafic réseau en ligne de commande avec tshark',
+    kw: 'tshark wireshark capture paquets analyse reseau filtre',
+    cmds: ['tshark -D', 'tshark -i', 'tshark -f', 'tshark -Y', 'tshark -T fields -e', 'tshark -z conv,tcp', 'tshark -z follow,tcp', 'tshark -z expert']
+  },
 ];

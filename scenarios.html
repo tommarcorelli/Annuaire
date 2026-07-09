@@ -2221,8 +2221,388 @@ resource "local_file" "hello" {
             <code>dcdiag</code>
           </li>
         </ol>
+        <!-- ═══ 37. ALPINE ═══ -->
+    <details class="sc" id="sc-alpine" style="--c:#0D597F">
+      <summary>
+        <span class="sc-ico">🏔️</span>
+        <div class="sc-head">
+          <div class="sc-name">Configurer un serveur Alpine minimal de zéro</div>
+          <div class="sc-meta">Alpine Linux — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Alpine mise sur la légèreté : musl libc, BusyBox, OpenRC. Ce qui prend 2 Go ailleurs tient ici en 130 Mo — parfait pour un conteneur ou une VM minimale, mais avec quelques réflexes différents à connaître.</p>
+        <p class="sc-links"><a href="commands.html?os=alpine">⌘ commandes Alpine</a> · <a href="quiz.html?os=alpine">🎓 quiz Alpine</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Installation interactive de base</div>
+            <code>setup-alpine</code>
+            <p class="st-note">Assistant qui configure clavier, réseau, disque et utilisateurs en une seule commande.</p>
+          </li>
+          <li>
+            <div class="st-desc">Mettre à jour la liste des paquets puis le système</div>
+            <code>apk update</code>
+            <code>apk upgrade</code>
+          </li>
+          <li>
+            <div class="st-desc">Installer un paquet</div>
+            <code>apk add nginx</code>
+          </li>
+          <li>
+            <div class="st-desc">Activer un service au démarrage (OpenRC, pas systemd)</div>
+            <code>rc-update add nginx default</code>
+            <code>rc-service nginx start</code>
+          </li>
+          <li>
+            <div class="st-desc">Ajouter un utilisateur non-root pour l'administration courante</div>
+            <code>adduser tom</code>
+          </li>
+          <li>
+            <div class="st-desc">Rendre la config persistante</div>
+            <code>lbu commit</code>
+            <p class="st-note">Sur une install en RAM (mode diskless), sans <b>lbu commit</b> tout disparaît au redémarrage.</p>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier l'état de tous les services</div>
+            <code>rc-status</code>
+          </li>
+        </ol>
       </div>
     </details>
+
+    <!-- ═══ 38. AWS CLI ═══ -->
+    <details class="sc" id="sc-awscli" style="--c:#FF9900">
+      <summary>
+        <span class="sc-ico">☁️</span>
+        <div class="sc-head">
+          <div class="sc-name">Déployer et gérer une instance EC2 avec AWS CLI</div>
+          <div class="sc-meta">AWS CLI — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Tout ce qu'on peut faire dans la console web AWS est scriptable en CLI — plus rapide à rejouer, versionnable, et sans clic perdu dans un menu.</p>
+        <p class="sc-links"><a href="commands.html?os=awscli">⌘ commandes AWS CLI</a> · <a href="quiz.html?os=awscli">🎓 quiz AWS CLI</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Configurer les identifiants</div>
+            <code>aws configure</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier quelle identité est active</div>
+            <code>aws sts get-caller-identity</code>
+            <p class="st-note">Toujours vérifier avant de manipuler des ressources — surtout avec plusieurs comptes/profils.</p>
+          </li>
+          <li>
+            <div class="st-desc">Créer une paire de clés SSH</div>
+            <code>aws ec2 create-key-pair --key-name lab-key --query 'KeyMaterial' --output text > lab-key.pem</code>
+          </li>
+          <li>
+            <div class="st-desc">Lancer une instance</div>
+            <code>aws ec2 run-instances --image-id ami-xxxxx --instance-type t3.micro --key-name lab-key</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier son état</div>
+            <code>aws ec2 describe-instances</code>
+          </li>
+          <li>
+            <div class="st-desc">S'y connecter sans exposer de port SSH public</div>
+            <code>aws ssm start-session --target i-xxxxxxxxx</code>
+          </li>
+          <li>
+            <div class="st-desc">Nettoyer en fin de lab</div>
+            <code>aws ec2 stop-instances --instance-ids i-xxxxxxxxx</code>
+            <code>aws ec2 terminate-instances --instance-ids i-xxxxxxxxx</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 39. AZURE CLI ═══ -->
+    <details class="sc" id="sc-azurecli" style="--c:#0078D4">
+      <summary>
+        <span class="sc-ico">🔷</span>
+        <div class="sc-head">
+          <div class="sc-name">Déployer une VM et un groupe de ressources avec Azure CLI</div>
+          <div class="sc-meta">Azure CLI — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Azure organise tout autour du groupe de ressources : le supprimer suffit à tout nettoyer d'un coup en fin de lab, sans traquer chaque ressource une par une.</p>
+        <p class="sc-links"><a href="commands.html?os=azurecli">⌘ commandes Azure CLI</a> · <a href="quiz.html?os=azurecli">🎓 quiz Azure CLI</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Se connecter</div>
+            <code>az login</code>
+          </li>
+          <li>
+            <div class="st-desc">Choisir l'abonnement actif si plusieurs sont disponibles</div>
+            <code>az account set --subscription "Mon abonnement"</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer un groupe de ressources</div>
+            <code>az group create --name lab-rg --location francecentral</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer une VM dedans</div>
+            <code>az vm create --resource-group lab-rg --name lab-vm --image Ubuntu2204 --admin-username tom --generate-ssh-keys</code>
+          </li>
+          <li>
+            <div class="st-desc">Ouvrir un port dans le groupe de sécurité réseau</div>
+            <code>az network nsg rule create --resource-group lab-rg --nsg-name lab-vmNSG --name allow-ssh --priority 100 --destination-port-ranges 22 --access Allow</code>
+          </li>
+          <li>
+            <div class="st-desc">Nettoyer en fin de lab — supprime tout le groupe en une commande</div>
+            <code>az group delete --name lab-rg --yes</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 40. FREEBSD ═══ -->
+    <details class="sc" id="sc-freebsd" style="--c:#AB2B28">
+      <summary>
+        <span class="sc-ico">😈</span>
+        <div class="sc-head">
+          <div class="sc-name">Installer et durcir un serveur FreeBSD</div>
+          <div class="sc-meta">FreeBSD — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">FreeBSD n'est pas une distribution Linux : son propre noyau, son propre pare-feu (pf), son propre gestionnaire de paquets. Une base solide et stable, très présente sur les routeurs et appliances réseau.</p>
+        <p class="sc-links"><a href="commands.html?os=freebsd">⌘ commandes FreeBSD</a> · <a href="quiz.html?os=freebsd">🎓 quiz FreeBSD</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Installation initiale du système</div>
+            <code>bsdinstall</code>
+          </li>
+          <li>
+            <div class="st-desc">Mettre le système à jour</div>
+            <code>freebsd-update fetch install</code>
+          </li>
+          <li>
+            <div class="st-desc">Installer un paquet</div>
+            <code>pkg install nginx</code>
+          </li>
+          <li>
+            <div class="st-desc">Activer un service au démarrage</div>
+            <code>sysrc nginx_enable=YES</code>
+            <code>service nginx start</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer un utilisateur</div>
+            <code>pw useradd tom -m -s /bin/sh</code>
+          </li>
+          <li>
+            <div class="st-desc">Filtrer le trafic avec pf</div>
+            <code>pfctl -e</code>
+            <code>pfctl -f /etc/pf.conf</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier si des paquets installés ont des failles connues</div>
+            <code>pkg audit -F</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 41. IPTABLES ═══ -->
+    <details class="sc" id="sc-firewall-iptables" style="--c:#4A5568">
+      <summary>
+        <span class="sc-ico">🛡️</span>
+        <div class="sc-head">
+          <div class="sc-name">Construire un pare-feu iptables de A à Z</div>
+          <div class="sc-meta">iptables — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">La bonne méthode : tout bloquer par défaut, puis n'ouvrir explicitement que ce qui est nécessaire — jamais l'inverse.</p>
+        <p class="sc-links"><a href="commands.html?os=iptables">⌘ commandes iptables</a> · <a href="quiz.html?os=iptables">🎓 quiz iptables</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Politique par défaut restrictive sur les trois chaînes</div>
+            <code>iptables -P INPUT DROP</code>
+            <code>iptables -P FORWARD DROP</code>
+            <code>iptables -P OUTPUT ACCEPT</code>
+          </li>
+          <li>
+            <div class="st-desc">Autoriser le loopback et les connexions déjà établies</div>
+            <code>iptables -A INPUT -i lo -j ACCEPT</code>
+            <code>iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT</code>
+          </li>
+          <li>
+            <div class="st-desc">Ouvrir explicitement le port SSH</div>
+            <code>iptables -A INPUT -p tcp --dport 22 -j ACCEPT</code>
+          </li>
+          <li>
+            <div class="st-desc">Se protéger du brute-force sur ce port</div>
+            <code>iptables -A INPUT -p tcp --dport 22 -m recent --update --seconds 60 --hitcount 4 -j DROP</code>
+          </li>
+          <li>
+            <div class="st-desc">Partager la connexion à un réseau interne (routeur/passerelle)</div>
+            <code>iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier les règles actives avant de fermer la session</div>
+            <code>iptables -L -n -v --line-numbers</code>
+            <p class="st-note">À faire systématiquement en SSH distant — sinon un DROP mal placé peut fermer l'accès pour de bon.</p>
+          </li>
+          <li>
+            <div class="st-desc">Rendre les règles persistantes au redémarrage</div>
+            <code>netfilter-persistent save</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 42. MACOS ═══ -->
+    <details class="sc" id="sc-macos" style="--c:#555555">
+      <summary>
+        <span class="sc-ico">🍎</span>
+        <div class="sc-head">
+          <div class="sc-name">Administrer un Mac en ligne de commande avec Homebrew</div>
+          <div class="sc-meta">macOS — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">macOS a un vrai terminal Unix (BSD) sous le capot — Homebrew comble ce qui manque en gestion de paquets, et une bonne partie de l'administration système reste accessible en CLI, sans passer par les Préférences Système.</p>
+        <p class="sc-links"><a href="commands.html?os=macos">⌘ commandes macOS</a> · <a href="quiz.html?os=macos">🎓 quiz macOS</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Installer un logiciel</div>
+            <code>brew install wget</code>
+          </li>
+          <li>
+            <div class="st-desc">Garder les paquets à jour</div>
+            <code>brew update</code>
+            <code>brew upgrade</code>
+          </li>
+          <li>
+            <div class="st-desc">Voir les infos système et la version d'OS</div>
+            <code>sw_vers</code>
+            <code>system_profiler SPHardwareDataType</code>
+          </li>
+          <li>
+            <div class="st-desc">Gérer un daemon/agent système</div>
+            <code>launchctl load /Library/LaunchDaemons/mon-service.plist</code>
+          </li>
+          <li>
+            <div class="st-desc">Modifier une préférence système depuis le terminal</div>
+            <code>defaults write com.apple.finder AppleShowAllFiles YES</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier la configuration réseau Wi-Fi</div>
+            <code>networksetup -getairportnetwork en0</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier l'état des sauvegardes Time Machine</div>
+            <code>tmutil status</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 43. RHEL ═══ -->
+    <details class="sc" id="sc-rhel" style="--c:#CC0000">
+      <summary>
+        <span class="sc-ico">🎩</span>
+        <div class="sc-head">
+          <div class="sc-name">Administrer un serveur RHEL avec dnf et SELinux</div>
+          <div class="sc-meta">RHEL / CentOS — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Le duo firewalld + SELinux fait la réputation (et parfois la galère) de RHEL : deux couches de sécurité actives par défaut, qu'il faut savoir lire avant de désactiver quoi que ce soit.</p>
+        <p class="sc-links"><a href="commands.html?os=rhel">⌘ commandes RHEL</a> · <a href="quiz.html?os=rhel">🎓 quiz RHEL</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Installer un paquet</div>
+            <code>dnf install httpd</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier l'état de SELinux avant de blâmer le pare-feu</div>
+            <code>sestatus</code>
+            <code>getenforce</code>
+          </li>
+          <li>
+            <div class="st-desc">Ouvrir un port dans le pare-feu</div>
+            <code>firewall-cmd --permanent --add-service=http</code>
+            <code>firewall-cmd --reload</code>
+          </li>
+          <li>
+            <div class="st-desc">Autoriser un contexte SELinux bloquant un service légitime</div>
+            <code>semanage port -a -t http_port_t -p tcp 8080</code>
+            <code>restorecon -Rv /var/www/html</code>
+          </li>
+          <li>
+            <div class="st-desc">Gérer le service via systemd</div>
+            <code>systemctl enable --now httpd</code>
+          </li>
+          <li>
+            <div class="st-desc">Étendre un volume logique manquant d'espace</div>
+            <code>lvextend -L +5G /dev/mapper/rhel-root</code>
+            <code>xfs_growfs /</code>
+          </li>
+          <li>
+            <div class="st-desc">Enregistrer le système auprès du Customer Portal Red Hat</div>
+            <code>subscription-manager register</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 44. TSHARK ═══ -->
+    <details class="sc" id="sc-tshark" style="--c:#1679BE">
+      <summary>
+        <span class="sc-ico">🦈</span>
+        <div class="sc-head">
+          <div class="sc-name">Analyser du trafic réseau en ligne de commande avec tshark</div>
+          <div class="sc-meta">tshark — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Wireshark sans interface graphique : mêmes filtres, même moteur d'analyse, mais scriptable et utilisable sur un serveur distant sans affichage.</p>
+        <p class="sc-links"><a href="commands.html?os=tshark">⌘ commandes tshark</a> · <a href="quiz.html?os=tshark">🎓 quiz tshark</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Lister les interfaces disponibles</div>
+            <code>tshark -D</code>
+          </li>
+          <li>
+            <div class="st-desc">Lancer une capture filtrée (filtre de capture, avant collecte)</div>
+            <code>tshark -i eth0 -f "tcp port 443"</code>
+          </li>
+          <li>
+            <div class="st-desc">Filtrer l'affichage après capture (filtre plus riche, sur le contenu décodé)</div>
+            <code>tshark -r capture.pcap -Y "http.response.code >= 400"</code>
+          </li>
+          <li>
+            <div class="st-desc">Extraire des champs précis, dans un format exploitable par un script</div>
+            <code>tshark -r capture.pcap -T fields -e ip.src -e ip.dst -e tcp.port</code>
+          </li>
+          <li>
+            <div class="st-desc">Voir les statistiques de conversations TCP</div>
+            <code>tshark -r capture.pcap -q -z conv,tcp</code>
+          </li>
+          <li>
+            <div class="st-desc">Suivre un flux TCP complet, dans l'ordre</div>
+            <code>tshark -r capture.pcap -z follow,tcp,ascii,0</code>
+          </li>
+          <li>
+            <div class="st-desc">Repérer les anomalies détectées automatiquement (retransmissions, erreurs...)</div>
+            <code>tshark -r capture.pcap -z expert</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
 
   </div>
 
