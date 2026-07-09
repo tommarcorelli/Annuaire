@@ -310,6 +310,102 @@ const EXTRA_COMMANDS = [
     flags: ["in <min>", "at <hh:mm>", "cancel"]
   },
 
+    {
+    name: "show version",
+    os: "cisco",
+    category: "Réseau",
+    description: "Affiche la version de l'IOS, le modèle du matériel, la mémoire disponible et l'uptime — le premier réflexe pour identifier un équipement.",
+    syntax: "show version",
+    examples: [
+      { cmd: "show version", desc: "Version IOS, RAM, uptime, registre de configuration" }
+    ],
+    flags: []
+  },
+  {
+    name: "show interfaces",
+    os: "cisco",
+    category: "Réseau",
+    description: "Affiche l'état détaillé d'une ou toutes les interfaces : compteurs d'erreurs, débit, encapsulation — plus complet que 'show ip interface brief'.",
+    syntax: "show interfaces [<interface>]",
+    examples: [
+      { cmd: "show interfaces GigabitEthernet0/1", desc: "Détail complet de cette interface" },
+      { cmd: "show interfaces | include error", desc: "Ne montre que les lignes avec des erreurs" }
+    ],
+    flags: []
+  },
+  {
+    name: "ping / traceroute",
+    os: "cisco",
+    category: "Réseau",
+    description: "Teste la connectivité et trace le chemin réseau vers une destination, directement depuis l'IOS.",
+    syntax: "ping <ip> / traceroute <ip>",
+    examples: [
+      { cmd: "ping 8.8.8.8", desc: "Test de connectivité basique" },
+      { cmd: "traceroute 8.8.8.8", desc: "Affiche chaque saut jusqu'à la destination" }
+    ],
+    flags: []
+  },
+  {
+    name: "no shutdown",
+    os: "cisco",
+    category: "Réseau",
+    description: "Active une interface — par défaut, les interfaces sont administrativement désactivées et n'ont besoin que de cette commande pour passer up.",
+    syntax: "interface <nom> puis no shutdown",
+    examples: [
+      { cmd: "interface GigabitEthernet0/1", desc: "Entre en mode config de l'interface" },
+      { cmd: "no shutdown", desc: "Active l'interface (sinon elle reste 'administratively down')" }
+    ],
+    flags: ["shutdown (désactive)", "no shutdown (active)"]
+  },
+  {
+    name: "show spanning-tree",
+    os: "cisco",
+    category: "Réseau",
+    description: "Affiche l'état du protocole Spanning Tree : quel port est root, bloqué ou en transmission — essentiel pour diagnostiquer une boucle réseau.",
+    syntax: "show spanning-tree [vlan <id>]",
+    examples: [
+      { cmd: "show spanning-tree vlan 10", desc: "État STP pour le VLAN 10" },
+      { cmd: "show spanning-tree summary", desc: "Vue d'ensemble condensée" }
+    ],
+    flags: []
+  },
+  {
+    name: "ip nat inside/outside",
+    os: "cisco",
+    category: "Réseau",
+    description: "Configure la traduction d'adresses (NAT) entre un réseau interne et une interface connectée à Internet.",
+    syntax: "ip nat inside / ip nat outside (sur les interfaces) + ip nat inside source",
+    examples: [
+      { cmd: "interface Gi0/1 \\n ip nat inside", desc: "Marque l'interface LAN comme réseau interne" },
+      { cmd: "ip nat inside source list 1 interface Gi0/0 overload", desc: "NAT dynamique (PAT) vers l'interface WAN" }
+    ],
+    flags: ["inside", "outside", "overload (PAT)"]
+  },
+  {
+    name: "copy tftp: / copy running-config tftp:",
+    os: "cisco",
+    category: "Réseau",
+    description: "Sauvegarde ou restaure la configuration via un serveur TFTP — pratique pour archiver ou dupliquer une config entre équipements.",
+    syntax: "copy running-config tftp: / copy tftp: running-config",
+    examples: [
+      { cmd: "copy running-config tftp:", desc: "Envoie la config actuelle vers un serveur TFTP" },
+      { cmd: "copy tftp: startup-config", desc: "Récupère une config sauvegardée" }
+    ],
+    flags: []
+  },
+  {
+    name: "show logging",
+    os: "cisco",
+    category: "Réseau",
+    description: "Affiche le journal des évènements système (erreurs, changements d'état d'interface, accès) stocké en mémoire.",
+    syntax: "show logging",
+    examples: [
+      { cmd: "show logging", desc: "Affiche l'historique des logs internes" },
+      { cmd: "show logging | include DOWN", desc: "Ne montre que les évènements d'interface tombée" }
+    ],
+    flags: []
+  },
+
   // ── PROXMOX VE ────────────────────────────────────────────
   {
     name: "qm list",
@@ -541,6 +637,144 @@ const EXTRA_COMMANDS = [
     flags: ["ping", "network-get-interfaces", "get-osinfo"]
   },
 
+    {
+    name: "qm destroy",
+    os: "proxmox",
+    category: "Virtualisation",
+    description: "Supprime définitivement une VM et ses disques associés — irréversible, à utiliser avec précaution.",
+    syntax: "qm destroy <vmid>",
+    examples: [
+      { cmd: "qm destroy 105", desc: "Supprime la VM 105 et libère son stockage" },
+      { cmd: "qm destroy 105 --purge", desc: "Supprime aussi les références dans les jobs de sauvegarde" }
+    ],
+    flags: ["--purge (nettoie aussi les jobs liés)"]
+  },
+  {
+    name: "qm resize",
+    os: "proxmox",
+    category: "Virtualisation",
+    description: "Agrandit le disque virtuel d'une VM à chaud, sans devoir l'éteindre.",
+    syntax: "qm resize <vmid> <disque> +<taille>",
+    examples: [
+      { cmd: "qm resize 105 scsi0 +20G", desc: "Ajoute 20 Go au disque scsi0 de la VM 105" }
+    ],
+    flags: ["+<taille> (ajoute)", "taille absolue (redéfinit)"]
+  },
+  {
+    name: "qm set",
+    os: "proxmox",
+    category: "Virtualisation",
+    description: "Modifie la configuration d'une VM existante — RAM, CPU, ajout de disque ou de carte réseau — sans passer par l'interface web.",
+    syntax: "qm set <vmid> --<option> <valeur>",
+    examples: [
+      { cmd: "qm set 105 --memory 4096 --cores 2", desc: "Modifie RAM et CPU" },
+      { cmd: "qm set 105 --net1 virtio,bridge=vmbr1", desc: "Ajoute une deuxième carte réseau" }
+    ],
+    flags: ["--memory", "--cores", "--net<n>", "--scsi<n>"]
+  },
+  {
+    name: "qm shutdown / qm stop",
+    os: "proxmox",
+    category: "Virtualisation",
+    description: "Éteint une VM : shutdown fait un arrêt propre via ACPI, stop coupe brutalement (comme débrancher la prise).",
+    syntax: "qm shutdown <vmid> / qm stop <vmid>",
+    examples: [
+      { cmd: "qm shutdown 105", desc: "Arrêt propre, laisse le temps à l'OS de fermer les services" },
+      { cmd: "qm stop 105", desc: "Coupe immédiatement, utile si la VM ne répond plus" }
+    ],
+    flags: ["shutdown (propre)", "stop (forcé)"]
+  },
+  {
+    name: "qm reboot",
+    os: "proxmox",
+    category: "Virtualisation",
+    description: "Redémarre une VM proprement, équivalent à un redémarrage depuis l'intérieur de l'OS.",
+    syntax: "qm reboot <vmid>",
+    examples: [
+      { cmd: "qm reboot 105", desc: "Redémarre la VM 105" }
+    ],
+    flags: []
+  },
+  {
+    name: "pct destroy",
+    os: "proxmox",
+    category: "Virtualisation",
+    description: "Supprime définitivement un conteneur LXC et son stockage associé.",
+    syntax: "pct destroy <vmid>",
+    examples: [
+      { cmd: "pct destroy 110", desc: "Supprime le conteneur 110" }
+    ],
+    flags: ["--purge"]
+  },
+  {
+    name: "pct exec",
+    os: "proxmox",
+    category: "Virtualisation",
+    description: "Exécute une commande à l'intérieur d'un conteneur LXC sans y entrer complètement avec pct enter.",
+    syntax: "pct exec <vmid> -- <commande>",
+    examples: [
+      { cmd: "pct exec 110 -- apt update", desc: "Met à jour les paquets du conteneur depuis l'hôte" }
+    ],
+    flags: ["-- (sépare la commande)"]
+  },
+  {
+    name: "pct resize",
+    os: "proxmox",
+    category: "Virtualisation",
+    description: "Agrandit le disque d'un conteneur LXC à chaud.",
+    syntax: "pct resize <vmid> <disque> +<taille>",
+    examples: [
+      { cmd: "pct resize 110 rootfs +10G", desc: "Ajoute 10 Go au conteneur 110" }
+    ],
+    flags: ["+<taille>"]
+  },
+  {
+    name: "pvesm add / list",
+    os: "proxmox",
+    category: "Virtualisation",
+    description: "Ajoute ou liste les stockages (local, NFS, ZFS, Ceph...) disponibles sur le cluster Proxmox.",
+    syntax: "pvesm add <type> <id> --<options> / pvesm list <storage>",
+    examples: [
+      { cmd: "pvesm add nfs backup-nfs --server 10.0.0.9 --export /export/backup", desc: "Ajoute un stockage NFS" },
+      { cmd: "pvesm list local", desc: "Liste le contenu du stockage 'local'" }
+    ],
+    flags: []
+  },
+  {
+    name: "pvecm add / nodes",
+    os: "proxmox",
+    category: "Virtualisation",
+    description: "Ajoute un nouveau nœud à un cluster Proxmox existant, ou liste les nœuds déjà membres.",
+    syntax: "pvecm add <ip-nœud-existant> / pvecm nodes",
+    examples: [
+      { cmd: "pvecm add 10.0.0.10", desc: "Rejoint le cluster dont un nœud a cette IP" },
+      { cmd: "pvecm nodes", desc: "Liste tous les nœuds du cluster" }
+    ],
+    flags: []
+  },
+  {
+    name: "systemctl restart pveproxy",
+    os: "proxmox",
+    category: "Virtualisation",
+    description: "Redémarre les services web de Proxmox (interface d'administration) sans affecter les VMs en cours d'exécution.",
+    syntax: "systemctl restart pveproxy pvedaemon",
+    examples: [
+      { cmd: "systemctl restart pveproxy", desc: "Redémarre l'interface web après un changement de certificat SSL" }
+    ],
+    flags: []
+  },
+  {
+    name: "qmrestore",
+    os: "proxmox",
+    category: "Virtualisation",
+    description: "Restaure une VM à partir d'une sauvegarde créée par vzdump — recrée entièrement la VM depuis l'archive.",
+    syntax: "qmrestore <archive.vma> <nouveau-vmid> --storage <stockage>",
+    examples: [
+      { cmd: "qmrestore /mnt/backup/vzdump-qemu-105.vma.zst 205 --storage local-lvm", desc: "Restaure sous un nouvel ID pour tester sans écraser l'originale" }
+    ],
+    flags: ["--storage <cible>"]
+  },
+
   // ── MYSQL / MARIADB ───────────────────────────────────────
   {
     name: "mysql",
@@ -722,6 +956,164 @@ const EXTRA_COMMANDS = [
     flags: ["ping", "status", "processlist", "shutdown"]
   },
 
+    {
+    name: "SHOW TABLES",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Liste toutes les tables de la base de données actuellement sélectionnée.",
+    syntax: "SHOW TABLES;",
+    examples: [
+      { cmd: "USE ma_base; SHOW TABLES;", desc: "Liste les tables de 'ma_base'" }
+    ],
+    flags: []
+  },
+  {
+    name: "DESCRIBE",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Affiche la structure d'une table : colonnes, types, valeurs par défaut, clés.",
+    syntax: "DESCRIBE <table>; / DESC <table>;",
+    examples: [
+      { cmd: "DESCRIBE utilisateurs;", desc: "Affiche les colonnes de la table" }
+    ],
+    flags: []
+  },
+  {
+    name: "DROP DATABASE / TABLE",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Supprime définitivement une base de données ou une table entière, avec toutes ses données.",
+    syntax: "DROP DATABASE <nom>; / DROP TABLE <nom>;",
+    examples: [
+      { cmd: "DROP TABLE IF EXISTS logs_temp;", desc: "Supprime la table si elle existe, sans erreur sinon" }
+    ],
+    flags: ["IF EXISTS (évite l'erreur si absent)"]
+  },
+  {
+    name: "JOIN",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Combine des lignes de plusieurs tables selon une condition de correspondance — la base des requêtes relationnelles.",
+    syntax: "SELECT ... FROM <table1> JOIN <table2> ON <condition>;",
+    examples: [
+      { cmd: "SELECT u.nom, c.total FROM utilisateurs u JOIN commandes c ON u.id = c.user_id;", desc: "Associe chaque utilisateur à ses commandes" },
+      { cmd: "... LEFT JOIN ...", desc: "Garde aussi les lignes sans correspondance à droite" }
+    ],
+    flags: ["INNER JOIN (par défaut)", "LEFT JOIN", "RIGHT JOIN"]
+  },
+  {
+    name: "CREATE INDEX",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Crée un index sur une ou plusieurs colonnes pour accélérer les recherches et les jointures.",
+    syntax: "CREATE INDEX <nom> ON <table> (<colonne>);",
+    examples: [
+      { cmd: "CREATE INDEX idx_email ON utilisateurs (email);", desc: "Accélère les recherches par email" }
+    ],
+    flags: []
+  },
+  {
+    name: "EXPLAIN",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Affiche le plan d'exécution qu'utiliserait MySQL pour une requête — pour comprendre pourquoi elle est lente et si un index est utilisé.",
+    syntax: "EXPLAIN <requête SELECT>;",
+    examples: [
+      { cmd: "EXPLAIN SELECT * FROM commandes WHERE user_id = 5;", desc: "Montre si un index est utilisé ou si c'est un scan complet" }
+    ],
+    flags: []
+  },
+  {
+    name: "mysqlcheck",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Vérifie, répare et optimise les tables depuis la ligne de commande, sans se connecter au client mysql.",
+    syntax: "mysqlcheck -u <user> -p [--auto-repair] <base>",
+    examples: [
+      { cmd: "mysqlcheck -u root -p --auto-repair ma_base", desc: "Vérifie et répare automatiquement les tables corrompues" }
+    ],
+    flags: ["--auto-repair", "--optimize", "--all-databases"]
+  },
+  {
+    name: "mysqlimport",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Importe rapidement un fichier texte (CSV/TSV) directement dans une table, sans écrire de requêtes INSERT.",
+    syntax: "mysqlimport -u <user> -p --local <base> <fichier.txt>",
+    examples: [
+      { cmd: "mysqlimport -u root -p --local ma_base clients.txt", desc: "Importe clients.txt dans la table 'clients'" }
+    ],
+    flags: ["--local", "--fields-terminated-by=<sep>"]
+  },
+  {
+    name: "REVOKE",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Retire des privilèges précédemment accordés à un utilisateur — l'inverse de GRANT.",
+    syntax: "REVOKE <privilège> ON <base>.<table> FROM '<user>'@'<host>';",
+    examples: [
+      { cmd: "REVOKE DELETE ON ma_base.* FROM 'app'@'localhost';", desc: "Retire le droit de suppression à cet utilisateur" }
+    ],
+    flags: []
+  },
+  {
+    name: "FLUSH PRIVILEGES",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Recharge les tables de privilèges en mémoire — nécessaire après certaines modifications manuelles des droits.",
+    syntax: "FLUSH PRIVILEGES;",
+    examples: [
+      { cmd: "FLUSH PRIVILEGES;", desc: "Applique immédiatement les changements de droits" }
+    ],
+    flags: []
+  },
+  {
+    name: "ALTER USER / SET PASSWORD",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Change le mot de passe d'un utilisateur MySQL existant.",
+    syntax: "ALTER USER '<user>'@'<host>' IDENTIFIED BY '<mdp>';",
+    examples: [
+      { cmd: "ALTER USER 'app'@'localhost' IDENTIFIED BY 'NouveauMdp123!';", desc: "Change le mot de passe de cet utilisateur" }
+    ],
+    flags: []
+  },
+  {
+    name: "mysqlbinlog",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Lit les logs binaires de réplication/transactions — utile pour restaurer jusqu'à un instant précis (point-in-time recovery).",
+    syntax: "mysqlbinlog <fichier-binlog>",
+    examples: [
+      { cmd: "mysqlbinlog binlog.000012 | mysql -u root -p", desc: "Rejoue les transactions enregistrées" }
+    ],
+    flags: ["--start-datetime", "--stop-datetime"]
+  },
+  {
+    name: "SHOW TABLE STATUS / information_schema",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Interroge les métadonnées internes de MySQL : taille des tables, moteur de stockage, nombre de lignes estimé.",
+    syntax: "SELECT * FROM information_schema.tables WHERE table_schema = '<base>';",
+    examples: [
+      { cmd: "SHOW TABLE STATUS LIKE 'commandes';", desc: "Taille et moteur de la table" },
+      { cmd: "SELECT table_name, data_length FROM information_schema.tables ORDER BY data_length DESC;", desc: "Classe les tables par taille" }
+    ],
+    flags: []
+  },
+  {
+    name: "LOCK TABLES",
+    os: "mysql",
+    category: "Bases de données",
+    description: "Verrouille une ou plusieurs tables pour empêcher d'autres connexions d'y écrire pendant une opération sensible (sauvegarde, migration).",
+    syntax: "LOCK TABLES <table> WRITE|READ; ... UNLOCK TABLES;",
+    examples: [
+      { cmd: "LOCK TABLES commandes WRITE;", desc: "Verrouille en écriture le temps de l'opération" },
+      { cmd: "UNLOCK TABLES;", desc: "Libère le verrou" }
+    ],
+    flags: ["READ", "WRITE"]
+  },
+
   // ── NGINX ─────────────────────────────────────────────────
   {
     name: "nginx -t",
@@ -869,6 +1261,179 @@ const EXTRA_COMMANDS = [
       { cmd: "nginx -V 2>&1 | tr ' ' '\\n' | grep module", desc: "Liste les modules compilés" }
     ],
     flags: ["-v (version)", "-V (version + options de compilation)"]
+  },
+
+    {
+    name: "nginx -T",
+    os: "nginx",
+    category: "Web",
+    description: "Teste la config comme -t, mais affiche en plus la configuration complète telle que réellement interprétée (tous les include résolus).",
+    syntax: "nginx -T",
+    examples: [
+      { cmd: "sudo nginx -T | less", desc: "Voit la config finale complète, utile pour du debug" }
+    ],
+    flags: ["-t (teste seulement)", "-T (teste + affiche)"]
+  },
+  {
+    name: "upstream (bloc)",
+    os: "nginx",
+    category: "Web",
+    description: "Déclare un groupe de serveurs backend pour répartir la charge — la base du load balancing avec nginx.",
+    syntax: "upstream <nom> { server <ip:port>; ... }",
+    examples: [
+      { cmd: "upstream backend { server 10.0.0.1:8080; server 10.0.0.2:8080; }", desc: "Deux serveurs backend en round-robin" },
+      { cmd: "proxy_pass http://backend;", desc: "Utilisé ensuite dans un bloc location" }
+    ],
+    flags: ["least_conn;", "ip_hash;", "weight=<n>"]
+  },
+  {
+    name: "gzip",
+    os: "nginx",
+    category: "Web",
+    description: "Compresse les réponses avant envoi pour réduire la bande passante et accélérer le chargement côté client.",
+    syntax: "gzip on; gzip_types <types mime>;",
+    examples: [
+      { cmd: "gzip on;", desc: "Active la compression" },
+      { cmd: "gzip_types text/css application/javascript;", desc: "Précise quels types compresser" }
+    ],
+    flags: ["gzip_min_length", "gzip_comp_level"]
+  },
+  {
+    name: "add_header",
+    os: "nginx",
+    category: "Web",
+    description: "Ajoute un en-tête HTTP personnalisé à la réponse — utilisé pour les en-têtes de sécurité (HSTS, CSP, X-Frame-Options).",
+    syntax: "add_header <Nom> <valeur>;",
+    examples: [
+      { cmd: "add_header X-Frame-Options DENY;", desc: "Empêche l'affichage du site dans une iframe" },
+      { cmd: "add_header Strict-Transport-Security \"max-age=63072000\" always;", desc: "Force le HTTPS côté navigateur (HSTS)" }
+    ],
+    flags: ["always (envoie même sur les erreurs)"]
+  },
+  {
+    name: "error_page",
+    os: "nginx",
+    category: "Web",
+    description: "Définit une page personnalisée à afficher pour un code d'erreur HTTP précis, au lieu de la page par défaut.",
+    syntax: "error_page <code> <chemin>;",
+    examples: [
+      { cmd: "error_page 404 /404.html;", desc: "Page 404 personnalisée" },
+      { cmd: "error_page 500 502 503 504 /50x.html;", desc: "Page commune pour les erreurs serveur" }
+    ],
+    flags: []
+  },
+  {
+    name: "client_max_body_size",
+    os: "nginx",
+    category: "Web",
+    description: "Fixe la taille maximale acceptée pour le corps d'une requête — sans ça, les gros uploads sont rejetés (erreur 413).",
+    syntax: "client_max_body_size <taille>;",
+    examples: [
+      { cmd: "client_max_body_size 50M;", desc: "Autorise des uploads jusqu'à 50 Mo" }
+    ],
+    flags: []
+  },
+  {
+    name: "map (bloc)",
+    os: "nginx",
+    category: "Web",
+    description: "Crée une variable dont la valeur dépend d'une autre variable, via une table de correspondance — logique conditionnelle sans langage de script.",
+    syntax: "map <variable source> <nouvelle variable> { <valeur> <résultat>; }",
+    examples: [
+      { cmd: "map $http_user_agent $is_bot { default 0; ~*bot 1; }", desc: "Détecte un bot depuis le User-Agent" }
+    ],
+    flags: []
+  },
+  {
+    name: "include",
+    os: "nginx",
+    category: "Web",
+    description: "Insère le contenu d'un autre fichier de config à cet endroit — permet de découper la config en modules réutilisables.",
+    syntax: "include <chemin ou motif>;",
+    examples: [
+      { cmd: "include /etc/nginx/sites-enabled/*;", desc: "Charge tous les sites activés" },
+      { cmd: "include /etc/nginx/snippets/ssl.conf;", desc: "Réutilise un bloc de config SSL commun" }
+    ],
+    flags: []
+  },
+  {
+    name: "proxy_set_header",
+    os: "nginx",
+    category: "Web",
+    description: "Transmet ou modifie un en-tête envoyé au serveur backend — indispensable pour que celui-ci connaisse l'IP réelle du client derrière le proxy.",
+    syntax: "proxy_set_header <Nom> <valeur>;",
+    examples: [
+      { cmd: "proxy_set_header X-Real-IP $remote_addr;", desc: "Transmet l'IP réelle du visiteur" },
+      { cmd: "proxy_set_header Host $host;", desc: "Conserve le nom d'hôte d'origine" }
+    ],
+    flags: []
+  },
+  {
+    name: "autoindex",
+    os: "nginx",
+    category: "Web",
+    description: "Génère automatiquement une liste de fichiers cliquable quand un dossier ne contient pas de page d'index.",
+    syntax: "autoindex on;",
+    examples: [
+      { cmd: "location /fichiers/ { autoindex on; }", desc: "Affiche le contenu du dossier /fichiers/" }
+    ],
+    flags: ["autoindex_exact_size off;", "autoindex_format html|json|xml;"]
+  },
+  {
+    name: "stream (bloc)",
+    os: "nginx",
+    category: "Web",
+    description: "Fait proxy/load-balancing sur des protocoles TCP/UDP bruts (base de données, DNS...), pas seulement HTTP.",
+    syntax: "stream { server { listen <port>; proxy_pass <backend>; } }",
+    examples: [
+      { cmd: "stream { upstream db { server 10.0.0.5:5432; } server { listen 5432; proxy_pass db; } }", desc: "Fait transiter du trafic PostgreSQL brut" }
+    ],
+    flags: []
+  },
+  {
+    name: "resolver",
+    os: "nginx",
+    category: "Web",
+    description: "Précise le serveur DNS que nginx doit utiliser pour résoudre les noms d'hôte dynamiques (backends déclarés par nom, pas par IP fixe).",
+    syntax: "resolver <ip> [valid=<durée>];",
+    examples: [
+      { cmd: "resolver 127.0.0.1 valid=10s;", desc: "Utilise un résolveur local, rafraîchi toutes les 10s" }
+    ],
+    flags: ["valid=<durée>"]
+  },
+  {
+    name: "allow / deny",
+    os: "nginx",
+    category: "Web",
+    description: "Restreint l'accès à une IP ou un sous-réseau précis — souvent utilisé pour protéger une interface d'admin.",
+    syntax: "allow <ip|cidr>; deny <ip|cidr|all>;",
+    examples: [
+      { cmd: "location /admin/ { allow 192.168.1.0/24; deny all; }", desc: "Admin accessible uniquement depuis le LAN" }
+    ],
+    flags: ["allow", "deny all"]
+  },
+  {
+    name: "worker_processes / worker_connections",
+    os: "nginx",
+    category: "Web",
+    description: "Règle le nombre de processus worker et de connexions simultanées supportées par worker — le principal levier de perf de nginx.",
+    syntax: "worker_processes <n|auto>; events { worker_connections <n>; }",
+    examples: [
+      { cmd: "worker_processes auto;", desc: "Un worker par cœur CPU disponible" },
+      { cmd: "events { worker_connections 1024; }", desc: "1024 connexions max par worker" }
+    ],
+    flags: ["auto (détecte le nombre de CPU)"]
+  },
+  {
+    name: "nginx -c",
+    os: "nginx",
+    category: "Web",
+    description: "Démarre nginx avec un fichier de configuration alternatif, différent du nginx.conf par défaut.",
+    syntax: "nginx -c <fichier>",
+    examples: [
+      { cmd: "nginx -c /etc/nginx/test.conf -t", desc: "Teste une config alternative avant de basculer dessus" }
+    ],
+    flags: ["-c <fichier>"]
   },
 
   // ── OPENSSL ───────────────────────────────────────────────
@@ -1042,6 +1607,162 @@ const EXTRA_COMMANDS = [
       { cmd: "openssl speed rsa2048", desc: "Signatures/vérifications RSA par seconde" }
     ],
     flags: ["-evp <algo> (utilise l'accélération matérielle)"]
+  },
+
+    {
+    name: "openssl pkey",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Génère ou manipule des clés modernes (RSA, EC...) via une commande unifiée — remplace progressivement genrsa/ecparam pour la génération.",
+    syntax: "openssl genpkey -algorithm <algo> -out <clé.pem>",
+    examples: [
+      { cmd: "openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out cle.pem", desc: "Génère une clé RSA 4096 bits" }
+    ],
+    flags: ["-algorithm RSA|EC|ED25519"]
+  },
+  {
+    name: "openssl ecparam",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Génère une clé basée sur les courbes elliptiques (EC) — plus courte et plus rapide qu'une clé RSA à sécurité équivalente.",
+    syntax: "openssl ecparam -name <courbe> -genkey -out <clé.pem>",
+    examples: [
+      { cmd: "openssl ecparam -name prime256v1 -genkey -out ec.pem", desc: "Clé EC sur la courbe P-256" }
+    ],
+    flags: ["-name <courbe>", "-genkey"]
+  },
+  {
+    name: "openssl req -x509",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Génère un certificat auto-signé directement en une commande, sans passer par une étape CSR séparée — pratique pour un lab ou un test interne.",
+    syntax: "openssl req -x509 -newkey rsa:<bits> -keyout <clé> -out <cert> -days <n>",
+    examples: [
+      { cmd: "openssl req -x509 -newkey rsa:4096 -keyout cle.pem -out cert.pem -days 365 -nodes", desc: "Clé + certificat auto-signé en une seule commande" }
+    ],
+    flags: ["-days <n>", "-nodes (pas de passphrase)"]
+  },
+  {
+    name: "openssl s_server",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Démarre un serveur TLS de test minimal — pratique pour vérifier une configuration client ou un certificat sans monter un vrai serveur.",
+    syntax: "openssl s_server -cert <cert> -key <clé> -port <n>",
+    examples: [
+      { cmd: "openssl s_server -cert cert.pem -key cle.pem -port 4433", desc: "Serveur TLS de test sur le port 4433" }
+    ],
+    flags: ["-port <n>", "-www (répond en HTTP basique)"]
+  },
+  {
+    name: "openssl smime",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Chiffre ou signe un email au format S/MIME, en utilisant un certificat X.509.",
+    syntax: "openssl smime -encrypt -in <fichier> -out <sortie> <cert.pem>",
+    examples: [
+      { cmd: "openssl smime -encrypt -in message.txt -out message.enc destinataire.pem", desc: "Chiffre un message pour un destinataire précis" }
+    ],
+    flags: ["-encrypt", "-sign", "-decrypt"]
+  },
+  {
+    name: "openssl dhparam",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Génère les paramètres Diffie-Hellman utilisés pour l'échange de clé — recommandé pour renforcer la config TLS d'un serveur.",
+    syntax: "openssl dhparam -out <fichier> <bits>",
+    examples: [
+      { cmd: "openssl dhparam -out dhparam.pem 2048", desc: "Génère des paramètres DH de 2048 bits (peut prendre du temps)" }
+    ],
+    flags: []
+  },
+  {
+    name: "openssl asn1parse",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Décode la structure ASN.1 brute d'un certificat ou d'une clé — utile pour du debug bas niveau sur un format X.509.",
+    syntax: "openssl asn1parse -in <fichier>",
+    examples: [
+      { cmd: "openssl asn1parse -in cert.pem", desc: "Affiche la structure interne détaillée du certificat" }
+    ],
+    flags: []
+  },
+  {
+    name: "openssl storeutl",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Affiche le contenu d'un magasin de clés/certificats (fichier ou périphérique), quel que soit son format d'origine.",
+    syntax: "openssl storeutl -text <fichier>",
+    examples: [
+      { cmd: "openssl storeutl -text cert.pem", desc: "Affiche le contenu lisible du fichier" }
+    ],
+    flags: ["-text"]
+  },
+  {
+    name: "openssl base64",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Encode ou décode du contenu en base64 — utile pour transporter des données binaires (clés, certificats) dans du texte.",
+    syntax: "openssl base64 -in <fichier> [-d]",
+    examples: [
+      { cmd: "openssl base64 -in cle.bin -out cle.b64", desc: "Encode en base64" },
+      { cmd: "openssl base64 -d -in cle.b64 -out cle.bin", desc: "Décode" }
+    ],
+    flags: ["-d (décode)"]
+  },
+  {
+    name: "openssl version",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Affiche la version d'OpenSSL installée et les options de compilation — utile pour vérifier la présence de failles connues (Heartbleed etc.).",
+    syntax: "openssl version [-a]",
+    examples: [
+      { cmd: "openssl version -a", desc: "Version complète + détails de compilation" }
+    ],
+    flags: ["-a (tout afficher)"]
+  },
+  {
+    name: "openssl list",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Liste les algorithmes, commandes ou providers disponibles dans l'installation OpenSSL actuelle.",
+    syntax: "openssl list -digest-algorithms|-cipher-algorithms",
+    examples: [
+      { cmd: "openssl list -digest-algorithms", desc: "Liste les algorithmes de hachage disponibles" }
+    ],
+    flags: ["-digest-algorithms", "-cipher-algorithms"]
+  },
+  {
+    name: "openssl pkcs8",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Convertit une clé privée vers/depuis le format PKCS#8, standard et largement compatible entre outils.",
+    syntax: "openssl pkcs8 -topk8 -in <clé> -out <clé-pkcs8>",
+    examples: [
+      { cmd: "openssl pkcs8 -topk8 -nocrypt -in cle.pem -out cle-pkcs8.pem", desc: "Convertit vers PKCS#8 sans chiffrement" }
+    ],
+    flags: ["-topk8", "-nocrypt"]
+  },
+  {
+    name: "openssl ts (timestamping)",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Crée ou vérifie un horodatage cryptographique sur un fichier, prouvant qu'il existait à une date donnée sans en révéler le contenu.",
+    syntax: "openssl ts -query -data <fichier> -out <requête.tsq>",
+    examples: [
+      { cmd: "openssl ts -query -data document.pdf -out requete.tsq -sha256", desc: "Prépare une requête d'horodatage" }
+    ],
+    flags: ["-query", "-verify"]
+  },
+  {
+    name: "openssl x509 -noout -fingerprint",
+    os: "openssl",
+    category: "Sécurité",
+    description: "Calcule l'empreinte unique d'un certificat — pour vérifier rapidement qu'un certificat correspond bien à celui attendu.",
+    syntax: "openssl x509 -noout -fingerprint -<algo> -in <cert>",
+    examples: [
+      { cmd: "openssl x509 -noout -fingerprint -sha256 -in cert.pem", desc: "Empreinte SHA-256 du certificat" }
+    ],
+    flags: ["-sha256", "-sha1"]
   },
 
   // ── TCPDUMP ───────────────────────────────────────────────
@@ -1339,6 +2060,173 @@ const EXTRA_COMMANDS = [
       { cmd: "sudo tcpdump less 60", desc: "Paquets très courts, souvent des scans ou du contrôle" }
     ],
     flags: ["greater <n>", "less <n>"]
+  },
+
+    {
+    name: "tcpdump -v / -vv / -vvv",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Augmente la verbosité de la sortie — plus de détails sur les en-têtes (TTL, options, checksums).",
+    syntax: "tcpdump -v|-vv|-vvv [filtre]",
+    examples: [
+      { cmd: "sudo tcpdump -vv -i eth0 icmp", desc: "Détails complets sur les paquets ICMP" }
+    ],
+    flags: ["-v", "-vv", "-vvv (de plus en plus verbeux)"]
+  },
+  {
+    name: "tcpdump ip6",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Filtre uniquement le trafic IPv6, à séparer explicitement de l'IPv4 sur un réseau double pile.",
+    syntax: "tcpdump ip6 [filtre]",
+    examples: [
+      { cmd: "sudo tcpdump ip6 and tcp port 443", desc: "HTTPS uniquement en IPv6" }
+    ],
+    flags: ["ip6", "ip (IPv4 explicite)"]
+  },
+  {
+    name: "tcpdump -Z",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Abandonne les privilèges root vers un utilisateur normal une fois la capture démarrée — bonne pratique de sécurité.",
+    syntax: "tcpdump -Z <utilisateur>",
+    examples: [
+      { cmd: "sudo tcpdump -i eth0 -Z nobody -w capture.pcap", desc: "Capture avec droits root puis bascule vers 'nobody'" }
+    ],
+    flags: ["-Z <utilisateur>"]
+  },
+  {
+    name: "tcpdump -K",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Ignore la vérification des checksums — nécessaire avec certaines cartes réseau qui déchargent ce calcul au matériel (checksum offloading).",
+    syntax: "tcpdump -K [filtre]",
+    examples: [
+      { cmd: "sudo tcpdump -K -i eth0 tcp", desc: "Évite les faux 'bad checksum' liés à l'offloading" }
+    ],
+    flags: ["-K (ignore les checksums)"]
+  },
+  {
+    name: "tcpdump -x",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Affiche le contenu du paquet en hexadécimal, sans la partie ASCII (contrairement à -X qui montre les deux).",
+    syntax: "tcpdump -x [filtre]",
+    examples: [
+      { cmd: "sudo tcpdump -x -i eth0 port 53", desc: "Contenu brut des requêtes DNS en hexa" }
+    ],
+    flags: ["-x (hexa)", "-X (hexa + ASCII)"]
+  },
+  {
+    name: "tcpdump ether host",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Filtre par adresse MAC plutôt que par IP — utile quand une machine change d'IP mais garde la même carte réseau.",
+    syntax: "tcpdump ether host <mac>",
+    examples: [
+      { cmd: "sudo tcpdump ether host aa:bb:cc:dd:ee:ff", desc: "Tout le trafic impliquant cette adresse MAC" }
+    ],
+    flags: ["ether host", "ether src / ether dst"]
+  },
+  {
+    name: "tcpdump tcp[] (filtre par octet)",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Filtre BPF avancé : accède directement à un octet précis de l'en-tête pour des conditions très spécifiques.",
+    syntax: "tcpdump 'tcp[<offset>] <op> <valeur>'",
+    examples: [
+      { cmd: "sudo tcpdump 'tcp[13] & 4 != 0'", desc: "Paquets avec le flag RST positionné" }
+    ],
+    flags: ["tcp[13] (octet des flags)"]
+  },
+  {
+    name: "tcpdump -y",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Force un type de lien précis pour la capture — utile sur des interfaces spéciales (tunnels, bridges).",
+    syntax: "tcpdump -y <type>",
+    examples: [
+      { cmd: "sudo tcpdump -y LINUX_SLL -i any", desc: "Type de lien 'cooked' pour capturer sur toutes les interfaces" }
+    ],
+    flags: ["-y <type de lien>"]
+  },
+  {
+    name: "tcpdump -U",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Écrit chaque paquet immédiatement dans le fichier de sortie, sans mise en buffer — utile pour suivre une capture en direct depuis un autre outil.",
+    syntax: "tcpdump -U -w <fichier>",
+    examples: [
+      { cmd: "sudo tcpdump -U -i eth0 -w - | tee capture.pcap", desc: "Écriture immédiate, exploitable en direct" }
+    ],
+    flags: ["-U (non-bufferisé)"]
+  },
+  {
+    name: "tcpdump -tttt",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Affiche un horodatage complet et lisible (date + heure) pour chaque paquet, au lieu du format relatif par défaut.",
+    syntax: "tcpdump -tttt [filtre]",
+    examples: [
+      { cmd: "sudo tcpdump -tttt -i eth0", desc: "Horodatage complet, pratique pour croiser avec d'autres logs" }
+    ],
+    flags: ["-t (aucun horodatage)", "-tttt (complet)"]
+  },
+  {
+    name: "tcpdump vlan <id>",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Filtre le trafic appartenant à un VLAN 802.1Q précis, utile sur un lien trunk qui transporte plusieurs VLANs.",
+    syntax: "tcpdump vlan <id>",
+    examples: [
+      { cmd: "sudo tcpdump vlan 10", desc: "Uniquement le trafic étiqueté VLAN 10" }
+    ],
+    flags: ["vlan <id>"]
+  },
+  {
+    name: "tcpdump -i any",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Capture sur toutes les interfaces réseau en même temps, plutôt que d'en choisir une seule.",
+    syntax: "tcpdump -i any [filtre]",
+    examples: [
+      { cmd: "sudo tcpdump -i any port 443", desc: "Trafic HTTPS peu importe l'interface" }
+    ],
+    flags: ["-i any", "-i <nom> (interface précise)"]
+  },
+  {
+    name: "tcpdump -F",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Charge l'expression de filtre depuis un fichier texte plutôt que de la taper en ligne de commande — pratique pour des filtres longs et réutilisables.",
+    syntax: "tcpdump -F <fichier>",
+    examples: [
+      { cmd: "echo 'tcp and port 443' > filtre.txt", desc: "Écrit le filtre dans un fichier" },
+      { cmd: "sudo tcpdump -F filtre.txt -i eth0", desc: "Réutilise ce filtre" }
+    ],
+    flags: ["-F <fichier>"]
+  },
+  {
+    name: "tcpdump -w - (pipe vers Wireshark)",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Envoie la capture en direct vers Wireshark via un tube SSH, pour analyser graphiquement le trafic d'une machine distante.",
+    syntax: "ssh <hôte> 'tcpdump -w -' | wireshark -k -i -",
+    examples: [
+      { cmd: "ssh serveur 'sudo tcpdump -i eth0 -w -' | wireshark -k -i -", desc: "Capture distante affichée en direct localement" }
+    ],
+    flags: ["-w - (écrit sur stdout)"]
+  },
+  {
+    name: "tcpdump icmp6",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Filtre spécifiquement le trafic ICMPv6 (ping IPv6, découverte de voisins, annonces de routeur).",
+    syntax: "tcpdump icmp6",
+    examples: [
+      { cmd: "sudo tcpdump icmp6", desc: "Ping IPv6 et messages de découverte de voisinage" }
+    ],
+    flags: ["icmp6"]
   },
 
   // ── IPTABLES / NFTABLES ───────────────────────────────────
@@ -1652,6 +2540,178 @@ const EXTRA_COMMANDS = [
     flags: ["sans argument = toutes les chaînes"]
   },
 
+    {
+    name: "iptables -m multiport",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Filtre plusieurs ports non contigus dans une seule règle, au lieu d'écrire une règle par port.",
+    syntax: "iptables -A <chaîne> -p tcp -m multiport --dports <p1,p2,p3> -j <cible>",
+    examples: [
+      { cmd: "sudo iptables -A INPUT -p tcp -m multiport --dports 80,443,8080 -j ACCEPT", desc: "Autorise trois ports web en une règle" }
+    ],
+    flags: ["--dports (destination)", "--sports (source)"]
+  },
+  {
+    name: "iptables -m recent",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Garde en mémoire les IPs récemment vues et permet de bloquer celles qui reviennent trop souvent — anti brute-force plus fin que -m limit.",
+    syntax: "iptables -A <chaîne> -m recent --name <liste> --set|--update",
+    examples: [
+      { cmd: "sudo iptables -A INPUT -p tcp --dport 22 -m recent --name ssh --set", desc: "Mémorise chaque tentative SSH" },
+      { cmd: "sudo iptables -A INPUT -p tcp --dport 22 -m recent --name ssh --update --seconds 60 --hitcount 4 -j DROP", desc: "Bloque si 4 tentatives en 60s" }
+    ],
+    flags: ["--set", "--update", "--seconds", "--hitcount"]
+  },
+  {
+    name: "iptables -m mac",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Filtre selon l'adresse MAC source — utile en complément d'un filtrage IP sur un réseau local.",
+    syntax: "iptables -A <chaîne> -m mac --mac-source <mac> -j <cible>",
+    examples: [
+      { cmd: "sudo iptables -A INPUT -m mac --mac-source AA:BB:CC:DD:EE:FF -j ACCEPT", desc: "N'autorise que cette machine par son adresse physique" }
+    ],
+    flags: ["--mac-source <adresse MAC>"]
+  },
+  {
+    name: "iptables -m owner",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Filtre le trafic sortant selon l'utilisateur système qui l'a émis — restreindre l'accès réseau à un service précis.",
+    syntax: "iptables -A OUTPUT -m owner --uid-owner <utilisateur> -j <cible>",
+    examples: [
+      { cmd: "sudo iptables -A OUTPUT -m owner --uid-owner www-data -j ACCEPT", desc: "Seul l'utilisateur www-data peut sortir sur le réseau" }
+    ],
+    flags: ["--uid-owner", "--gid-owner"]
+  },
+  {
+    name: "iptables --syn",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Ne matche que les paquets d'ouverture de connexion TCP (SYN), pour filtrer précisément les nouvelles connexions.",
+    syntax: "iptables -A <chaîne> -p tcp --syn -j <cible>",
+    examples: [
+      { cmd: "sudo iptables -A INPUT -p tcp --syn -m limit --limit 5/s -j ACCEPT", desc: "Limite le taux de nouvelles connexions TCP" }
+    ],
+    flags: ["--syn"]
+  },
+  {
+    name: "iptables --tcp-flags",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Filtre selon une combinaison précise de flags TCP — repérer des paquets malformés utilisés en scan furtif.",
+    syntax: "iptables -A <chaîne> -p tcp --tcp-flags <masque> <flags posés> -j <cible>",
+    examples: [
+      { cmd: "sudo iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP", desc: "Bloque les paquets sans aucun flag (scan nul)" },
+      { cmd: "sudo iptables -A INPUT -p tcp --tcp-flags SYN,FIN SYN,FIN -j DROP", desc: "Bloque les paquets SYN+FIN simultanés (anormaux)" }
+    ],
+    flags: ["ALL", "NONE", "SYN,ACK,FIN,RST,URG,PSH"]
+  },
+  {
+    name: "nft delete rule",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Supprime une règle nftables précise, identifiée par son handle (numéro interne), sans toucher aux autres.",
+    syntax: "nft delete rule <table> <chaîne> handle <n>",
+    examples: [
+      { cmd: "sudo nft -a list ruleset", desc: "Liste les règles avec leur handle" },
+      { cmd: "sudo nft delete rule inet filter input handle 8", desc: "Supprime la règle n°8" }
+    ],
+    flags: ["-a (affiche les handles)"]
+  },
+  {
+    name: "nft flush ruleset",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Vide entièrement la configuration nftables (toutes tables, chaînes et règles) — repartir de zéro.",
+    syntax: "nft flush ruleset",
+    examples: [
+      { cmd: "sudo nft flush ruleset", desc: "Réinitialise tout nftables" }
+    ],
+    flags: []
+  },
+  {
+    name: "nft list ruleset -a",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Affiche toutes les tables/chaînes/règles nftables avec leur handle numérique, nécessaire pour cibler une suppression.",
+    syntax: "nft -a list ruleset",
+    examples: [
+      { cmd: "sudo nft -a list ruleset", desc: "Vue complète avec handles" }
+    ],
+    flags: ["-a (affiche les handles)"]
+  },
+  {
+    name: "iptables -m hashlimit",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Version avancée de -m limit : applique un taux limite par IP source individuelle, pas globalement pour toute la règle.",
+    syntax: "iptables -A <chaîne> -m hashlimit --hashlimit-above <taux> --hashlimit-mode srcip --hashlimit-name <nom> -j <cible>",
+    examples: [
+      { cmd: "sudo iptables -A INPUT -p tcp --dport 22 -m hashlimit --hashlimit-above 3/min --hashlimit-mode srcip --hashlimit-name ssh -j DROP", desc: "Chaque IP est limitée individuellement, pas l'ensemble du trafic" }
+    ],
+    flags: ["--hashlimit-mode srcip|dstip", "--hashlimit-name"]
+  },
+  {
+    name: "iptables -j REJECT",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Rejette un paquet en renvoyant une erreur explicite à l'émetteur, contrairement à DROP qui ignore silencieusement.",
+    syntax: "iptables -A <chaîne> <critères> -j REJECT [--reject-with <type>]",
+    examples: [
+      { cmd: "sudo iptables -A INPUT -p tcp --dport 8080 -j REJECT --reject-with tcp-reset", desc: "Renvoie un RST au lieu d'ignorer" }
+    ],
+    flags: ["DROP (silencieux)", "REJECT (répond une erreur)"]
+  },
+  {
+    name: "ipset",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Gère une liste dynamique d'IPs (une blocklist) référencée par une seule règle iptables, au lieu d'une règle par IP.",
+    syntax: "ipset create <nom> hash:ip ; iptables ... -m set --match-set <nom> src -j <cible>",
+    examples: [
+      { cmd: "sudo ipset create blocklist hash:ip", desc: "Crée l'ensemble" },
+      { cmd: "sudo ipset add blocklist 203.0.113.9", desc: "Ajoute une IP à bloquer" },
+      { cmd: "sudo iptables -A INPUT -m set --match-set blocklist src -j DROP", desc: "Une seule règle pour tout l'ensemble" }
+    ],
+    flags: ["hash:ip", "hash:net"]
+  },
+  {
+    name: "nft named sets",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Équivalent nftables d'ipset : un ensemble d'adresses nommé, modifiable sans toucher aux règles qui l'utilisent.",
+    syntax: "nft add set <table> <nom> { type ipv4_addr \\; }",
+    examples: [
+      { cmd: "sudo nft add set inet filter blocklist { type ipv4_addr \\; }", desc: "Crée l'ensemble" },
+      { cmd: "sudo nft add element inet filter blocklist { 203.0.113.9 }", desc: "Ajoute une IP" }
+    ],
+    flags: ["type ipv4_addr|ipv6_addr"]
+  },
+  {
+    name: "iptables-apply",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Applique un nouveau jeu de règles avec un filet de sécurité : annule automatiquement si la confirmation n'arrive pas (évite de s'enfermer dehors à distance).",
+    syntax: "iptables-apply <fichier-de-règles>",
+    examples: [
+      { cmd: "sudo iptables-apply /etc/iptables/rules.v4", desc: "Applique, puis annule dans 30s sans confirmation manuelle" }
+    ],
+    flags: ["-t <secondes> (délai avant rollback)"]
+  },
+  {
+    name: "iptables (INPUT/OUTPUT/FORWARD)",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Les trois chaînes de base : INPUT pour le trafic entrant destiné à la machine, OUTPUT pour le sortant, FORWARD pour ce qui transite (routeur).",
+    syntax: "iptables -A INPUT|OUTPUT|FORWARD ...",
+    examples: [
+      { cmd: "sudo iptables -A FORWARD -i eth0 -o eth1 -j ACCEPT", desc: "Autorise le routage entre deux interfaces" }
+    ],
+    flags: ["INPUT", "OUTPUT", "FORWARD"]
+  },
+
   // ── TMUX ──────────────────────────────────────────────────
   {
     name: "tmux new",
@@ -1955,7 +3015,177 @@ const EXTRA_COMMANDS = [
     flags: ["-p (affiche dans le terminal plutôt que la barre de statut)"]
   },
 
-    // ── VIM ───────────────────────────────────────────────────
+      {
+    name: "tmux break-pane",
+    os: "tmux",
+    category: "Système",
+    description: "Transforme un panneau en fenêtre indépendante — pratique pour isoler une tâche qui prend trop de place dans un split.",
+    syntax: "Ctrl+b !",
+    examples: [
+      { cmd: "Ctrl+b !", desc: "Le panneau actif devient sa propre fenêtre" }
+    ],
+    flags: ["!"]
+  },
+  {
+    name: "tmux join-pane",
+    os: "tmux",
+    category: "Système",
+    description: "Fusionne une fenêtre entière dans un panneau d'une autre fenêtre — l'inverse de break-pane.",
+    syntax: "tmux join-pane -s <fenêtre-source> -t <fenêtre-cible>",
+    examples: [
+      { cmd: "tmux join-pane -s 2 -t 0", desc: "Ramène la fenêtre 2 comme panneau dans la fenêtre 0" }
+    ],
+    flags: ["-s <source>", "-t <cible>"]
+  },
+  {
+    name: "tmux move-window",
+    os: "tmux",
+    category: "Système",
+    description: "Change le numéro d'une fenêtre, pour réorganiser l'ordre d'affichage dans la barre de statut.",
+    syntax: "tmux move-window -s <n> -t <nouveau-n>",
+    examples: [
+      { cmd: "tmux move-window -t 1", desc: "Déplace la fenêtre active en position 1" }
+    ],
+    flags: ["-s <source>", "-t <cible>"]
+  },
+  {
+    name: "tmux respawn-pane",
+    os: "tmux",
+    category: "Système",
+    description: "Relance la commande d'un panneau dont le processus s'est terminé, sans avoir à recréer tout le panneau.",
+    syntax: "Ctrl+b : puis respawn-pane -k",
+    examples: [
+      { cmd: "tmux respawn-pane -k -t 0", desc: "Relance le panneau 0, même s'il affiche encore 'terminé'" }
+    ],
+    flags: ["-k (force même si le panneau est actif)"]
+  },
+  {
+    name: "tmux select-layout",
+    os: "tmux",
+    category: "Système",
+    description: "Applique une disposition prédéfinie aux panneaux existants (en grille, colonnes égales...) sans les redécouper à la main.",
+    syntax: "Ctrl+b <espace> ou tmux select-layout <nom>",
+    examples: [
+      { cmd: "Ctrl+b <espace>", desc: "Passe à la disposition suivante" },
+      { cmd: "tmux select-layout tiled", desc: "Répartit tous les panneaux en grille égale" }
+    ],
+    flags: ["even-horizontal", "even-vertical", "tiled"]
+  },
+  {
+    name: "tmux command-prompt",
+    os: "tmux",
+    category: "Système",
+    description: "Ouvre une invite de commande tmux interactive, pour exécuter n'importe quelle commande tmux à la volée.",
+    syntax: "Ctrl+b :",
+    examples: [
+      { cmd: "Ctrl+b :", desc: "Ouvre l'invite" },
+      { cmd: ":resize-pane -D 10", desc: "Exemple de commande tapée ensuite" }
+    ],
+    flags: [": (ouvre l'invite)"]
+  },
+  {
+    name: "tmux if-shell",
+    os: "tmux",
+    category: "Système",
+    description: "Exécute une commande tmux conditionnellement, selon le résultat d'une commande shell — pratique dans .tmux.conf multi-OS.",
+    syntax: "if-shell '<test shell>' '<commande si vrai>' '<sinon>'",
+    examples: [
+      { cmd: "if-shell 'uname | grep -q Darwin' 'set -g default-shell /bin/zsh'", desc: "Config spécifique si macOS détecté" }
+    ],
+    flags: []
+  },
+  {
+    name: "tmux set -s / -w / -g",
+    os: "tmux",
+    category: "Système",
+    description: "Portée d'une option : -s pour la session, -w pour la fenêtre, -g pour tout appliquer globalement.",
+    syntax: "tmux set -s|-w|-g <option> <valeur>",
+    examples: [
+      { cmd: "tmux set -w monitor-activity on", desc: "Option limitée à la fenêtre courante" }
+    ],
+    flags: ["-s (session)", "-w (fenêtre)", "-g (global)"]
+  },
+  {
+    name: "tmux recherche en copy-mode",
+    os: "tmux",
+    category: "Système",
+    description: "Recherche du texte dans le défilement (scrollback) une fois en mode copie, comme dans un pager.",
+    syntax: "Ctrl+b [ puis / <motif>",
+    examples: [
+      { cmd: "Ctrl+b [", desc: "Entre en mode copie" },
+      { cmd: "/erreur", desc: "Cherche 'erreur' dans l'historique affiché" }
+    ],
+    flags: ["/ (recherche avant)", "? (recherche arrière)", "n (occurrence suivante)"]
+  },
+  {
+    name: "tmux buffers (paste-buffer)",
+    os: "tmux",
+    category: "Système",
+    description: "Gère plusieurs presse-papiers internes à tmux, indépendants du presse-papier système.",
+    syntax: "Ctrl+b ] (colle) / tmux list-buffers / tmux choose-buffer",
+    examples: [
+      { cmd: "Ctrl+b ]", desc: "Colle le dernier buffer copié" },
+      { cmd: "tmux list-buffers", desc: "Liste tous les buffers en mémoire" }
+    ],
+    flags: ["] (colle le dernier)", "choose-buffer (sélection interactive)"]
+  },
+  {
+    name: "tmux status-bar (status-right)",
+    os: "tmux",
+    category: "Système",
+    description: "Personnalise le contenu affiché dans la barre de statut — heure, charge système, nom d'hôte.",
+    syntax: "set -g status-right '<format>'",
+    examples: [
+      { cmd: "set -g status-right '#H %H:%M'", desc: "Affiche le nom d'hôte et l'heure" }
+    ],
+    flags: ["status-left", "status-right", "status-interval"]
+  },
+  {
+    name: "tmux hooks",
+    os: "tmux",
+    category: "Système",
+    description: "Déclenche automatiquement une commande tmux quand un évènement précis se produit (panneau fermé, fenêtre créée...).",
+    syntax: "set-hook -g <évènement> '<commande>'",
+    examples: [
+      { cmd: "set-hook -g pane-died 'display-message \"Le panneau vient de se fermer\"'", desc: "Notifie à la fermeture d'un panneau" }
+    ],
+    flags: ["pane-died", "session-created", "client-attached"]
+  },
+  {
+    name: "tmuxinator / tmuxp",
+    os: "tmux",
+    category: "Système",
+    description: "Outils externes qui décrivent une disposition tmux complète (fenêtres, panneaux, commandes) dans un fichier YAML, à relancer en une commande.",
+    syntax: "tmuxinator start <projet> / tmuxp load <fichier.yaml>",
+    examples: [
+      { cmd: "tmuxinator start webapp", desc: "Recrée toute la disposition de travail du projet 'webapp'" }
+    ],
+    flags: []
+  },
+  {
+    name: "tmux attach -d",
+    os: "tmux",
+    category: "Système",
+    description: "Se rattache à une session en détachant automatiquement tous les autres clients déjà connectés, pour éviter les conflits d'affichage.",
+    syntax: "tmux attach -d -t <session>",
+    examples: [
+      { cmd: "tmux attach -d -t admin", desc: "Reprend la main, détache les autres connexions à cette session" }
+    ],
+    flags: ["-d (détache les autres clients)"]
+  },
+  {
+    name: "tmux resize-window",
+    os: "tmux",
+    category: "Système",
+    description: "Force la taille d'une fenêtre, utile quand plusieurs clients de tailles d'écran différentes partagent la même session.",
+    syntax: "tmux resize-window -t <fenêtre> -x <largeur> -y <hauteur>",
+    examples: [
+      { cmd: "tmux resize-window -t 0 -x 200 -y 50", desc: "Fixe une taille précise pour la fenêtre 0" }
+    ],
+    flags: ["-x (largeur)", "-y (hauteur)"]
+  },
+
+  // ── VIM ───────────────────────────────────────────────────
   {
     name: "vim (modes)",
     os: "vim",
@@ -2281,6 +3511,186 @@ const EXTRA_COMMANDS = [
     ],
     flags: ["u (undo)", "Ctrl+r (redo)", ":undolist"]
   },
+    {
+    name: "vim :normal",
+    os: "vim",
+    category: "Système",
+    description: "Applique une séquence de touches du mode normal à toute une plage de lignes sélectionnées — automatise une modification répétitive.",
+    syntax: ":<plage>normal <touches>",
+    examples: [
+      { cmd: ":%normal A;", desc: "Ajoute un point-virgule à la fin de chaque ligne" },
+      { cmd: ":5,10normal I// ", desc: "Commente les lignes 5 à 10" }
+    ],
+    flags: [":% (tout le fichier)", ":<début>,<fin> (plage précise)"]
+  },
+  {
+    name: "vim text objects (ci( di\")",
+    os: "vim",
+    category: "Système",
+    description: "Modifie ou supprime le contenu à l'intérieur d'une paire de délimiteurs (parenthèses, guillemets, balises) sans les sélectionner à la main.",
+    syntax: "ci<délimiteur> / di<délimiteur> / ca<délimiteur>",
+    examples: [
+      { cmd: "ci\"", desc: "Change le contenu entre guillemets sous le curseur" },
+      { cmd: "di(", desc: "Supprime le contenu entre parenthèses" },
+      { cmd: "cit", desc: "Change le contenu d'une balise HTML/XML" }
+    ],
+    flags: ["i (inside, sans les délimiteurs)", "a (around, avec les délimiteurs)"]
+  },
+  {
+    name: "vim :terminal",
+    os: "vim",
+    category: "Système",
+    description: "Ouvre un terminal intégré dans une fenêtre Vim, sans quitter l'éditeur pour lancer une commande.",
+    syntax: ":terminal",
+    examples: [
+      { cmd: ":terminal", desc: "Ouvre un shell dans un split" },
+      { cmd: "Ctrl+\\ Ctrl+n", desc: "Repasse en mode normal pour naviguer hors du terminal" }
+    ],
+    flags: []
+  },
+  {
+    name: "vim gq (reformater un paragraphe)",
+    os: "vim",
+    category: "Système",
+    description: "Reformate un texte pour respecter la largeur de ligne définie (textwidth) — utile pour du texte ou des commentaires longs.",
+    syntax: "gq<mouvement>",
+    examples: [
+      { cmd: ":set textwidth=80", desc: "Définit la largeur cible" },
+      { cmd: "gqip", desc: "Reformate le paragraphe courant à cette largeur" }
+    ],
+    flags: ["gqq (ligne courante)", "gqip (paragraphe)"]
+  },
+  {
+    name: "vim diff (diffthis)",
+    os: "vim",
+    category: "Système",
+    description: "Compare deux fichiers ouverts côte à côte avec les différences surlignées, sans quitter Vim.",
+    syntax: ":diffthis (sur chaque fenêtre) / diffget / diffput",
+    examples: [
+      { cmd: "vim -d fichier1 fichier2", desc: "Ouvre directement en mode diff" },
+      { cmd: "]c / [c", desc: "Saute à la différence suivante / précédente" },
+      { cmd: "do / dp", desc: "Récupère (obtain) ou envoie (put) un bloc de l'autre fichier" }
+    ],
+    flags: ["]c / [c (navigation)", "do (obtain)", "dp (put)"]
+  },
+  {
+    name: "vim :set spell",
+    os: "vim",
+    category: "Système",
+    description: "Active la correction orthographique en surlignant les mots suspects, avec navigation et suggestions.",
+    syntax: ":set spell spelllang=<langue>",
+    examples: [
+      { cmd: ":set spell spelllang=fr", desc: "Active la correction en français" },
+      { cmd: "]s / [s", desc: "Mot mal orthographié suivant / précédent" },
+      { cmd: "z=", desc: "Propose des corrections pour le mot sous le curseur" }
+    ],
+    flags: ["]s / [s (navigation)", "z= (suggestions)", "zg (ajoute au dictionnaire)"]
+  },
+  {
+    name: "vim jump list (Ctrl+o / Ctrl+i)",
+    os: "vim",
+    category: "Système",
+    description: "Navigue dans l'historique des déplacements du curseur, comme les boutons précédent/suivant d'un navigateur web.",
+    syntax: "Ctrl+o / Ctrl+i",
+    examples: [
+      { cmd: "Ctrl+o", desc: "Retourne à la position précédente" },
+      { cmd: "Ctrl+i", desc: "Avance vers la position suivante" }
+    ],
+    flags: ["Ctrl+o (arrière)", "Ctrl+i (avant)", ":jumps (historique complet)"]
+  },
+  {
+    name: "vim :mksession",
+    os: "vim",
+    category: "Système",
+    description: "Sauvegarde l'état complet d'une session d'édition (fichiers ouverts, splits, position du curseur) pour la reprendre plus tard.",
+    syntax: ":mksession <fichier.vim>",
+    examples: [
+      { cmd: ":mksession ~/session.vim", desc: "Sauvegarde la session actuelle" },
+      { cmd: "vim -S ~/session.vim", desc: "Rouvre exactement dans le même état" }
+    ],
+    flags: ["-S <fichier> (au lancement)"]
+  },
+  {
+    name: "vim netrw (:Explore)",
+    os: "vim",
+    category: "Système",
+    description: "Explorateur de fichiers intégré à Vim, sans plugin — naviguer et ouvrir des fichiers depuis l'éditeur.",
+    syntax: ":Explore / :Vexplore",
+    examples: [
+      { cmd: ":Explore", desc: "Ouvre l'explorateur dans la fenêtre courante" },
+      { cmd: ":Vexplore", desc: "Ouvre l'explorateur dans un split vertical" }
+    ],
+    flags: [":Explore", ":Vexplore (vertical)", ":Sexplore (horizontal)"]
+  },
+  {
+    name: "vim :iabbrev",
+    os: "vim",
+    category: "Système",
+    description: "Définit une abréviation qui se transforme automatiquement en texte complet pendant la saisie — gagner du temps sur des formules répétitives.",
+    syntax: ":iabbrev <raccourci> <texte complet>",
+    examples: [
+      { cmd: ":iabbrev @@ mon.email@exemple.com", desc: "Taper @@ puis espace insère l'adresse complète" }
+    ],
+    flags: []
+  },
+  {
+    name: "vim digraphs (Ctrl+k)",
+    os: "vim",
+    category: "Système",
+    description: "Insère un caractère spécial en tapant une combinaison de deux lettres, sans clavier dédié (accents, symboles).",
+    syntax: "Ctrl+k <lettre1><lettre2> (en mode insertion)",
+    examples: [
+      { cmd: "Ctrl+k e:", desc: "Insère 'ë'" },
+      { cmd: ":digraphs", desc: "Liste tous les digraphes disponibles" }
+    ],
+    flags: []
+  },
+  {
+    name: "vim :set wrap / nowrap",
+    os: "vim",
+    category: "Système",
+    description: "Active ou désactive le retour à la ligne visuel pour les lignes plus longues que la fenêtre — utile pour du code avec de longues lignes.",
+    syntax: ":set wrap / :set nowrap",
+    examples: [
+      { cmd: ":set nowrap", desc: "Les longues lignes défilent horizontalement au lieu de revenir à la ligne" }
+    ],
+    flags: ["wrap (défaut)", "nowrap"]
+  },
+  {
+    name: "vim % (bracket matching)",
+    os: "vim",
+    category: "Système",
+    description: "Saute instantanément à la parenthèse, accolade ou crochet correspondant — très utile pour naviguer dans du code imbriqué.",
+    syntax: "%",
+    examples: [
+      { cmd: "%", desc: "Depuis une accolade ouvrante, saute à sa fermante (et inversement)" }
+    ],
+    flags: []
+  },
+  {
+    name: "vim :changes / :jumps",
+    os: "vim",
+    category: "Système",
+    description: "Affiche l'historique des modifications ou des déplacements effectués dans le fichier — retrouver où on a travaillé récemment.",
+    syntax: ":changes / :jumps",
+    examples: [
+      { cmd: ":changes", desc: "Liste les positions des dernières modifications" },
+      { cmd: "g;", desc: "Va directement au dernier endroit modifié" }
+    ],
+    flags: ["g; (dernier changement)", "g, (change suivant)"]
+  },
+  {
+    name: "vim plugins (packadd)",
+    os: "vim",
+    category: "Système",
+    description: "Charge un plugin installé manuellement dans le dossier pack/, sans gestionnaire de plugins externe.",
+    syntax: ":packadd <nom-du-plugin>",
+    examples: [
+      { cmd: ":packadd matchit", desc: "Charge le plugin natif matchit (améliore % )" }
+    ],
+    flags: []
+  },
+
   // ── NPM / NODE ────────────────────────────────────────────
   {
     name: "npm init",
@@ -2436,6 +3846,188 @@ const EXTRA_COMMANDS = [
       { cmd: "nvm ls", desc: "Versions installées" }
     ],
     flags: ["install --lts", "use <v>", "alias default <v>"]
+  },
+
+    {
+    name: "npm list",
+    os: "npm",
+    category: "Développement",
+    description: "Affiche l'arborescence des dépendances installées, avec leurs versions et sous-dépendances.",
+    syntax: "npm list [--depth=<n>]",
+    examples: [
+      { cmd: "npm list --depth=0", desc: "N'affiche que les dépendances directes" },
+      { cmd: "npm list react", desc: "Cherche où 'react' apparaît dans l'arbre" }
+    ],
+    flags: ["--depth=<n>", "-g (global)"]
+  },
+  {
+    name: "npm dedupe",
+    os: "npm",
+    category: "Développement",
+    description: "Réorganise l'arbre de dépendances pour fusionner les versions dupliquées quand c'est possible, allégeant node_modules.",
+    syntax: "npm dedupe",
+    examples: [
+      { cmd: "npm dedupe", desc: "Nettoie les doublons de versions compatibles" }
+    ],
+    flags: []
+  },
+  {
+    name: "npm link",
+    os: "npm",
+    category: "Développement",
+    description: "Relie un package local en développement à un autre projet, sans devoir le publier sur le registre — pratique pour tester une librairie avant publication.",
+    syntax: "npm link (dans le package) puis npm link <package> (dans le projet)",
+    examples: [
+      { cmd: "cd ma-lib && npm link", desc: "Rend la librairie locale liable" },
+      { cmd: "cd mon-projet && npm link ma-lib", desc: "L'utilise comme si elle était installée" }
+    ],
+    flags: []
+  },
+  {
+    name: "npm publish",
+    os: "npm",
+    category: "Développement",
+    description: "Publie le package courant sur le registre npm (ou un registre privé), le rendant installable par d'autres.",
+    syntax: "npm publish [--access public|restricted]",
+    examples: [
+      { cmd: "npm publish --access public", desc: "Publie un package sous scope (@user/pkg) en accès public" }
+    ],
+    flags: ["--access public|restricted", "--dry-run (simulation)"]
+  },
+  {
+    name: "npm version",
+    os: "npm",
+    category: "Développement",
+    description: "Incrémente automatiquement la version dans package.json en respectant le versionnage sémantique, et crée un tag Git correspondant.",
+    syntax: "npm version patch|minor|major",
+    examples: [
+      { cmd: "npm version patch", desc: "1.2.3 → 1.2.4" },
+      { cmd: "npm version minor", desc: "1.2.3 → 1.3.0" }
+    ],
+    flags: ["patch", "minor", "major"]
+  },
+  {
+    name: "npm test",
+    os: "npm",
+    category: "Développement",
+    description: "Lance le script de tests défini dans package.json — raccourci conventionnel pour npm run test.",
+    syntax: "npm test",
+    examples: [
+      { cmd: "npm test", desc: "Exécute la suite de tests du projet" }
+    ],
+    flags: []
+  },
+  {
+    name: "npm exec",
+    os: "npm",
+    category: "Développement",
+    description: "Exécute un binaire d'un package sans l'installer de façon permanente — équivalent moderne de npx.",
+    syntax: "npm exec <paquet> -- <arguments>",
+    examples: [
+      { cmd: "npm exec cowsay -- \"Hello\"", desc: "Exécute cowsay sans l'ajouter aux dépendances" }
+    ],
+    flags: ["-- (sépare les args du paquet)"]
+  },
+  {
+    name: "npm workspaces",
+    os: "npm",
+    category: "Développement",
+    description: "Gère plusieurs packages liés (monorepo) depuis un seul package.json racine, avec des dépendances partagées.",
+    syntax: "npm install -w <workspace> / npm run <script> --workspaces",
+    examples: [
+      { cmd: "npm run build --workspaces", desc: "Lance le build dans chaque sous-projet du monorepo" }
+    ],
+    flags: ["-w <nom>", "--workspaces (tous)"]
+  },
+  {
+    name: "npm fund",
+    os: "npm",
+    category: "Développement",
+    description: "Liste les liens de financement (sponsoring) des packages utilisés dans le projet.",
+    syntax: "npm fund",
+    examples: [
+      { cmd: "npm fund", desc: "Affiche les liens vers les pages de sponsoring des dépendances" }
+    ],
+    flags: []
+  },
+  {
+    name: "npm doctor",
+    os: "npm",
+    category: "Développement",
+    description: "Diagnostique l'environnement npm : connexion au registre, permissions, cache — utile en cas de comportement bizarre.",
+    syntax: "npm doctor",
+    examples: [
+      { cmd: "npm doctor", desc: "Vérifie que tout l'environnement npm fonctionne correctement" }
+    ],
+    flags: []
+  },
+  {
+    name: "npm prune",
+    os: "npm",
+    category: "Développement",
+    description: "Supprime de node_modules les packages qui ne sont plus listés dans package.json — nettoie les résidus après suppression de dépendances.",
+    syntax: "npm prune [--production]",
+    examples: [
+      { cmd: "npm prune --production", desc: "Ne garde que les dépendances de production" }
+    ],
+    flags: ["--production"]
+  },
+  {
+    name: ".npmrc",
+    os: "npm",
+    category: "Développement",
+    description: "Fichier de configuration npm (registre utilisé, proxy, tokens d'authentification) — au niveau projet ou utilisateur.",
+    syntax: "~/.npmrc ou ./.npmrc",
+    examples: [
+      { cmd: "registry=https://registry.npmjs.org/", desc: "Précise le registre à utiliser" },
+      { cmd: "npm config set registry <url>", desc: "Modifie .npmrc en ligne de commande" }
+    ],
+    flags: []
+  },
+  {
+    name: "npm pack",
+    os: "npm",
+    category: "Développement",
+    description: "Génère l'archive .tgz qui serait publiée, sans la publier — pour vérifier son contenu exact avant publication.",
+    syntax: "npm pack",
+    examples: [
+      { cmd: "npm pack", desc: "Crée mon-package-1.0.0.tgz dans le dossier courant" },
+      { cmd: "tar -tzf mon-package-1.0.0.tgz", desc: "Inspecte les fichiers réellement inclus" }
+    ],
+    flags: []
+  },
+  {
+    name: "package-lock.json",
+    os: "npm",
+    category: "Développement",
+    description: "Fige les versions exactes de toutes les dépendances (directes et transitives) pour garantir des installations identiques partout.",
+    syntax: "généré automatiquement par npm install",
+    examples: [
+      { cmd: "npm ci", desc: "Installe strictement depuis ce fichier, sans le modifier" }
+    ],
+    flags: []
+  },
+  {
+    name: "npm rebuild",
+    os: "npm",
+    category: "Développement",
+    description: "Recompile les modules natifs (bindings C++) déjà installés — utile après un changement de version de Node.",
+    syntax: "npm rebuild [paquet]",
+    examples: [
+      { cmd: "npm rebuild", desc: "Recompile tous les modules natifs pour la version de Node actuelle" }
+    ],
+    flags: []
+  },
+  {
+    name: "npm ls -g",
+    os: "npm",
+    category: "Développement",
+    description: "Liste les packages installés globalement sur la machine, en dehors de tout projet.",
+    syntax: "npm ls -g --depth=0",
+    examples: [
+      { cmd: "npm ls -g --depth=0", desc: "Liste les CLI installées globalement (ex : nodemon, typescript)" }
+    ],
+    flags: ["-g", "--depth=0"]
   },
 
   // ── PYTHON / PIP ──────────────────────────────────────────
@@ -2595,7 +4187,190 @@ const EXTRA_COMMANDS = [
     ],
     flags: ["venv", "pip install/freeze", "run"]
   },
-
+  {
+    name: "python3 -m pip",
+    os: "python",
+    category: "Développement",
+    description: "Invoque pip via l'interpréteur Python explicitement — évite les ambiguïtés quand plusieurs versions de Python coexistent.",
+    syntax: "python3 -m pip <commande>",
+    examples: [
+      { cmd: "python3 -m pip install requests", desc: "Garantit que le paquet va dans le bon environnement Python" }
+    ],
+    flags: []
+  },
+  {
+    name: "python3 -c",
+    os: "python",
+    category: "Développement",
+    description: "Exécute une ligne de code Python directement depuis le terminal, sans créer de fichier.",
+    syntax: "python3 -c '<code>'",
+    examples: [
+      { cmd: "python3 -c 'import sys; print(sys.version)'", desc: "Affiche la version de Python en une commande" }
+    ],
+    flags: ["-c <code>"]
+  },
+  {
+    name: "black",
+    os: "python",
+    category: "Développement",
+    description: "Reformate automatiquement le code Python selon un style unique et non-négociable — plus de débat sur le style.",
+    syntax: "black <fichier|dossier>",
+    examples: [
+      { cmd: "black .", desc: "Reformate tous les fichiers Python du dossier" },
+      { cmd: "black --check .", desc: "Vérifie sans modifier (utile en CI)" }
+    ],
+    flags: ["--check", "--diff"]
+  },
+  {
+    name: "ruff",
+    os: "python",
+    category: "Développement",
+    description: "Linter Python ultra-rapide qui repère les erreurs de style et les bugs potentiels avant l'exécution.",
+    syntax: "ruff check <fichier|dossier>",
+    examples: [
+      { cmd: "ruff check .", desc: "Analyse tout le projet" },
+      { cmd: "ruff check --fix .", desc: "Corrige automatiquement ce qui peut l'être" }
+    ],
+    flags: ["--fix"]
+  },
+  {
+    name: "python3 -m cProfile",
+    os: "python",
+    category: "Développement",
+    description: "Profile l'exécution d'un script pour identifier les fonctions qui prennent le plus de temps.",
+    syntax: "python3 -m cProfile <script.py>",
+    examples: [
+      { cmd: "python3 -m cProfile -s cumulative script.py", desc: "Trie les résultats par temps cumulé" }
+    ],
+    flags: ["-s cumulative|time (tri des résultats)"]
+  },
+  {
+    name: "requirements.txt",
+    os: "python",
+    category: "Développement",
+    description: "Fichier listant les dépendances d'un projet Python, pour les réinstaller à l'identique ailleurs.",
+    syntax: "pip freeze > requirements.txt / pip install -r requirements.txt",
+    examples: [
+      { cmd: "pip freeze > requirements.txt", desc: "Génère la liste depuis l'environnement actuel" },
+      { cmd: "pip install -r requirements.txt", desc: "Réinstalle exactement ces dépendances ailleurs" }
+    ],
+    flags: ["-r <fichier>"]
+  },
+  {
+    name: "python3 -m build",
+    os: "python",
+    category: "Développement",
+    description: "Construit les artefacts de distribution d'un package Python (wheel et sdist), prêts à être publiés sur PyPI.",
+    syntax: "python3 -m build",
+    examples: [
+      { cmd: "python3 -m build", desc: "Génère les fichiers dans dist/" }
+    ],
+    flags: []
+  },
+  {
+    name: "poetry",
+    os: "python",
+    category: "Développement",
+    description: "Gestionnaire de dépendances et de packaging Python tout-en-un — alternative moderne à pip + venv + setup.py séparés.",
+    syntax: "poetry init / poetry add <paquet> / poetry install",
+    examples: [
+      { cmd: "poetry new mon-projet", desc: "Crée la structure d'un nouveau projet" },
+      { cmd: "poetry add requests", desc: "Ajoute une dépendance et met à jour le lock file" },
+      { cmd: "poetry shell", desc: "Active l'environnement virtuel du projet" }
+    ],
+    flags: []
+  },
+  {
+    name: "python3 -i",
+    os: "python",
+    category: "Développement",
+    description: "Lance un script puis reste dans un interpréteur interactif — pratique pour inspecter les variables après exécution.",
+    syntax: "python3 -i <script.py>",
+    examples: [
+      { cmd: "python3 -i analyse.py", desc: "Exécute puis garde la console ouverte avec les variables du script" }
+    ],
+    flags: ["-i (interactif après exécution)"]
+  },
+  {
+    name: "__pycache__ / .pyc",
+    os: "python",
+    category: "Développement",
+    description: "Dossier de cache généré automatiquement contenant le bytecode compilé — accélère les imports suivants, peut être supprimé sans risque.",
+    syntax: "find . -name __pycache__ -exec rm -rf {} +",
+    examples: [
+      { cmd: "find . -type d -name __pycache__ -exec rm -rf {} +", desc: "Supprime tous les caches du projet" },
+      { cmd: "python3 -B script.py", desc: "N'écrit aucun fichier .pyc pour cette exécution" }
+    ],
+    flags: ["-B (n'écrit pas de cache)"]
+  },
+  {
+    name: "python3 -m timeit",
+    os: "python",
+    category: "Développement",
+    description: "Mesure précisément le temps d'exécution d'un petit bout de code, en répétant plusieurs fois pour lisser les variations.",
+    syntax: "python3 -m timeit '<code>'",
+    examples: [
+      { cmd: "python3 -m timeit '\"-\".join(str(n) for n in range(100))'", desc: "Compare la performance de différentes approches" }
+    ],
+    flags: ["-n <n> (nombre d'exécutions)"]
+  },
+  {
+    name: "mypy",
+    os: "python",
+    category: "Développement",
+    description: "Vérifie statiquement les annotations de type Python, pour attraper des erreurs de type avant l'exécution.",
+    syntax: "mypy <fichier|dossier>",
+    examples: [
+      { cmd: "mypy mon_projet/", desc: "Vérifie tout le dossier" },
+      { cmd: "mypy --strict fichier.py", desc: "Mode strict, exige des annotations partout" }
+    ],
+    flags: ["--strict"]
+  },
+  {
+    name: "python3 -m site",
+    os: "python",
+    category: "Développement",
+    description: "Affiche les chemins utilisés par Python pour chercher les modules — utile pour déboguer un problème d'import ou d'environnement.",
+    syntax: "python3 -m site",
+    examples: [
+      { cmd: "python3 -m site", desc: "Affiche sys.path et l'emplacement des packages installés" }
+    ],
+    flags: []
+  },
+  {
+    name: "conda",
+    os: "python",
+    category: "Développement",
+    description: "Gestionnaire d'environnements et de paquets scientifique, alternative à venv/pip très utilisée en data science (gère aussi des dépendances non-Python).",
+    syntax: "conda create -n <nom> python=<version> / conda activate <nom>",
+    examples: [
+      { cmd: "conda create -n data python=3.11 pandas numpy", desc: "Crée un environnement avec des paquets scientifiques" },
+      { cmd: "conda activate data", desc: "Active l'environnement" }
+    ],
+    flags: ["-n <nom>"]
+  },
+  {
+    name: "python3 -m pdb <script>",
+    os: "python",
+    category: "Développement",
+    description: "Lance un script directement sous débogueur, en s'arrêtant à la première ligne — contrairement à pdb.set_trace() qui demande de modifier le code.",
+    syntax: "python3 -m pdb <script.py>",
+    examples: [
+      { cmd: "python3 -m pdb script.py", desc: "Démarre en pause avant la première instruction" }
+    ],
+    flags: []
+  },
+  {
+    name: "python3 -O",
+    os: "python",
+    category: "Développement",
+    description: "Lance Python en mode optimisé : retire les assertions (assert) et le code de debug conditionné par __debug__.",
+    syntax: "python3 -O <script.py>",
+    examples: [
+      { cmd: "python3 -O script.py", desc: "Ignore tous les 'assert' du script" }
+    ],
+    flags: ["-O", "-OO (retire aussi les docstrings)"]
+  },
   // ── UNIVERSEL : TRAITEMENT DE TEXTE & ESSENTIELS ──────────
   {
     name: "jq",
