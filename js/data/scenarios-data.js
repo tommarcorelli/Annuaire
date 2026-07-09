@@ -198,4 +198,28 @@ const SCENARIOS_DATA = [
     kw: 'luks chiffrement disque cryptsetup securite coffre phrase de passe',
     cmds: ['lsblk', 'mkfs', 'mount', 'umount', 'mkdir', 'df']
   },
+  {
+    id: 'sc-terraform', icon: '🧱',
+    title: 'Provisionner une infra depuis zéro avec Terraform',
+    kw: 'terraform iac infrastructure as code provider plan apply state hashicorp',
+    cmds: ['terraform init', 'terraform validate', 'terraform plan', 'terraform apply', 'terraform state list', 'terraform show', 'terraform destroy']
+  },
+  {
+    id: 'sc-vagrant', icon: '📦',
+    title: 'Monter un lab VM reproductible avec Vagrant',
+    kw: 'vagrant vagrantfile box vm virtualbox vmware lab reproductible provisioning',
+    cmds: ['vagrant init', 'vagrant box', 'vagrant up', 'vagrant ssh', 'vagrant status', 'vagrant suspend / resume', 'vagrant destroy']
+  },
+  {
+    id: 'sc-helm', icon: '⎈',
+    title: 'Déployer une application avec Helm sur Kubernetes',
+    kw: 'helm kubernetes k8s chart namespace release rollback upgrade package manager',
+    cmds: ['helm repo add / update', 'helm search repo', 'helm show values', 'helm install --namespace --create-namespace', 'helm list', 'helm status', 'helm upgrade', 'helm rollback']
+  },
+  {
+    id: 'sc-ad', icon: '🗂️',
+    title: 'Créer un utilisateur, une OU et une GPO dans Active Directory',
+    kw: 'active directory ad ds ou utilisateur groupe gpo strategie de groupe powershell windows server annuaire',
+    cmds: ['New-ADOrganizationalUnit', 'New-ADUser', 'Get-ADUser', 'Get-ADGroup / Add-ADGroupMember', 'New-GPO', 'gpupdate', 'dcdiag']
+  },
 ];

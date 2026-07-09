@@ -2018,6 +2018,212 @@ jobs:
       </div>
     </details>
 
+    <!-- ═══ 33. TERRAFORM ═══ -->
+    <details class="sc" id="sc-terraform" style="--c:#7B42BC">
+      <summary>
+        <span class="sc-ico">🧱</span>
+        <div class="sc-head">
+          <div class="sc-name">Provisionner une infra depuis zéro avec Terraform</div>
+          <div class="sc-meta">Terraform — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Décrire son infra en code plutôt que de cliquer dans une console : reproductible, versionnable dans Git, et qu'on peut détruire proprement en une commande à la fin d'un lab.</p>
+        <p class="sc-links"><a href="commands.html?os=terraform">⌘ commandes Terraform</a> · <a href="quiz.html?os=terraform">🎓 quiz Terraform</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Déclarer un provider et une ressource (fichier main.tf)</div>
+            <pre>terraform {
+  required_providers {
+    local = { source = "hashicorp/local", version = "~> 2.0" }
+  }
+}
+resource "local_file" "hello" {
+  filename = "hello.txt"
+  content  = "Salut depuis Terraform"
+}</pre>
+            <p class="st-note">Le provider <b>local</b> ne touche à rien d'externe — parfait pour s'entraîner sans compte cloud.</p>
+          </li>
+          <li>
+            <div class="st-desc">Initialiser le projet</div>
+            <code>terraform init</code>
+            <p class="st-note">Télécharge le(s) provider(s) déclarés dans <b>.terraform/</b> — à refaire à chaque ajout de provider.</p>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier que la syntaxe est valide</div>
+            <code>terraform validate</code>
+          </li>
+          <li>
+            <div class="st-desc">Prévisualiser ce qui va être créé</div>
+            <code>terraform plan</code>
+            <p class="st-note">Rien n'est encore appliqué : plan affiche juste le diff entre l'état actuel et la config désirée.</p>
+          </li>
+          <li>
+            <div class="st-desc">Appliquer pour de vrai</div>
+            <code>terraform apply</code>
+            <p class="st-note">Terraform demande de taper <b>yes</b> avant de toucher à quoi que ce soit — jamais de surprise.</p>
+          </li>
+          <li>
+            <div class="st-desc">Inspecter ce qui existe dans l'état</div>
+            <code>terraform state list</code>
+            <code>terraform show</code>
+          </li>
+          <li>
+            <div class="st-desc">Nettoyer en fin de lab</div>
+            <code>terraform destroy</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 34. VAGRANT ═══ -->
+    <details class="sc" id="sc-vagrant" style="--c:#1868F2">
+      <summary>
+        <span class="sc-ico">📦</span>
+        <div class="sc-head">
+          <div class="sc-name">Monter un lab VM reproductible avec Vagrant</div>
+          <div class="sc-meta">Vagrant — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Un Vagrantfile décrit une VM de bout en bout (box, réseau, provisioning). Le partager, c'est partager un lab identique à l'octet près, sans capture d'écran d'une config à refaire à la main.</p>
+        <p class="sc-links"><a href="commands.html?os=vagrant">⌘ commandes Vagrant</a> · <a href="quiz.html?os=vagrant">🎓 quiz Vagrant</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Initialiser le Vagrantfile depuis une box</div>
+            <code>vagrant init debian/bookworm64</code>
+            <p class="st-note">Crée un Vagrantfile minimal dans le dossier courant, prêt à être ajusté.</p>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier les boxes déjà en cache localement</div>
+            <code>vagrant box list</code>
+          </li>
+          <li>
+            <div class="st-desc">Démarrer la VM</div>
+            <code>vagrant up</code>
+            <p class="st-note">Première exécution : télécharge la box si elle n'est pas encore en cache, puis démarre.</p>
+          </li>
+          <li>
+            <div class="st-desc">S'y connecter</div>
+            <code>vagrant ssh</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier l'état de la VM</div>
+            <code>vagrant status</code>
+          </li>
+          <li>
+            <div class="st-desc">Mettre en pause entre deux sessions de travail, sans tout recréer</div>
+            <code>vagrant suspend</code>
+            <code>vagrant resume</code>
+          </li>
+          <li>
+            <div class="st-desc">Détruire proprement en fin de lab</div>
+            <code>vagrant destroy</code>
+            <p class="st-note">Supprime la VM et libère l'espace disque — à faire avant de refermer si le lab est terminé.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 35. HELM ═══ -->
+    <details class="sc" id="sc-helm" style="--c:#0F1689">
+      <summary>
+        <span class="sc-ico">⎈</span>
+        <div class="sc-head">
+          <div class="sc-name">Déployer une application avec Helm sur Kubernetes</div>
+          <div class="sc-meta">Kubectl · Helm — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Helm empaquette une appli Kubernetes entière (déploiement, service, config) en un seul objet versionné et paramétrable — plus simple à installer, mettre à jour ou annuler qu'une pile de manifestes YAML séparés.</p>
+        <p class="sc-links"><a href="commands.html?os=helm">⌘ commandes Helm</a> · <a href="quiz.html?os=helm">🎓 quiz Helm</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Ajouter un dépôt de charts</div>
+            <code>helm repo add bitnami https://charts.bitnami.com/bitnami</code>
+            <code>helm repo update</code>
+          </li>
+          <li>
+            <div class="st-desc">Chercher un chart</div>
+            <code>helm search repo nginx</code>
+          </li>
+          <li>
+            <div class="st-desc">Voir les valeurs par défaut avant d'installer — jamais à l'aveugle</div>
+            <code>helm show values bitnami/nginx</code>
+          </li>
+          <li>
+            <div class="st-desc">Installer dans un namespace dédié</div>
+            <code>helm install mon-nginx bitnami/nginx --namespace web --create-namespace</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier l'état du déploiement</div>
+            <code>helm list --namespace web</code>
+            <code>helm status mon-nginx --namespace web</code>
+          </li>
+          <li>
+            <div class="st-desc">Mettre à jour la configuration</div>
+            <code>helm upgrade mon-nginx bitnami/nginx --namespace web --set service.type=LoadBalancer</code>
+          </li>
+          <li>
+            <div class="st-desc">Revenir en arrière si la mise à jour casse tout</div>
+            <code>helm rollback mon-nginx 1 --namespace web</code>
+            <p class="st-note">Chaque install/upgrade crée une révision numérotée (visible avec <b>helm history</b>) — rollback revient simplement à l'une d'elles.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ 36. ACTIVE DIRECTORY ═══ -->
+    <details class="sc" id="sc-ad" style="--c:#0078D4">
+      <summary>
+        <span class="sc-ico">🗂️</span>
+        <div class="sc-head">
+          <div class="sc-name">Créer un utilisateur, une OU et une GPO dans Active Directory</div>
+          <div class="sc-meta">Windows Server · PowerShell — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">La base de toute administration AD : structurer l'annuaire en unités d'organisation, y créer des comptes, les grouper, et leur appliquer une politique via une GPO. Tout en PowerShell, donc scriptable et rejouable.</p>
+        <p class="sc-links"><a href="commands.html?os=windows-server">⌘ commandes Windows Server</a> · <a href="quiz.html?os=windows-server">🎓 quiz Windows Server</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Créer une unité d'organisation pour ranger les comptes</div>
+            <code>New-ADOrganizationalUnit -Name "Stagiaires" -Path "DC=nexa,DC=local"</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer un utilisateur dedans</div>
+            <code>New-ADUser -Name "Julie Petit" -SamAccountName jpetit -Path "OU=Stagiaires,DC=nexa,DC=local" -Enabled $true -AccountPassword (Read-Host -AsSecureString "Mot de passe")</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier qu'il existe bien</div>
+            <code>Get-ADUser jpetit</code>
+          </li>
+          <li>
+            <div class="st-desc">L'ajouter à un groupe existant</div>
+            <code>Get-ADGroup -Identity "Stagiaires-2026"</code>
+            <code>Add-ADGroupMember -Identity "Stagiaires-2026" -Members jpetit</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer une GPO et la lier à l'OU</div>
+            <code>New-GPO -Name "Restriction-USB" | New-GPLink -Target "OU=Stagiaires,DC=nexa,DC=local"</code>
+            <p class="st-note"><b>New-GPO</b> crée seulement l'objet stratégie ; sans <b>New-GPLink</b>, elle n'est liée à rien et ne s'applique jamais.</p>
+          </li>
+          <li>
+            <div class="st-desc">Forcer l'application immédiate, sans attendre le cycle de rafraîchissement</div>
+            <code>gpupdate /force</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier la santé du contrôleur de domaine (surtout utile à plusieurs DC)</div>
+            <code>dcdiag</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
   </div>
 
   <div class="sc-toast" id="scToast">✓ Copié !</div>

@@ -1170,6 +1170,176 @@ const EXTRA_COMMANDS = [
     ],
     flags: ["broadcast", "multicast", "arp"]
   },
+  {
+    name: "tcpdump -r",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Relit une capture enregistrée dans un fichier .pcap, pour l'analyser hors ligne ou dans Wireshark.",
+    syntax: "tcpdump -r <fichier.pcap> [filtre]",
+    examples: [
+      { cmd: "tcpdump -r capture.pcap", desc: "Relit tout le fichier" },
+      { cmd: "tcpdump -r capture.pcap port 443", desc: "Ne montre que le trafic HTTPS du fichier" }
+    ],
+    flags: ["-r <fichier> (lecture)", "-w <fichier> (écriture)"]
+  },
+  {
+    name: "tcpdump -c",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Arrête la capture après un nombre de paquets donné — évite de devoir faire Ctrl+C à la main.",
+    syntax: "tcpdump -c <n> [filtre]",
+    examples: [
+      { cmd: "sudo tcpdump -i eth0 -c 20", desc: "Capture exactement 20 paquets puis s'arrête" }
+    ],
+    flags: ["-c <n> (nombre de paquets)"]
+  },
+  {
+    name: "tcpdump -s",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Règle la taille de capture par paquet (snaplen) — utile pour capturer les paquets en entier, en-têtes et données.",
+    syntax: "tcpdump -s <octets>",
+    examples: [
+      { cmd: "sudo tcpdump -i eth0 -s 0 -w full.pcap", desc: "Capture chaque paquet en entier (0 = pas de limite)" }
+    ],
+    flags: ["-s 0 (taille illimitée)"]
+  },
+  {
+    name: "tcpdump net",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Filtre le trafic par sous-réseau entier (notation CIDR), plutôt qu'une seule IP.",
+    syntax: "tcpdump net <réseau/masque>",
+    examples: [
+      { cmd: "sudo tcpdump net 192.168.1.0/24", desc: "Tout le trafic vers/depuis ce sous-réseau" }
+    ],
+    flags: ["net <cidr>"]
+  },
+  {
+    name: "tcpdump src / dst",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Filtre le trafic dans un seul sens : uniquement en émission (src) ou en réception (dst).",
+    syntax: "tcpdump src|dst <ip>",
+    examples: [
+      { cmd: "sudo tcpdump src 10.0.0.5", desc: "Uniquement les paquets émis par cette IP" },
+      { cmd: "sudo tcpdump dst 10.0.0.5 and port 443", desc: "Uniquement le trafic HTTPS reçu par cette IP" }
+    ],
+    flags: ["src <ip>", "dst <ip>"]
+  },
+  {
+    name: "tcpdump and / or / not",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Combine plusieurs filtres avec de la logique booléenne, pour des captures précises.",
+    syntax: "tcpdump <filtre1> and|or|not <filtre2>",
+    examples: [
+      { cmd: "sudo tcpdump host 10.0.0.5 and port 22", desc: "Trafic SSH avec cette IP uniquement" },
+      { cmd: "sudo tcpdump not port 22", desc: "Tout sauf le trafic SSH" }
+    ],
+    flags: ["and", "or", "not"]
+  },
+  {
+    name: "tcpdump -e",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Affiche les en-têtes de couche liaison (adresses MAC) en plus des en-têtes IP habituels.",
+    syntax: "tcpdump -e [filtre]",
+    examples: [
+      { cmd: "sudo tcpdump -e -i eth0 arp", desc: "Voir les adresses MAC dans les requêtes ARP" }
+    ],
+    flags: ["-e (en-têtes Ethernet)"]
+  },
+  {
+    name: "tcpdump -D",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Liste toutes les interfaces disponibles pour la capture, avant de choisir laquelle écouter.",
+    syntax: "tcpdump -D",
+    examples: [
+      { cmd: "tcpdump -D", desc: "Liste les interfaces (eth0, wlan0, any...)" }
+    ],
+    flags: ["-D (liste les interfaces)"]
+  },
+  {
+    name: "tcpdump -G",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Fait tourner la capture en continu en créant un nouveau fichier à intervalle régulier — utile pour du monitoring longue durée.",
+    syntax: "tcpdump -G <secondes> -w <motif>",
+    examples: [
+      { cmd: "sudo tcpdump -i eth0 -G 3600 -w capture-%Y%m%d-%H%M.pcap", desc: "Un nouveau fichier chaque heure" }
+    ],
+    flags: ["-G <secondes>", "-W <n> (nombre max de fichiers)"]
+  },
+  {
+    name: "tcpdump udp",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Filtre uniquement le trafic UDP — DNS, DHCP, streaming, VoIP.",
+    syntax: "tcpdump udp [port <n>]",
+    examples: [
+      { cmd: "sudo tcpdump udp port 53", desc: "Requêtes/réponses DNS" },
+      { cmd: "sudo tcpdump udp port 67 or port 68", desc: "Trafic DHCP" }
+    ],
+    flags: ["udp", "port <n>"]
+  },
+  {
+    name: "tcpdump arp",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Capture uniquement les requêtes/réponses ARP — pratique pour détecter un conflit d'IP ou une usurpation.",
+    syntax: "tcpdump arp",
+    examples: [
+      { cmd: "sudo tcpdump -i eth0 arp", desc: "Toutes les résolutions IP → MAC sur le segment" }
+    ],
+    flags: []
+  },
+  {
+    name: "tcpdump -q",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Affiche une sortie plus courte, une ligne par paquet, sans les détails de protocole — pour une vue d'ensemble rapide.",
+    syntax: "tcpdump -q [filtre]",
+    examples: [
+      { cmd: "sudo tcpdump -q -i eth0", desc: "Sortie condensée, plus lisible pour un gros volume" }
+    ],
+    flags: ["-q (quiet)"]
+  },
+  {
+    name: "tcpdump portrange",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Filtre une plage de ports plutôt qu'un seul, utile pour surveiller des services multi-ports (FTP passif, RTP...).",
+    syntax: "tcpdump portrange <début>-<fin>",
+    examples: [
+      { cmd: "sudo tcpdump portrange 6000-6100", desc: "Capture toute la plage de ports" }
+    ],
+    flags: ["portrange <début>-<fin>"]
+  },
+  {
+    name: "tcpdump -S",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Affiche les numéros de séquence TCP en valeur absolue plutôt qu'en valeur relative — utile pour du debug fin.",
+    syntax: "tcpdump -S [filtre]",
+    examples: [
+      { cmd: "sudo tcpdump -S -i eth0 tcp port 443", desc: "Numéros de séquence bruts, pas relatifs" }
+    ],
+    flags: ["-S (séquences absolues)"]
+  },
+  {
+    name: "tcpdump greater / less",
+    os: "tcpdump",
+    category: "Réseau",
+    description: "Filtre les paquets par taille — repérer de gros paquets (transferts) ou anormalement petits (scans, keepalive).",
+    syntax: "tcpdump greater|less <octets>",
+    examples: [
+      { cmd: "sudo tcpdump greater 1000", desc: "Uniquement les paquets de plus de 1000 octets" },
+      { cmd: "sudo tcpdump less 60", desc: "Paquets très courts, souvent des scans ou du contrôle" }
+    ],
+    flags: ["greater <n>", "less <n>"]
+  },
 
   // ── IPTABLES / NFTABLES ───────────────────────────────────
   {
@@ -1302,6 +1472,185 @@ const EXTRA_COMMANDS = [
     ],
     flags: ["status [jail]", "set <jail> banip/unbanip <ip>", "reload"]
   },
+  {
+    name: "iptables -F",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Vide (flush) toutes les règles d'une chaîne ou de la table entière — remise à zéro complète.",
+    syntax: "iptables -F [chaîne]",
+    examples: [
+      { cmd: "sudo iptables -F", desc: "Vide toutes les chaînes de la table filter" },
+      { cmd: "sudo iptables -F INPUT", desc: "Vide uniquement la chaîne INPUT" },
+      { cmd: "sudo iptables -t nat -F", desc: "Vide la table NAT" }
+    ],
+    flags: ["-t <table> (nat, mangle...)", "sans argument = toute la table"]
+  },
+  {
+    name: "iptables -N",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Crée une chaîne personnalisée, pratique pour regrouper des règles réutilisables (ex : anti-scan).",
+    syntax: "iptables -N <nom-chaîne>",
+    examples: [
+      { cmd: "sudo iptables -N LOG_DROP", desc: "Crée une chaîne personnalisée" },
+      { cmd: "sudo iptables -A LOG_DROP -j LOG --log-prefix \"DROP: \"", desc: "Ajoute une règle dedans" },
+      { cmd: "sudo iptables -A INPUT -j LOG_DROP", desc: "Renvoie le trafic INPUT vers cette chaîne" }
+    ],
+    flags: ["-X (supprime une chaîne vide)", "-E (renomme une chaîne)"]
+  },
+  {
+    name: "iptables -I",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Insère une règle à une position précise dans la chaîne, au lieu de l'ajouter à la fin comme -A.",
+    syntax: "iptables -I <chaîne> <position> <critères> -j <cible>",
+    examples: [
+      { cmd: "sudo iptables -I INPUT 1 -p tcp --dport 22 -j ACCEPT", desc: "Insère en tout premier (priorité max)" },
+      { cmd: "sudo iptables -I INPUT -s 203.0.113.9 -j DROP", desc: "Insère en tête sans préciser de position" }
+    ],
+    flags: ["<position> (numéro de ligne)", "sans position = en tête"]
+  },
+  {
+    name: "iptables -R",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Remplace une règle existante à une position donnée, sans devoir la supprimer puis la recréer.",
+    syntax: "iptables -R <chaîne> <n° ligne> <critères> -j <cible>",
+    examples: [
+      { cmd: "sudo iptables -L INPUT --line-numbers", desc: "Repère d'abord le numéro de ligne à modifier" },
+      { cmd: "sudo iptables -R INPUT 3 -p tcp --dport 2222 -j ACCEPT", desc: "Remplace la règle n°3" }
+    ],
+    flags: ["<n° ligne> (via --line-numbers)"]
+  },
+  {
+    name: "iptables -m conntrack",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Filtre selon l'état de connexion (nouvelle, établie, liée) — la base d'un pare-feu stateful correct.",
+    syntax: "iptables -A <chaîne> -m conntrack --ctstate <état> -j <cible>",
+    examples: [
+      { cmd: "sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT", desc: "Autorise les réponses aux connexions déjà ouvertes" },
+      { cmd: "sudo iptables -A INPUT -m conntrack --ctstate INVALID -j DROP", desc: "Rejette les paquets dans un état incohérent" }
+    ],
+    flags: ["NEW", "ESTABLISHED", "RELATED", "INVALID"]
+  },
+  {
+    name: "iptables -m limit",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Limite le débit d'une règle — utile contre le flood (ping, tentatives SSH répétées).",
+    syntax: "iptables -A <chaîne> -m limit --limit <taux> -j <cible>",
+    examples: [
+      { cmd: "sudo iptables -A INPUT -p icmp --icmp-type echo-request -m limit --limit 1/s -j ACCEPT", desc: "Limite les pings à 1 par seconde" },
+      { cmd: "sudo iptables -A INPUT -p tcp --dport 22 -m limit --limit 3/min --limit-burst 3 -j ACCEPT", desc: "Anti brute-force SSH basique" }
+    ],
+    flags: ["--limit <n>/sec|min|hour", "--limit-burst <n>"]
+  },
+  {
+    name: "iptables -j LOG",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Journalise les paquets correspondant à une règle dans les logs noyau (dmesg / journalctl), sans les bloquer.",
+    syntax: "iptables -A <chaîne> <critères> -j LOG --log-prefix \"<préfixe>\"",
+    examples: [
+      { cmd: "sudo iptables -A INPUT -j LOG --log-prefix \"IPT-DROP: \" --log-level 4", desc: "Log avant un DROP final, pour debug" },
+      { cmd: "sudo dmesg | grep IPT-DROP", desc: "Relit les paquets journalisés" }
+    ],
+    flags: ["--log-prefix", "--log-level"]
+  },
+  {
+    name: "iptables -j MASQUERADE",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Fait du NAT dynamique en sortie : permet à un réseau interne de sortir via l'IP publique du routeur.",
+    syntax: "iptables -t nat -A POSTROUTING -o <interface> -j MASQUERADE",
+    examples: [
+      { cmd: "sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE", desc: "Partage la connexion eth0 avec le réseau interne" },
+      { cmd: "sudo sysctl -w net.ipv4.ip_forward=1", desc: "À activer aussi côté noyau, sinon le routage ne se fait pas" }
+    ],
+    flags: ["-o <interface externe>"]
+  },
+  {
+    name: "iptables -j DNAT",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Redirige un port entrant vers une autre machine/port — la base d'une redirection de port (port forwarding).",
+    syntax: "iptables -t nat -A PREROUTING -p tcp --dport <port> -j DNAT --to-destination <ip>:<port>",
+    examples: [
+      { cmd: "sudo iptables -t nat -A PREROUTING -p tcp --dport 8080 -j DNAT --to-destination 192.168.1.50:80", desc: "Renvoie le port 8080 du routeur vers le port 80 d'une VM interne" }
+    ],
+    flags: ["--to-destination <ip>:<port>"]
+  },
+  {
+    name: "netfilter-persistent",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Sauvegarde les règles iptables actuelles pour qu'elles survivent à un redémarrage (sinon tout se réinitialise).",
+    syntax: "netfilter-persistent save|reload",
+    examples: [
+      { cmd: "sudo apt install iptables-persistent", desc: "Installe le service (Debian/Ubuntu)" },
+      { cmd: "sudo netfilter-persistent save", desc: "Écrit les règles actuelles dans /etc/iptables/" }
+    ],
+    flags: ["save", "reload", "flush"]
+  },
+  {
+    name: "ip6tables",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Équivalent d'iptables pour le trafic IPv6 — des règles séparées, à ne pas oublier si l'IPv6 est actif.",
+    syntax: "ip6tables <mêmes options qu'iptables>",
+    examples: [
+      { cmd: "sudo ip6tables -L -n -v", desc: "Liste les règles IPv6 actives" },
+      { cmd: "sudo ip6tables -A INPUT -p tcp --dport 22 -j ACCEPT", desc: "Autorise SSH en IPv6" }
+    ],
+    flags: ["mêmes options que iptables"]
+  },
+  {
+    name: "nft add table / chain",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Crée la structure de base d'un pare-feu nftables : une table puis une chaîne avec sa politique par défaut.",
+    syntax: "nft add table <famille> <nom> ; nft add chain <table> <chaîne> { type filter hook input priority 0 ; }",
+    examples: [
+      { cmd: "sudo nft add table inet filter", desc: "Crée la table (inet = IPv4 + IPv6)" },
+      { cmd: "sudo nft add chain inet filter input { type filter hook input priority 0 \\; policy drop \\; }", desc: "Chaîne INPUT, tout bloqué par défaut" }
+    ],
+    flags: ["inet (v4+v6)", "hook input|output|forward"]
+  },
+  {
+    name: "nft monitor",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Affiche en direct les paquets qui matchent les règles nftables — équivalent live du -j LOG d'iptables.",
+    syntax: "nft monitor trace",
+    examples: [
+      { cmd: "sudo nft monitor trace", desc: "Trace en direct les paquets qui traversent les règles" }
+    ],
+    flags: []
+  },
+  {
+    name: "iptables -C",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Vérifie si une règle existe déjà, sans l'ajouter — indispensable pour rendre un script idempotent.",
+    syntax: "iptables -C <chaîne> <critères> -j <cible>",
+    examples: [
+      { cmd: "sudo iptables -C INPUT -p tcp --dport 22 -j ACCEPT || sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT", desc: "N'ajoute la règle que si elle n'existe pas déjà" }
+    ],
+    flags: ["code retour 0 = existe, 1 = absente"]
+  },
+  {
+    name: "iptables -Z",
+    os: "iptables",
+    category: "Sécurité",
+    description: "Remet à zéro les compteurs de paquets/octets d'une chaîne, sans toucher aux règles elles-mêmes.",
+    syntax: "iptables -Z [chaîne]",
+    examples: [
+      { cmd: "sudo iptables -Z INPUT", desc: "Remet à zéro les compteurs de INPUT" },
+      { cmd: "sudo iptables -L -n -v", desc: "Puis observer les compteurs repartir de zéro" }
+    ],
+    flags: ["sans argument = toutes les chaînes"]
+  },
 
   // ── TMUX ──────────────────────────────────────────────────
   {
@@ -1432,8 +1781,181 @@ const EXTRA_COMMANDS = [
     ],
     flags: ["kill-session -a (toutes sauf courante)"]
   },
+  {
+    name: "tmux split-window",
+    os: "tmux",
+    category: "Système",
+    description: "Découpe la fenêtre en plusieurs panneaux, verticalement ou horizontalement, sans ouvrir de nouvelle fenêtre.",
+    syntax: "Ctrl+b % (vertical) / Ctrl+b \" (horizontal)",
+    examples: [
+      { cmd: "Ctrl+b %", desc: "Découpe en deux colonnes côte à côte" },
+      { cmd: "Ctrl+b \"", desc: "Découpe en deux lignes l'une sous l'autre" }
+    ],
+    flags: ["% (vertical)", "\" (horizontal)"]
+  },
+  {
+    name: "tmux select-pane",
+    os: "tmux",
+    category: "Système",
+    description: "Navigue entre les panneaux d'une même fenêtre, sans devoir cliquer à la souris.",
+    syntax: "Ctrl+b <flèche>",
+    examples: [
+      { cmd: "Ctrl+b →", desc: "Passe au panneau de droite" },
+      { cmd: "Ctrl+b o", desc: "Passe au panneau suivant, peu importe sa position" }
+    ],
+    flags: ["flèches directionnelles", "o (suivant)", "q (affiche les numéros)"]
+  },
+  {
+    name: "tmux rename-window / session",
+    os: "tmux",
+    category: "Système",
+    description: "Renomme la fenêtre ou la session en cours, pour s'y retrouver quand plusieurs sont ouvertes.",
+    syntax: "Ctrl+b , (fenêtre) / tmux rename-session -t <ancien> <nouveau>",
+    examples: [
+      { cmd: "Ctrl+b ,", desc: "Renomme la fenêtre active" },
+      { cmd: "tmux rename-session -t 0 prod", desc: "Renomme la session '0' en 'prod'" }
+    ],
+    flags: [", (renomme fenêtre)"]
+  },
+  {
+    name: "tmux list-sessions / windows",
+    os: "tmux",
+    category: "Système",
+    description: "Liste toutes les sessions ou fenêtres ouvertes, avec leur nom et leur statut (attachée ou non).",
+    syntax: "tmux ls",
+    examples: [
+      { cmd: "tmux ls", desc: "Liste toutes les sessions" },
+      { cmd: "tmux list-windows -t admin", desc: "Liste les fenêtres de la session 'admin'" }
+    ],
+    flags: ["ls (alias de list-sessions)"]
+  },
+  {
+    name: "tmux kill-session",
+    os: "tmux",
+    category: "Système",
+    description: "Ferme une session tmux entière, avec toutes ses fenêtres et panneaux — sans avoir à s'y attacher d'abord.",
+    syntax: "tmux kill-session -t <nom>",
+    examples: [
+      { cmd: "tmux kill-session -t admin", desc: "Ferme la session 'admin'" },
+      { cmd: "tmux kill-session -a", desc: "Ferme toutes les sessions sauf celle attachée" }
+    ],
+    flags: ["-t <nom>", "-a (toutes sauf active)"]
+  },
+  {
+    name: "tmux swap-pane",
+    os: "tmux",
+    category: "Système",
+    description: "Échange la position de deux panneaux, pour réorganiser l'affichage sans tout redécouper.",
+    syntax: "Ctrl+b { / Ctrl+b }",
+    examples: [
+      { cmd: "Ctrl+b {", desc: "Échange avec le panneau précédent" },
+      { cmd: "Ctrl+b }", desc: "Échange avec le panneau suivant" }
+    ],
+    flags: ["{ (précédent)", "} (suivant)"]
+  },
+  {
+    name: "tmux set -g",
+    os: "tmux",
+    category: "Système",
+    description: "Change une option globale de tmux (souris, préfixe, thème) — à mettre dans .tmux.conf pour que ce soit permanent.",
+    syntax: "tmux set -g <option> <valeur>",
+    examples: [
+      { cmd: "tmux set -g mouse on", desc: "Active le clic/scroll/redimensionnement à la souris" },
+      { cmd: "tmux set -g prefix C-a", desc: "Change le préfixe de Ctrl+b vers Ctrl+a" }
+    ],
+    flags: ["-g (option globale)"]
+  },
+  {
+    name: "tmux source-file",
+    os: "tmux",
+    category: "Système",
+    description: "Recharge le fichier de config .tmux.conf sans devoir fermer et rouvrir tmux.",
+    syntax: "tmux source-file ~/.tmux.conf",
+    examples: [
+      { cmd: "tmux source-file ~/.tmux.conf", desc: "Applique les changements du fichier de config" }
+    ],
+    flags: []
+  },
+  {
+    name: "tmux choose-tree",
+    os: "tmux",
+    category: "Système",
+    description: "Ouvre un menu interactif pour naviguer et basculer entre toutes les sessions/fenêtres ouvertes.",
+    syntax: "Ctrl+b w",
+    examples: [
+      { cmd: "Ctrl+b w", desc: "Ouvre l'arborescence interactive des sessions" }
+    ],
+    flags: ["w"]
+  },
+  {
+    name: "tmux setw synchronize-panes",
+    os: "tmux",
+    category: "Système",
+    description: "Envoie la même frappe clavier à tous les panneaux en même temps — pratique pour lancer la même commande sur plusieurs serveurs.",
+    syntax: "tmux setw synchronize-panes on|off",
+    examples: [
+      { cmd: "tmux setw synchronize-panes on", desc: "Tout ce qui est tapé va dans tous les panneaux" },
+      { cmd: "tmux setw synchronize-panes off", desc: "Retour au mode normal" }
+    ],
+    flags: ["on", "off"]
+  },
+  {
+    name: "tmux zoom-pane",
+    os: "tmux",
+    category: "Système",
+    description: "Agrandit temporairement un panneau en plein écran, sans perdre la disposition des autres.",
+    syntax: "Ctrl+b z",
+    examples: [
+      { cmd: "Ctrl+b z", desc: "Zoome le panneau actif ; rappuyer pour revenir en arrière" }
+    ],
+    flags: ["z"]
+  },
+  {
+    name: "tmux new-session -d",
+    os: "tmux",
+    category: "Système",
+    description: "Crée une session détachée directement depuis un script, sans jamais s'y attacher — utile pour lancer des tâches en arrière-plan.",
+    syntax: "tmux new-session -d -s <nom> '<commande>'",
+    examples: [
+      { cmd: "tmux new-session -d -s backup 'rsync -av /data /mnt/backup'", desc: "Lance une tâche longue en arrière-plan" }
+    ],
+    flags: ["-d (détachée)", "-s <nom>"]
+  },
+  {
+    name: "tmux pipe-pane",
+    os: "tmux",
+    category: "Système",
+    description: "Enregistre la sortie d'un panneau dans un fichier en direct — un journal de tout ce qui s'affiche dans la session.",
+    syntax: "tmux pipe-pane -o 'cat >> <fichier>'",
+    examples: [
+      { cmd: "tmux pipe-pane -o 'cat >> session.log'", desc: "Journalise la sortie du panneau actif" }
+    ],
+    flags: ["-o (bascule on/off)"]
+  },
+  {
+    name: "tmux list-keys",
+    os: "tmux",
+    category: "Système",
+    description: "Affiche tous les raccourcis clavier configurés — utile pour retrouver une combinaison oubliée.",
+    syntax: "tmux list-keys",
+    examples: [
+      { cmd: "tmux list-keys | grep split", desc: "Cherche les raccourcis liés au découpage" }
+    ],
+    flags: []
+  },
+  {
+    name: "tmux display-message",
+    os: "tmux",
+    category: "Système",
+    description: "Affiche une info ponctuelle dans la barre de statut — nom de session, numéro de panneau, etc. Utile dans des scripts.",
+    syntax: "tmux display-message '<texte>'",
+    examples: [
+      { cmd: "tmux display-message -p '#S:#I.#P'", desc: "Affiche session:fenêtre.panneau" }
+    ],
+    flags: ["-p (affiche dans le terminal plutôt que la barre de statut)"]
+  },
 
-  // ── VIM ───────────────────────────────────────────────────
+    // ── VIM ───────────────────────────────────────────────────
   {
     name: "vim (modes)",
     os: "vim",
@@ -1570,7 +2092,195 @@ const EXTRA_COMMANDS = [
     ],
     flags: ["set number", "set mouse=a", "colorscheme <nom>"]
   },
-
+  {
+    name: "vim :set number",
+    os: "vim",
+    category: "Système",
+    description: "Affiche les numéros de ligne dans la marge — pratique pour naviguer ou référencer une ligne précise.",
+    syntax: ":set number / :set nu",
+    examples: [
+      { cmd: ":set number", desc: "Active les numéros de ligne" },
+      { cmd: ":set relativenumber", desc: "Numéros relatifs à la ligne courante" }
+    ],
+    flags: ["nu (raccourci)", "rnu (relatif)"]
+  },
+  {
+    name: "vim ZZ / ZQ",
+    os: "vim",
+    category: "Système",
+    description: "Raccourcis mode normal pour sauvegarder+quitter (ZZ) ou quitter sans sauvegarder (ZQ), plus rapides que taper :wq.",
+    syntax: "ZZ / ZQ",
+    examples: [
+      { cmd: "ZZ", desc: "Équivalent de :wq — sauvegarde et quitte" },
+      { cmd: "ZQ", desc: "Équivalent de :q! — quitte sans sauvegarder" }
+    ],
+    flags: ["ZZ (save+quit)", "ZQ (quit sans save)"]
+  },
+  {
+    name: "vim macros",
+    os: "vim",
+    category: "Système",
+    description: "Enregistre une suite de touches et la rejoue à volonté — pour répéter une modification sur plusieurs lignes.",
+    syntax: "qa ... q puis @a",
+    examples: [
+      { cmd: "qa", desc: "Démarre l'enregistrement dans le registre 'a'" },
+      { cmd: "q", desc: "Arrête l'enregistrement" },
+      { cmd: "@a", desc: "Rejoue la macro ; 5@a la rejoue 5 fois" }
+    ],
+    flags: ["qX (enregistre dans X)", "@X (rejoue X)", "@@ (rejoue la dernière)"]
+  },
+  {
+    name: "vim marks",
+    os: "vim",
+    category: "Système",
+    description: "Pose un signet invisible sur une ligne pour y revenir instantanément, même après avoir navigué ailleurs.",
+    syntax: "m<lettre> puis '<lettre>",
+    examples: [
+      { cmd: "ma", desc: "Pose le signet 'a' à la position actuelle" },
+      { cmd: "'a", desc: "Retourne au début de la ligne du signet 'a'" },
+      { cmd: "\\`a", desc: "Retourne à la position exacte (ligne + colonne)" }
+    ],
+    flags: ["m<a-z> (signet local au fichier)", "m<A-Z> (signet global entre fichiers)"]
+  },
+  {
+    name: "vim registres",
+    os: "vim",
+    category: "Système",
+    description: "Copie/colle vers un registre nommé plutôt que le presse-papier par défaut — pour jongler entre plusieurs bouts de texte.",
+    syntax: "\"<lettre>yy puis \"<lettre>p",
+    examples: [
+      { cmd: "\"ayy", desc: "Copie la ligne dans le registre 'a'" },
+      { cmd: "\"ap", desc: "Colle le contenu du registre 'a'" },
+      { cmd: ":reg", desc: "Liste le contenu de tous les registres" }
+    ],
+    flags: ["\"a à \"z (registres nommés)", ":reg (liste)"]
+  },
+  {
+    name: "vim :g (global)",
+    os: "vim",
+    category: "Système",
+    description: "Applique une commande à toutes les lignes correspondant à un motif — bien plus puissant qu'un simple remplacement.",
+    syntax: ":g/<motif>/<commande>",
+    examples: [
+      { cmd: ":g/TODO/d", desc: "Supprime toutes les lignes contenant TODO" },
+      { cmd: ":g/^#/normal A ;", desc: "Ajoute ' ;' à la fin de chaque ligne commençant par #" }
+    ],
+    flags: [":g (sur les lignes qui matchent)", ":v ou :g! (sur celles qui ne matchent pas)"]
+  },
+  {
+    name: "vim folding (zf)",
+    os: "vim",
+    category: "Système",
+    description: "Replie des blocs de code ou de texte pour ne voir que la structure générale d'un gros fichier.",
+    syntax: "zf<mouvement> puis zo / zc",
+    examples: [
+      { cmd: "zfip", desc: "Replie le paragraphe courant" },
+      { cmd: "zo", desc: "Déplie (open) le repli sous le curseur" },
+      { cmd: "zc", desc: "Replie (close) à nouveau" }
+    ],
+    flags: ["zo (open)", "zc (close)", "za (toggle)", "zR (tout déplier)"]
+  },
+  {
+    name: "vim :set filetype",
+    os: "vim",
+    category: "Système",
+    description: "Active la coloration syntaxique et l'indentation adaptées à un langage, même si l'extension du fichier ne le précise pas.",
+    syntax: ":set filetype=<langage>",
+    examples: [
+      { cmd: ":syntax on", desc: "Active la coloration syntaxique en général" },
+      { cmd: ":set filetype=python", desc: "Force la reconnaissance comme fichier Python" }
+    ],
+    flags: [":syntax on|off", ":set ft=<langage> (raccourci)"]
+  },
+  {
+    name: "vim buffers",
+    os: "vim",
+    category: "Système",
+    description: "Garde plusieurs fichiers ouverts en mémoire (buffers) et bascule entre eux sans les afficher côte à côte.",
+    syntax: ":ls puis :b<n>",
+    examples: [
+      { cmd: ":ls", desc: "Liste tous les buffers ouverts" },
+      { cmd: ":bn / :bp", desc: "Buffer suivant / précédent" },
+      { cmd: ":b#", desc: "Revient au buffer précédent (comme Ctrl+^)" }
+    ],
+    flags: [":bn / :bp", ":b<n> (par numéro)", ":bd (ferme le buffer)"]
+  },
+  {
+    name: "vim tabs",
+    os: "vim",
+    category: "Système",
+    description: "Ouvre plusieurs fichiers dans des onglets séparés, chacun pouvant lui-même contenir plusieurs splits.",
+    syntax: ":tabnew <fichier> puis gt / gT",
+    examples: [
+      { cmd: ":tabnew fichier.txt", desc: "Ouvre un nouvel onglet" },
+      { cmd: "gt", desc: "Onglet suivant" },
+      { cmd: "gT", desc: "Onglet précédent" }
+    ],
+    flags: ["gt / gT (navigation)", ":tabc (ferme l'onglet)"]
+  },
+  {
+    name: "vim complétion (Ctrl+n)",
+    os: "vim",
+    category: "Système",
+    description: "Complète automatiquement un mot déjà présent ailleurs dans le fichier, en mode insertion.",
+    syntax: "Ctrl+n / Ctrl+p (en mode insertion)",
+    examples: [
+      { cmd: "Ctrl+n", desc: "Propose les mots suivants correspondant au début tapé" },
+      { cmd: "Ctrl+p", desc: "Même chose mais parcourt la liste en sens inverse" }
+    ],
+    flags: ["Ctrl+n (suivant)", "Ctrl+p (précédent)"]
+  },
+  {
+    name: "vim :r (read)",
+    os: "vim",
+    category: "Système",
+    description: "Insère le contenu d'un autre fichier, ou le résultat d'une commande shell, directement dans le buffer courant.",
+    syntax: ":r <fichier> / :r !<commande>",
+    examples: [
+      { cmd: ":r notes.txt", desc: "Insère le contenu de notes.txt à la position du curseur" },
+      { cmd: ":r !date", desc: "Insère la sortie de la commande 'date'" }
+    ],
+    flags: [":r <fichier>", ":r !<commande shell>"]
+  },
+  {
+    name: "vim :sort",
+    os: "vim",
+    category: "Système",
+    description: "Trie les lignes sélectionnées (ou tout le fichier) alphabétiquement, numériquement, ou en ordre inverse.",
+    syntax: ":sort / :sort!",
+    examples: [
+      { cmd: ":sort", desc: "Trie toutes les lignes par ordre alphabétique" },
+      { cmd: ":sort!", desc: "Trie en ordre inverse" },
+      { cmd: ":sort n", desc: "Trie numériquement" }
+    ],
+    flags: ["! (inverse)", "n (numérique)", "u (supprime les doublons)"]
+  },
+  {
+    name: "vim indentation (>> <<)",
+    os: "vim",
+    category: "Système",
+    description: "Décale l'indentation d'une ligne ou d'un bloc, ou réindente automatiquement selon la syntaxe détectée.",
+    syntax: ">> / << / gg=G",
+    examples: [
+      { cmd: ">>", desc: "Indente la ligne courante vers la droite" },
+      { cmd: "<<", desc: "Désindente la ligne courante" },
+      { cmd: "gg=G", desc: "Réindente automatiquement tout le fichier" }
+    ],
+    flags: [">> / <<", "gg=G (réindentation auto complète)"]
+  },
+  {
+    name: "vim undo tree",
+    os: "vim",
+    category: "Système",
+    description: "Vim garde un historique en arbre, pas juste une pile linéaire — possible de revenir à n'importe quel état passé.",
+    syntax: "u / Ctrl+r / :undolist",
+    examples: [
+      { cmd: "u", desc: "Annule la dernière modification" },
+      { cmd: "Ctrl+r", desc: "Rétablit (redo)" },
+      { cmd: ":undolist", desc: "Affiche l'arbre complet des états sauvegardés" }
+    ],
+    flags: ["u (undo)", "Ctrl+r (redo)", ":undolist"]
+  },
   // ── NPM / NODE ────────────────────────────────────────────
   {
     name: "npm init",
