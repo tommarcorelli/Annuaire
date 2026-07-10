@@ -13,7 +13,8 @@
     { href: 'quiz.html',       ico: '🎓', label: 'Quiz'       },
     { href: 'terminal.html',   ico: '>_', label: 'Terminal'   },
     { href: 'cheatsheet.html', ico: '⚡', label: 'Cheatsheet' },
-    { href: 'scenarios.html',  ico: '🧭', label: 'Scénarios'  }
+    { href: 'scenarios.html',  ico: '🧭', label: 'Scénarios'  },
+    { href: 'installation.html', ico: '💿', label: 'Installation' }
   ];
 
   var THEME_ICON = { dark: '🌙', light: '☀️', matrix: '💊', crt: '📟', synthwave: '🌆' };

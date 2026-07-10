@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>MANPAGES.EXE — Installation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=VT323&family=Honk&family=Noto+Sans+JP:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/commands.css"/>
+  <link rel="stylesheet" href="css/mobile-nav.css"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="icons/favicon-32.png"/>
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+  <meta name="theme-color" content="#0f0820"/>
+  <script>/* Thème : préférence sauvegardée, sinon réglage système */(function(){var t=localStorage.getItem('mpx-theme');if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <style>
+    .sc-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 90px 20px 60px;
+    }
+    .sc-eye {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+    .sc-title {
+      font-family: 'VT323', monospace;
+      font-size: clamp(34px, 6vw, 52px);
+      line-height: 1;
+      margin: 0 0 10px;
+      color: var(--text);
+    }
+    .sc-title span { color: #c77dff; }
+    .sc-sub { color: var(--text); opacity: 0.75; margin-bottom: 34px; font-size: 14px; }
+
+    details.sc {
+      background: var(--bg2);
+      border: 2px solid var(--border2);
+      border-left: 4px solid var(--c, var(--accent));
+      margin-bottom: 14px;
+    }
+    details.sc[open] { box-shadow: 6px 6px 0 var(--accent-glow); }
+    details.sc summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      user-select: none;
+    }
+    details.sc summary::-webkit-details-marker { display: none; }
+    details.sc summary:hover { background: var(--bg3); }
+    .sc-ico { font-size: 26px; flex-shrink: 0; }
+    .sc-head { flex: 1; min-width: 0; }
+    .sc-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+    }
+    .sc-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--c, var(--accent));
+      margin-top: 3px;
+    }
+    .sc-arrow {
+      color: var(--muted);
+      font-size: 12px;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    details.sc[open] .sc-arrow { transform: rotate(180deg); }
+
+    .sc-body { padding: 4px 18px 20px; border-top: 1px solid var(--border); }
+    .sc-intro {
+      font-size: 13.5px;
+      color: var(--text);
+      opacity: 0.85;
+      margin: 14px 0 18px;
+      line-height: 1.55;
+    }
+    ol.sc-steps {
+      list-style: none;
+      counter-reset: step;
+      margin: 0;
+      padding: 0;
+    }
+    ol.sc-steps > li {
+      counter-increment: step;
+      position: relative;
+      padding: 0 0 20px 44px;
+      border-left: 2px dashed var(--border2);
+      margin-left: 14px;
+    }
+    ol.sc-steps > li:last-child { border-left-color: transparent; padding-bottom: 4px; }
+    ol.sc-steps > li::before {
+      content: counter(step);
+      position: absolute;
+      left: -15px; top: -2px;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 2px solid var(--c, var(--accent));
+      color: var(--c, var(--accent));
+      font-family: 'VT323', monospace;
+      font-size: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .st-desc {
+      font-weight: 600;
+      font-size: 13.5px;
+      color: var(--text);
+      margin-bottom: 8px;
+      padding-top: 3px;
+    }
+    .sc-body code, .sc-body pre {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--accent-3);
+      padding: 8px 12px;
+      margin: 0 0 6px;
+      cursor: copy;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      transition: border-color 0.15s;
+    }
+    .sc-body code:hover, .sc-body pre:hover { border-color: var(--c, var(--accent)); }
+    .sc-body code.flash, .sc-body pre.flash { background: #14381c; color: #2ecc71; border-color: #2ecc71; }
+    .st-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 4px 0 0;
+      line-height: 1.5;
+    }
+    .st-note b { color: var(--accent-2); }
+    .sc-links {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      margin: -8px 0 18px;
+    }
+    .sc-links a {
+      color: var(--c, var(--accent));
+      text-decoration: none;
+      border-bottom: 1px dashed currentColor;
+    }
+    .sc-links a:hover { opacity: 0.75; }
+
+    /* Liens auto-générés vers les fiches de l'annuaire (scenarios-data.js) */
+    .sc-cmds {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin: 16px 0 0;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border2);
+      line-height: 2;
+    }
+    .sc-cmds a {
+      color: var(--accent-2);
+      text-decoration: none;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      padding: 2px 7px;
+      margin: 0 3px 0 0;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .sc-cmds a:hover { border-color: var(--accent-2); }
+
+    /* Suivi de progression : barre + bouton « terminé » */
+    .sc-progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: -22px 0 30px;
+    }
+    .sc-progress-bar {
+      flex: 1;
+      height: 10px;
+      background: var(--bg3);
+      border: 2px solid var(--border2);
+    }
+    .sc-progress-fill {
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+      transition: width 0.3s;
+    }
+    .sc-progress-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .sc-done-btn {
+      margin-top: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      background: transparent;
+      border: 2px solid var(--border2);
+      color: var(--muted);
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .sc-done-btn:hover { border-color: #2ecc71; color: #2ecc71; }
+    details.sc.done .sc-done-btn {
+      border-color: #2ecc71;
+      color: #2ecc71;
+      background: rgba(46,204,113,0.08);
+    }
+    details.sc.done summary .sc-name::after { content: ' ✓'; color: #2ecc71; }
+
+    .sc-toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--accent);
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      padding: 10px 22px;
+      box-shadow: 4px 4px 0 var(--accent-2);
+      transition: transform 0.25s;
+      z-index: 200;
+      max-width: 90vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sc-toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 640px) { .sc-wrap { padding-top: 80px; } }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">MAN<span>//</span>PAGES.EXE</a>
+    <div class="nav-right" style="margin-left:auto">
+      <button class="theme-toggle" id="themeToggle" title="Changer le thème" aria-label="Changer le thème">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <a href="commands.html" class="nav-back">⌘ Annuaire</a>
+      <a href="packages.html" class="nav-back" style="color:var(--accent-3)">📦 Paquets</a>
+      <a href="quiz.html" class="nav-back" style="color:#1BB91F">🎓 Quiz</a>
+      <a href="terminal.html" class="nav-back" style="color:#00d3b8">&gt;_ Terminal</a>
+      <a href="cheatsheet.html" class="nav-back" style="color:#d4a843">⚡ Cheatsheet</a>
+      <a href="scenarios.html" class="nav-back" style="color:#c77dff">🧭 Scénarios</a>
+      <a href="index.html" class="nav-back">← Accueil</a>
+    </div>
+  </nav>
+
+  <div class="sc-wrap">
+    <div class="sc-eye">// GUIDES D'INSTALLATION</div>
+    <h1 class="sc-title">INSTALL<span>//</span>ATION</h1>
+    <p class="sc-sub">De l'ISO au premier boot : support d'installation, partitionnement, et les toutes premières commandes après l'installation. Clique sur une commande pour la copier.</p>
+
+        <!-- ═══ DEBIAN/UBUNTU ═══ -->
+    <details class="sc" id="inst-debian" style="--c:#A81D33">
+      <summary>
+        <span class="sc-ico">🌀</span>
+        <div class="sc-head">
+          <div class="sc-name">Installer Debian / Ubuntu Server</div>
+          <div class="sc-meta">Debian/Ubuntu — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">La base la plus courante en homelab et en prod : installeur graphique simple, dépôts stables, énorme documentation en cas de blocage.</p>
+        <p class="sc-links"><a href="commands.html?os=debian">⌘ commandes Debian/Ubuntu</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Télécharger l'image et vérifier son empreinte</div>
+            <code>sha256sum debian-12.6.0-amd64-netinst.iso</code>
+            <p class="st-note">Compare le résultat avec le fichier SHA256SUMS officiel avant de graver quoi que ce soit — une ISO corrompue plante souvent au pire moment de l'install.</p>
+          </li>
+          <li>
+            <div class="st-desc">Créer la clé USB bootable</div>
+            <code>sudo dd if=debian-12.6.0-amd64-netinst.iso of=/dev/sdX bs=4M status=progress</code>
+            <p class="st-note">Sous Windows : Rufus. Vérifie bien <code>/dev/sdX</code> avec <code>lsblk</code> avant — une erreur ici écrase le mauvais disque.</p>
+          </li>
+          <li>
+            <div class="st-desc">Démarrer et choisir un schéma de partitionnement</div>
+            <p class="st-note">Pour un serveur : LVM (Guided - use entire disk and set up LVM) plutôt que partitionnement manuel, ça facilite l'extension future avec <code>lvextend</code>.</p>
+          </li>
+          <li>
+            <div class="st-desc">Sélectionner uniquement les rôles nécessaires</div>
+            <p class="st-note">Décoche "environnement de bureau" sur un serveur — ne garde que "SSH server" et "standard system utilities" pour rester léger.</p>
+          </li>
+          <li>
+            <div class="st-desc">Premier démarrage : mise à jour immédiate du système</div>
+            <code>sudo apt update && sudo apt full-upgrade -y</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifications de base post-install</div>
+            <code>ip a</code>
+            <code>systemctl status ssh</code>
+            <p class="st-note">Confirme l'IP obtenue et que le service SSH tourne avant de débrancher l'écran/clavier.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ ALPINE ═══ -->
+    <details class="sc" id="inst-alpine" style="--c:#0D597F">
+      <summary>
+        <span class="sc-ico">🏔️</span>
+        <div class="sc-head">
+          <div class="sc-name">Installer Alpine Linux</div>
+          <div class="sc-meta">Alpine Linux — 5 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Le mode diskless (tout en RAM, rien sur disque tant qu'on ne commit pas) déroute au début — c'est un choix volontaire, pas un bug.</p>
+        <p class="sc-links"><a href="commands.html?os=alpine">⌘ commandes Alpine</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Télécharger l'image "standard" (pas "virt" sauf usage cloud/conteneur pur)</div>
+            <code>sha256sum alpine-standard-3.20.0-x86_64.iso</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer la clé USB bootable</div>
+            <code>sudo dd if=alpine-standard-3.20.0-x86_64.iso of=/dev/sdX bs=4M status=progress</code>
+          </li>
+          <li>
+            <div class="st-desc">Lancer l'assistant d'installation une fois démarré</div>
+            <code>setup-alpine</code>
+            <p class="st-note">Répond aux questions clavier/réseau/disque, puis choisis "sys" pour une installation classique sur disque (pas "disk" en mode diskless).</p>
+          </li>
+          <li>
+            <div class="st-desc">Premier démarrage : mise à jour des paquets</div>
+            <code>apk update && apk upgrade</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier que la configuration a bien été écrite sur le disque</div>
+            <code>rc-status</code>
+            <p class="st-note">En mode diskless, n'oublie jamais <code>lbu commit</code> après un changement, sinon tout repart de zéro au redémarrage.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ ARCH LINUX ═══ -->
+    <details class="sc" id="inst-arch" style="--c:#1793D1">
+      <summary>
+        <span class="sc-ico">🔷</span>
+        <div class="sc-head">
+          <div class="sc-name">Installer Arch Linux (manuel)</div>
+          <div class="sc-meta">Arch Linux — 7 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Pas d'installeur graphique par défaut : chaque étape est une commande volontaire. Plus long, mais on comprend exactement ce qui a été fait — l'esprit même d'Arch.</p>
+        <p class="sc-links"><a href="commands.html?os=arch">⌘ commandes Arch Linux</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Vérifier la connectivité réseau depuis le live-ISO</div>
+            <code>ping -c 3 archlinux.org</code>
+          </li>
+          <li>
+            <div class="st-desc">Partitionner le disque</div>
+            <code>cfdisk /dev/sda</code>
+            <p class="st-note">Au minimum : une partition EFI (512 Mo, type EFI System) et une partition racine.</p>
+          </li>
+          <li>
+            <div class="st-desc">Formater et monter les partitions</div>
+            <code>mkfs.ext4 /dev/sda2</code>
+            <code>mount /dev/sda2 /mnt</code>
+          </li>
+          <li>
+            <div class="st-desc">Installer les paquets de base</div>
+            <code>pacstrap /mnt base linux linux-firmware vim</code>
+          </li>
+          <li>
+            <div class="st-desc">Générer la table des systèmes de fichiers</div>
+            <code>genfstab -U /mnt >> /mnt/etc/fstab</code>
+          </li>
+          <li>
+            <div class="st-desc">Entrer dans le nouveau système et finaliser (bootloader, mot de passe root, hostname)</div>
+            <code>arch-chroot /mnt</code>
+            <p class="st-note">C'est dans ce chroot qu'on installe GRUB, qu'on définit <code>passwd</code> et <code>hostnamectl</code> avant de redémarrer.</p>
+          </li>
+          <li>
+            <div class="st-desc">Premier démarrage : mise à jour du système</div>
+            <code>pacman -Syu</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ RHEL/CENTOS ═══ -->
+    <details class="sc" id="inst-rhel" style="--c:#CC0000">
+      <summary>
+        <span class="sc-ico">🎩</span>
+        <div class="sc-head">
+          <div class="sc-name">Installer RHEL / Rocky / AlmaLinux</div>
+          <div class="sc-meta">RHEL — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Anaconda (l'installeur graphique) est bien plus complet que celui de Debian — SELinux et le partitionnement avancé se configurent dès l'install, autant en profiter.</p>
+        <p class="sc-links"><a href="commands.html?os=rhel">⌘ commandes RHEL</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Vérifier l'empreinte de l'image téléchargée</div>
+            <code>sha256sum -c CHECKSUM</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer le support d'installation</div>
+            <code>sudo dd if=Rocky-9-x86_64-minimal.iso of=/dev/sdX bs=4M status=progress</code>
+          </li>
+          <li>
+            <div class="st-desc">Choisir le schéma de partitionnement dans Anaconda</div>
+            <p class="st-note">"Automatic" avec LVM convient à la plupart des cas ; en prod, sépare souvent /var et /home sur des volumes logiques distincts.</p>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier que SELinux est bien actif après l'installation</div>
+            <code>sestatus</code>
+            <p class="st-note">SELinux "Enforcing" par défaut sur RHEL — ne le désactive pas au moindre blocage, résous plutôt le contexte avec <code>restorecon</code>/<code>semanage</code>.</p>
+          </li>
+          <li>
+            <div class="st-desc">Premier démarrage : mise à jour et enregistrement de l'abonnement (RHEL uniquement)</div>
+            <code>sudo dnf update -y</code>
+            <code>subscription-manager register</code>
+          </li>
+          <li>
+            <div class="st-desc">Ouvrir les ports nécessaires dans le pare-feu</div>
+            <code>firewall-cmd --permanent --add-service=ssh && firewall-cmd --reload</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ FREEBSD ═══ -->
+    <details class="sc" id="inst-freebsd" style="--c:#AB2B28">
+      <summary>
+        <span class="sc-ico">😈</span>
+        <div class="sc-head">
+          <div class="sc-name">Installer FreeBSD</div>
+          <div class="sc-meta">FreeBSD — 5 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">bsdinstall est un installeur en mode texte, simple une fois qu'on a compris que ZFS est presque toujours le bon choix de système de fichiers par défaut.</p>
+        <p class="sc-links"><a href="commands.html?os=freebsd">⌘ commandes FreeBSD</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Créer le support d'installation</div>
+            <code>sudo dd if=FreeBSD-14.0-RELEASE-amd64-dvd1.iso of=/dev/sdX bs=4M status=progress</code>
+          </li>
+          <li>
+            <div class="st-desc">Lancer l'installeur et choisir le partitionnement</div>
+            <code>bsdinstall</code>
+            <p class="st-note">"Auto (ZFS)" est recommandé par défaut : snapshots et rollback facilités dès le départ.</p>
+          </li>
+          <li>
+            <div class="st-desc">Configurer le réseau pendant l'installation</div>
+            <p class="st-note">DHCP suffit pour un premier essai ; une IP fixe se configure ensuite via <code>/etc/rc.conf</code>.</p>
+          </li>
+          <li>
+            <div class="st-desc">Premier démarrage : mise à jour du système de base</div>
+            <code>freebsd-update fetch install</code>
+          </li>
+          <li>
+            <div class="st-desc">Installer le gestionnaire de paquets et un premier outil</div>
+            <code>pkg install vim</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ WINDOWS ═══ -->
+    <details class="sc" id="inst-windows" style="--c:#0078D4">
+      <summary>
+        <span class="sc-ico">🪟</span>
+        <div class="sc-head">
+          <div class="sc-name">Installer Windows 11</div>
+          <div class="sc-meta">Windows — 5 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Le Media Creation Tool officiel évite les images modifiées qui traînent ailleurs — surtout pour une VM de test ou un lab qu'on veut fiable.</p>
+        <p class="sc-links"><a href="commands.html?os=windows">⌘ commandes Windows</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Créer le support avec l'outil officiel Microsoft</div>
+            <p class="st-note">Media Creation Tool → "Créer un support d'installation" → clé USB. Fonctionne aussi pour générer directement un fichier ISO.</p>
+          </li>
+          <li>
+            <div class="st-desc">Démarrer et choisir "Installation personnalisée"</div>
+            <p class="st-note">Pas "Mise à niveau" — repartir d'un disque vide évite d'hériter de résidus d'une install précédente.</p>
+          </li>
+          <li>
+            <div class="st-desc">Contourner la vérification de compte Microsoft si besoin (compte local)</div>
+            <code>OOBE\BYPASSNRO</code>
+            <p class="st-note">À taper dans l'invite de commande (Shift+F10) pendant l'installation pour forcer un compte local plutôt qu'un compte en ligne.</p>
+          </li>
+          <li>
+            <div class="st-desc">Premier démarrage : vérifier les mises à jour Windows</div>
+            <p class="st-note">Paramètres → Windows Update → Rechercher des mises à jour, avant d'installer quoi que ce soit d'autre.</p>
+          </li>
+          <li>
+            <div class="st-desc">Ouvrir un terminal PowerShell en administrateur pour la suite</div>
+            <code>Get-ComputerInfo | Select WindowsProductName, OsVersion</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ WINDOWS SERVER ═══ -->
+    <details class="sc" id="inst-windows-server" style="--c:#00A4EF">
+      <summary>
+        <span class="sc-ico">🗂️</span>
+        <div class="sc-head">
+          <div class="sc-name">Installer Windows Server (Core ou Desktop Experience)</div>
+          <div class="sc-meta">Windows Server — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Le choix "Core" (sans interface graphique) économise des ressources et réduit la surface d'attaque — tout se pilote alors en PowerShell ou à distance.</p>
+        <p class="sc-links"><a href="commands.html?os=windows-server">⌘ commandes Windows Server</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Démarrer l'installeur et choisir l'édition</div>
+            <p class="st-note">"Server Core" pour un rôle serveur classique (AD, fichiers, DHCP) ; "Desktop Experience" seulement si une interface graphique est vraiment nécessaire.</p>
+          </li>
+          <li>
+            <div class="st-desc">Définir le mot de passe administrateur au premier démarrage</div>
+          </li>
+          <li>
+            <div class="st-desc">Configurer le réseau en IP fixe (recommandé pour un serveur)</div>
+            <code>New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 192.168.1.10 -PrefixLength 24 -DefaultGateway 192.168.1.1</code>
+          </li>
+          <li>
+            <div class="st-desc">Renommer la machine et redémarrer</div>
+            <code>Rename-Computer -NewName "SRV-01" -Restart</code>
+          </li>
+          <li>
+            <div class="st-desc">Installer les mises à jour</div>
+            <code>Install-WindowsUpdate</code>
+          </li>
+          <li>
+            <div class="st-desc">Ajouter le premier rôle serveur (exemple : Active Directory)</div>
+            <code>Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- ═══ MACOS ═══ -->
+    <details class="sc" id="inst-macos" style="--c:#555555">
+      <summary>
+        <span class="sc-ico">🍎</span>
+        <div class="sc-head">
+          <div class="sc-name">Réinstaller macOS via le mode de récupération</div>
+          <div class="sc-meta">macOS — 5 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Pas d'ISO classique sur Mac : tout passe par le mode de récupération intégré, qui télécharge le système directement depuis les serveurs Apple.</p>
+        <p class="sc-links"><a href="commands.html?os=macos">⌘ commandes macOS</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Redémarrer en mode de récupération</div>
+            <p class="st-note">Mac Apple Silicon : maintenir le bouton d'alimentation au démarrage. Mac Intel : Cmd+R au démarrage.</p>
+          </li>
+          <li>
+            <div class="st-desc">Effacer le disque si c'est une réinstallation complète</div>
+            <p class="st-note">Utilitaire de disque → sélectionner le disque interne → Effacer (format APFS).</p>
+          </li>
+          <li>
+            <div class="st-desc">Réinstaller macOS depuis le menu de récupération</div>
+            <p class="st-note">Le système se télécharge directement depuis Apple — compter 30 à 60 minutes selon la connexion.</p>
+          </li>
+          <li>
+            <div class="st-desc">Premier démarrage : installer les outils en ligne de commande</div>
+            <code>xcode-select --install</code>
+          </li>
+          <li>
+            <div class="st-desc">Installer Homebrew pour la gestion de paquets</div>
+            <code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+
+  </div>
+
+  <div class="sc-toast" id="scToast">✓ Copié !</div>
+
+  <script>
+    /* Suivi de progression : barre X/26 + bouton « terminé » par scénario.
+       Stocké dans localStorage (mpx-scenarios-done), exportable via le quiz. */
+    (function() {
+      var KEY = 'mpx-install-done';
+      var all = Array.prototype.slice.call(document.querySelectorAll('details.sc'));
+      if (!all.length) return;
+
+      function load() {
+        try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; }
+      }
+      function save(arr) {
+        try { localStorage.setItem(KEY, JSON.stringify(arr)); } catch (e) {}
+      }
+
+      // Barre de progression sous le sous-titre
+      var sub = document.querySelector('.sc-sub');
+      var prog = document.createElement('div');
+      prog.className = 'sc-progress';
+      prog.innerHTML =
+        '<div class="sc-progress-bar"><div class="sc-progress-fill" id="scProgressFill"></div></div>' +
+        '<span class="sc-progress-label" id="scProgressLabel"></span>';
+      sub.insertAdjacentElement('afterend', prog);
+
+      // Un bouton « terminé » à la fin de chaque scénario
+      all.forEach(function(d) {
+        var btn = document.createElement('button');
+        btn.className = 'sc-done-btn';
+        d.querySelector('.sc-body').appendChild(btn);
+        btn.addEventListener('click', function() {
+          var done = load();
+          var i = done.indexOf(d.id);
+          if (i === -1) done.push(d.id);
+          else done.splice(i, 1);
+          save(done);
+          refresh();
+        });
+      });
+
+      function refresh() {
+        var done = load();
+        var n = 0;
+        all.forEach(function(d) {
+          var isDone = done.indexOf(d.id) !== -1;
+          if (isDone) n++;
+          d.classList.toggle('done', isDone);
+          var btn = d.querySelector('.sc-done-btn');
+          if (btn) btn.textContent = isDone
+            ? '✓ Terminé — cliquer pour décocher'
+            : '☐ Marquer ce scénario comme terminé';
+        });
+        document.getElementById('scProgressFill').style.width = (n / all.length * 100) + '%';
+        document.getElementById('scProgressLabel').textContent =
+          n + '/' + all.length + ' terminé' + (n > 1 ? 's' : '');
+        if (n === all.length) {
+          // Asynchrone : laisse arcade-fun.js (chargé après) poser son écouteur
+          setTimeout(function() {
+            document.dispatchEvent(new CustomEvent('mpx:all-scenarios-done'));
+          }, 0);
+        }
+      }
+
+      refresh();
+    })();
+  </script>
+  <script>
+    (function() {
+      // Copie au clic sur n'importe quelle commande
+      var toast = document.getElementById('scToast');
+      var timer = null;
+      document.addEventListener('click', function(e) {
+        var code = e.target.closest('.sc-body code, .sc-body pre');
+        if (!code) return;
+        navigator.clipboard.writeText(code.textContent).then(function() {
+          code.classList.add('flash');
+          toast.textContent = '✓ Copié !';
+          toast.classList.add('show');
+          clearTimeout(timer);
+          timer = setTimeout(function() {
+            toast.classList.remove('show');
+            code.classList.remove('flash');
+          }, 1500);
+        });
+      });
+
+      // Thème : géré par theme.js (partagé par toutes les pages)
+
+      // Lien profond depuis la recherche globale : scenarios.html#sc-xxx
+      function openFromHash() {
+        if (!location.hash) return;
+        var target = document.querySelector(location.hash);
+        if (target && target.tagName === 'DETAILS') {
+          target.open = true;
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+      openFromHash();
+      window.addEventListener('hashchange', openFromHash);
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('sw.js').catch(function() {});
+        });
+      }
+    })();
+  </script>
+  <script src="js/theme.js"></script>
+  <script src="js/arcade-fun.js"></script>
+  <script src="js/mobile-nav.js"></script>
+</body>
+</html>

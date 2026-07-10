@@ -1910,7 +1910,8 @@ const EXTRA_COMMANDS = [
     description: "Arrête la capture après un nombre de paquets donné — évite de devoir faire Ctrl+C à la main.",
     syntax: "tcpdump -c <n> [filtre]",
     examples: [
-      { cmd: "sudo tcpdump -i eth0 -c 20", desc: "Capture exactement 20 paquets puis s'arrête" }
+      { cmd: "sudo tcpdump -i eth0 -c 20", desc: "Capture exactement 20 paquets puis s'arrête" },
+      { cmd: "sudo tcpdump -i eth0 -c 5 -w echantillon.pcap", desc: "Capture un petit échantillon directement dans un fichier" }
     ],
     flags: ["-c <n> (nombre de paquets)"]
   },
@@ -1921,7 +1922,8 @@ const EXTRA_COMMANDS = [
     description: "Règle la taille de capture par paquet (snaplen) — utile pour capturer les paquets en entier, en-têtes et données.",
     syntax: "tcpdump -s <octets>",
     examples: [
-      { cmd: "sudo tcpdump -i eth0 -s 0 -w full.pcap", desc: "Capture chaque paquet en entier (0 = pas de limite)" }
+      { cmd: "sudo tcpdump -i eth0 -s 0 -w full.pcap", desc: "Capture chaque paquet en entier (0 = pas de limite)" },
+      { cmd: "sudo tcpdump -i eth0 -s 128 -w headers-only.pcap", desc: "Limite à 128 octets, suffisant pour ne garder que les en-têtes" }
     ],
     flags: ["-s 0 (taille illimitée)"]
   },
@@ -1932,7 +1934,8 @@ const EXTRA_COMMANDS = [
     description: "Filtre le trafic par sous-réseau entier (notation CIDR), plutôt qu'une seule IP.",
     syntax: "tcpdump net <réseau/masque>",
     examples: [
-      { cmd: "sudo tcpdump net 192.168.1.0/24", desc: "Tout le trafic vers/depuis ce sous-réseau" }
+      { cmd: "sudo tcpdump net 192.168.1.0/24", desc: "Tout le trafic vers/depuis ce sous-réseau" },
+      { cmd: "sudo tcpdump net 10.0.0.0/8 and not net 10.0.5.0/24", desc: "Tout un réseau sauf un sous-réseau précis exclu" }
     ],
     flags: ["net <cidr>"]
   },
@@ -1967,7 +1970,8 @@ const EXTRA_COMMANDS = [
     description: "Affiche les en-têtes de couche liaison (adresses MAC) en plus des en-têtes IP habituels.",
     syntax: "tcpdump -e [filtre]",
     examples: [
-      { cmd: "sudo tcpdump -e -i eth0 arp", desc: "Voir les adresses MAC dans les requêtes ARP" }
+      { cmd: "sudo tcpdump -e -i eth0 arp", desc: "Voir les adresses MAC dans les requêtes ARP" },
+      { cmd: "sudo tcpdump -e -i eth0 ether host aa:bb:cc:dd:ee:ff", desc: "Combine avec un filtre sur une MAC précise" }
     ],
     flags: ["-e (en-têtes Ethernet)"]
   },
@@ -1978,7 +1982,8 @@ const EXTRA_COMMANDS = [
     description: "Liste toutes les interfaces disponibles pour la capture, avant de choisir laquelle écouter.",
     syntax: "tcpdump -D",
     examples: [
-      { cmd: "tcpdump -D", desc: "Liste les interfaces (eth0, wlan0, any...)" }
+      { cmd: "tcpdump -D", desc: "Liste les interfaces (eth0, wlan0, any...)" },
+      { cmd: "tcpdump -D | grep -v 'lo\\|any'", desc: "Exclut le loopback et l'interface 'any' de la liste" }
     ],
     flags: ["-D (liste les interfaces)"]
   },
@@ -1989,7 +1994,8 @@ const EXTRA_COMMANDS = [
     description: "Fait tourner la capture en continu en créant un nouveau fichier à intervalle régulier — utile pour du monitoring longue durée.",
     syntax: "tcpdump -G <secondes> -w <motif>",
     examples: [
-      { cmd: "sudo tcpdump -i eth0 -G 3600 -w capture-%Y%m%d-%H%M.pcap", desc: "Un nouveau fichier chaque heure" }
+      { cmd: "sudo tcpdump -i eth0 -G 3600 -w capture-%Y%m%d-%H%M.pcap", desc: "Un nouveau fichier chaque heure" },
+      { cmd: "sudo tcpdump -i eth0 -G 60 -W 24 -w capture-%H%M.pcap", desc: "Rotation horaire limitée à 24 fichiers (une journée complète)" }
     ],
     flags: ["-G <secondes>", "-W <n> (nombre max de fichiers)"]
   },
@@ -2012,7 +2018,8 @@ const EXTRA_COMMANDS = [
     description: "Capture uniquement les requêtes/réponses ARP — pratique pour détecter un conflit d'IP ou une usurpation.",
     syntax: "tcpdump arp",
     examples: [
-      { cmd: "sudo tcpdump -i eth0 arp", desc: "Toutes les résolutions IP → MAC sur le segment" }
+      { cmd: "sudo tcpdump -i eth0 arp", desc: "Toutes les résolutions IP → MAC sur le segment" },
+      { cmd: "sudo tcpdump -i eth0 arp and not arp src 192.168.1.1", desc: "Exclut les annonces ARP de la passerelle pour réduire le bruit" }
     ],
     flags: []
   },
@@ -2023,7 +2030,8 @@ const EXTRA_COMMANDS = [
     description: "Affiche une sortie plus courte, une ligne par paquet, sans les détails de protocole — pour une vue d'ensemble rapide.",
     syntax: "tcpdump -q [filtre]",
     examples: [
-      { cmd: "sudo tcpdump -q -i eth0", desc: "Sortie condensée, plus lisible pour un gros volume" }
+      { cmd: "sudo tcpdump -q -i eth0", desc: "Sortie condensée, plus lisible pour un gros volume" },
+      { cmd: "sudo tcpdump -q -i eth0 tcp port 443", desc: "Sortie condensée limitée au trafic HTTPS" }
     ],
     flags: ["-q (quiet)"]
   },
@@ -2034,7 +2042,8 @@ const EXTRA_COMMANDS = [
     description: "Filtre une plage de ports plutôt qu'un seul, utile pour surveiller des services multi-ports (FTP passif, RTP...).",
     syntax: "tcpdump portrange <début>-<fin>",
     examples: [
-      { cmd: "sudo tcpdump portrange 6000-6100", desc: "Capture toute la plage de ports" }
+      { cmd: "sudo tcpdump portrange 6000-6100", desc: "Capture toute la plage de ports" },
+      { cmd: "sudo tcpdump portrange 50000-51000 -w rtp.pcap", desc: "Capture une plage de ports RTP typique dans un fichier" }
     ],
     flags: ["portrange <début>-<fin>"]
   },
@@ -2045,7 +2054,8 @@ const EXTRA_COMMANDS = [
     description: "Affiche les numéros de séquence TCP en valeur absolue plutôt qu'en valeur relative — utile pour du debug fin.",
     syntax: "tcpdump -S [filtre]",
     examples: [
-      { cmd: "sudo tcpdump -S -i eth0 tcp port 443", desc: "Numéros de séquence bruts, pas relatifs" }
+      { cmd: "sudo tcpdump -S -i eth0 tcp port 443", desc: "Numéros de séquence bruts, pas relatifs" },
+      { cmd: "sudo tcpdump -S -nn tcp port 22", desc: "Combine avec -nn pour des IP/ports bruts et des séquences absolues" }
     ],
     flags: ["-S (séquences absolues)"]
   },
@@ -2069,7 +2079,8 @@ const EXTRA_COMMANDS = [
     description: "Augmente la verbosité de la sortie — plus de détails sur les en-têtes (TTL, options, checksums).",
     syntax: "tcpdump -v|-vv|-vvv [filtre]",
     examples: [
-      { cmd: "sudo tcpdump -vv -i eth0 icmp", desc: "Détails complets sur les paquets ICMP" }
+      { cmd: "sudo tcpdump -vv -i eth0 icmp", desc: "Détails complets sur les paquets ICMP" },
+      { cmd: "sudo tcpdump -vvv -i eth0 port 53", desc: "Verbosité maximale sur le trafic DNS uniquement" }
     ],
     flags: ["-v", "-vv", "-vvv (de plus en plus verbeux)"]
   },
@@ -2080,7 +2091,8 @@ const EXTRA_COMMANDS = [
     description: "Filtre uniquement le trafic IPv6, à séparer explicitement de l'IPv4 sur un réseau double pile.",
     syntax: "tcpdump ip6 [filtre]",
     examples: [
-      { cmd: "sudo tcpdump ip6 and tcp port 443", desc: "HTTPS uniquement en IPv6" }
+      { cmd: "sudo tcpdump ip6 and tcp port 443", desc: "HTTPS uniquement en IPv6" },
+      { cmd: "sudo tcpdump ip6 and icmp6", desc: "Ne garde que l'ICMPv6 (ping, découverte de voisins) en IPv6" }
     ],
     flags: ["ip6", "ip (IPv4 explicite)"]
   },
@@ -2091,7 +2103,8 @@ const EXTRA_COMMANDS = [
     description: "Abandonne les privilèges root vers un utilisateur normal une fois la capture démarrée — bonne pratique de sécurité.",
     syntax: "tcpdump -Z <utilisateur>",
     examples: [
-      { cmd: "sudo tcpdump -i eth0 -Z nobody -w capture.pcap", desc: "Capture avec droits root puis bascule vers 'nobody'" }
+      { cmd: "sudo tcpdump -i eth0 -Z nobody -w capture.pcap", desc: "Capture avec droits root puis bascule vers 'nobody'" },
+      { cmd: "sudo tcpdump -i eth0 -Z tcpdump -w capture.pcap", desc: "Bascule vers l'utilisateur système dédié 'tcpdump' plutôt que 'nobody'" }
     ],
     flags: ["-Z <utilisateur>"]
   },
@@ -2102,7 +2115,8 @@ const EXTRA_COMMANDS = [
     description: "Ignore la vérification des checksums — nécessaire avec certaines cartes réseau qui déchargent ce calcul au matériel (checksum offloading).",
     syntax: "tcpdump -K [filtre]",
     examples: [
-      { cmd: "sudo tcpdump -K -i eth0 tcp", desc: "Évite les faux 'bad checksum' liés à l'offloading" }
+      { cmd: "sudo tcpdump -K -i eth0 tcp", desc: "Évite les faux 'bad checksum' liés à l'offloading" },
+      { cmd: "sudo tcpdump -K -nn -i eth0", desc: "Combine avec -nn pour un affichage brut sans vérification de checksum" }
     ],
     flags: ["-K (ignore les checksums)"]
   },
@@ -2113,7 +2127,8 @@ const EXTRA_COMMANDS = [
     description: "Affiche le contenu du paquet en hexadécimal, sans la partie ASCII (contrairement à -X qui montre les deux).",
     syntax: "tcpdump -x [filtre]",
     examples: [
-      { cmd: "sudo tcpdump -x -i eth0 port 53", desc: "Contenu brut des requêtes DNS en hexa" }
+      { cmd: "sudo tcpdump -x -i eth0 port 53", desc: "Contenu brut des requêtes DNS en hexa" },
+      { cmd: "sudo tcpdump -x -c 3 -i eth0 icmp", desc: "Limite le dump hexadécimal aux 3 premiers paquets ICMP" }
     ],
     flags: ["-x (hexa)", "-X (hexa + ASCII)"]
   },
@@ -2124,7 +2139,8 @@ const EXTRA_COMMANDS = [
     description: "Filtre par adresse MAC plutôt que par IP — utile quand une machine change d'IP mais garde la même carte réseau.",
     syntax: "tcpdump ether host <mac>",
     examples: [
-      { cmd: "sudo tcpdump ether host aa:bb:cc:dd:ee:ff", desc: "Tout le trafic impliquant cette adresse MAC" }
+      { cmd: "sudo tcpdump ether host aa:bb:cc:dd:ee:ff", desc: "Tout le trafic impliquant cette adresse MAC" },
+      { cmd: "sudo tcpdump ether src aa:bb:cc:dd:ee:ff", desc: "Ne garde que le trafic émis par cette MAC, pas reçu" }
     ],
     flags: ["ether host", "ether src / ether dst"]
   },
@@ -2135,7 +2151,8 @@ const EXTRA_COMMANDS = [
     description: "Filtre BPF avancé : accède directement à un octet précis de l'en-tête pour des conditions très spécifiques.",
     syntax: "tcpdump 'tcp[<offset>] <op> <valeur>'",
     examples: [
-      { cmd: "sudo tcpdump 'tcp[13] & 4 != 0'", desc: "Paquets avec le flag RST positionné" }
+      { cmd: "sudo tcpdump 'tcp[13] & 4 != 0'", desc: "Paquets avec le flag RST positionné" },
+      { cmd: "sudo tcpdump 'tcp[13] & 2 != 0'", desc: "Repère les paquets SYN (établissement de connexion) via le même type de filtre" }
     ],
     flags: ["tcp[13] (octet des flags)"]
   },
@@ -2146,7 +2163,8 @@ const EXTRA_COMMANDS = [
     description: "Force un type de lien précis pour la capture — utile sur des interfaces spéciales (tunnels, bridges).",
     syntax: "tcpdump -y <type>",
     examples: [
-      { cmd: "sudo tcpdump -y LINUX_SLL -i any", desc: "Type de lien 'cooked' pour capturer sur toutes les interfaces" }
+      { cmd: "sudo tcpdump -y LINUX_SLL -i any", desc: "Type de lien 'cooked' pour capturer sur toutes les interfaces" },
+      { cmd: "tcpdump -D", desc: "Utile pour lister d'abord les types de lien disponibles avant de forcer -y" }
     ],
     flags: ["-y <type de lien>"]
   },
@@ -2157,7 +2175,8 @@ const EXTRA_COMMANDS = [
     description: "Écrit chaque paquet immédiatement dans le fichier de sortie, sans mise en buffer — utile pour suivre une capture en direct depuis un autre outil.",
     syntax: "tcpdump -U -w <fichier>",
     examples: [
-      { cmd: "sudo tcpdump -U -i eth0 -w - | tee capture.pcap", desc: "Écriture immédiate, exploitable en direct" }
+      { cmd: "sudo tcpdump -U -i eth0 -w - | tee capture.pcap", desc: "Écriture immédiate, exploitable en direct" },
+      { cmd: "sudo tcpdump -i eth0 -U -w - | ssh serveur 'cat > capture.pcap'", desc: "Envoie la capture non-bufferisée directement vers un serveur distant" }
     ],
     flags: ["-U (non-bufferisé)"]
   },
@@ -2168,7 +2187,8 @@ const EXTRA_COMMANDS = [
     description: "Affiche un horodatage complet et lisible (date + heure) pour chaque paquet, au lieu du format relatif par défaut.",
     syntax: "tcpdump -tttt [filtre]",
     examples: [
-      { cmd: "sudo tcpdump -tttt -i eth0", desc: "Horodatage complet, pratique pour croiser avec d'autres logs" }
+      { cmd: "sudo tcpdump -tttt -i eth0", desc: "Horodatage complet, pratique pour croiser avec d'autres logs" },
+      { cmd: "sudo tcpdump -tttt -i eth0 -w horodate.pcap", desc: "Combine l'horodatage lisible avec un enregistrement dans un fichier" }
     ],
     flags: ["-t (aucun horodatage)", "-tttt (complet)"]
   },
@@ -2179,7 +2199,8 @@ const EXTRA_COMMANDS = [
     description: "Filtre le trafic appartenant à un VLAN 802.1Q précis, utile sur un lien trunk qui transporte plusieurs VLANs.",
     syntax: "tcpdump vlan <id>",
     examples: [
-      { cmd: "sudo tcpdump vlan 10", desc: "Uniquement le trafic étiqueté VLAN 10" }
+      { cmd: "sudo tcpdump vlan 10", desc: "Uniquement le trafic étiqueté VLAN 10" },
+      { cmd: "sudo tcpdump vlan 10 and vlan 20", desc: "Filtre le trafic appartenant soit au VLAN 10 soit au VLAN 20" }
     ],
     flags: ["vlan <id>"]
   },
@@ -2190,7 +2211,8 @@ const EXTRA_COMMANDS = [
     description: "Capture sur toutes les interfaces réseau en même temps, plutôt que d'en choisir une seule.",
     syntax: "tcpdump -i any [filtre]",
     examples: [
-      { cmd: "sudo tcpdump -i any port 443", desc: "Trafic HTTPS peu importe l'interface" }
+      { cmd: "sudo tcpdump -i any port 443", desc: "Trafic HTTPS peu importe l'interface" },
+      { cmd: "sudo tcpdump -i any -nn icmp", desc: "Ping sur toutes les interfaces, en affichage brut sans résolution" }
     ],
     flags: ["-i any", "-i <nom> (interface précise)"]
   },
@@ -2213,7 +2235,8 @@ const EXTRA_COMMANDS = [
     description: "Envoie la capture en direct vers Wireshark via un tube SSH, pour analyser graphiquement le trafic d'une machine distante.",
     syntax: "ssh <hôte> 'tcpdump -w -' | wireshark -k -i -",
     examples: [
-      { cmd: "ssh serveur 'sudo tcpdump -i eth0 -w -' | wireshark -k -i -", desc: "Capture distante affichée en direct localement" }
+      { cmd: "ssh serveur 'sudo tcpdump -i eth0 -w -' | wireshark -k -i -", desc: "Capture distante affichée en direct localement" },
+      { cmd: "ssh serveur 'sudo tcpdump -i eth0 -w - port 443' | wireshark -k -i -", desc: "Limite le flux distant au trafic HTTPS avant de l'envoyer à Wireshark" }
     ],
     flags: ["-w - (écrit sur stdout)"]
   },
@@ -2224,7 +2247,8 @@ const EXTRA_COMMANDS = [
     description: "Filtre spécifiquement le trafic ICMPv6 (ping IPv6, découverte de voisins, annonces de routeur).",
     syntax: "tcpdump icmp6",
     examples: [
-      { cmd: "sudo tcpdump icmp6", desc: "Ping IPv6 et messages de découverte de voisinage" }
+      { cmd: "sudo tcpdump icmp6", desc: "Ping IPv6 et messages de découverte de voisinage" },
+      { cmd: "sudo tcpdump icmp6 and ip6[40] == 128", desc: "Filtre précisément les Echo Request ICMPv6 (ping) via leur type brut" }
     ],
     flags: ["icmp6"]
   },

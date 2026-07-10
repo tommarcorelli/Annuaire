@@ -15,6 +15,7 @@ const CORE_ASSETS = [
   './terminal.html',
   './cheatsheet.html',
   './scenarios.html',
+  './installation.html',
   './offline.html',
   './css/style.css',
   './css/commands.css',

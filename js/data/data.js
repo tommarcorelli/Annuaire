@@ -5394,7 +5394,8 @@ const COMMANDS = [
     description: "Vérifie la syntaxe et la cohérence interne de la configuration sans contacter de provider.",
     syntax: "terraform validate",
     examples: [
-      { cmd: "terraform validate", desc: "Valide la configuration localement" }
+      { cmd: "terraform validate", desc: "Valide la configuration localement" },
+      { cmd: "terraform validate -json | jq .valid", desc: "Récupère juste true/false pour un script CI" }
     ],
     flags: []
   },
@@ -5429,7 +5430,8 @@ const COMMANDS = [
     description: "Importe une ressource existante (créée manuellement) dans le state Terraform pour la gérer désormais via code.",
     syntax: "terraform import <adresse> <id>",
     examples: [
-      { cmd: "terraform import aws_instance.web i-0abc123def", desc: "Importe une instance EC2 existante" }
+      { cmd: "terraform import aws_instance.web i-0abc123def", desc: "Importe une instance EC2 existante" },
+      { cmd: "terraform import 'aws_instance.web[0]' i-0abc123def", desc: "Importe un élément précis d'une ressource en for_each/count" }
     ],
     flags: []
   },
@@ -5465,7 +5467,8 @@ const COMMANDS = [
     description: "Marque une ressource pour qu'elle soit détruite et recréée au prochain apply.",
     syntax: "terraform taint <adresse>",
     examples: [
-      { cmd: "terraform taint aws_instance.web", desc: "Force la recréation de l'instance au prochain apply" }
+      { cmd: "terraform taint aws_instance.web", desc: "Force la recréation de l'instance au prochain apply" },
+      { cmd: "terraform apply", desc: "Après un taint, le prochain apply recrée bien la ressource marquée" }
     ],
     flags: ["taint", "untaint"]
   },
@@ -5500,7 +5503,8 @@ const COMMANDS = [
     description: "Génère un graphe de dépendances entre les ressources, exportable en image via Graphviz.",
     syntax: "terraform graph | dot -Tpng > graph.png",
     examples: [
-      { cmd: "terraform graph | dot -Tpng > graph.png", desc: "Génère une image du graphe de dépendances" }
+      { cmd: "terraform graph | dot -Tpng > graph.png", desc: "Génère une image du graphe de dépendances" },
+      { cmd: "terraform graph -type=plan | dot -Tsvg > plan.svg", desc: "Graphe du plan plutôt que de la config complète" }
     ],
     flags: []
   },
@@ -5547,7 +5551,8 @@ const COMMANDS = [
     description: "Libère un verrou (lock) bloqué sur le state distant, après un plantage ou une interruption.",
     syntax: "terraform force-unlock <lock_id>",
     examples: [
-      { cmd: "terraform force-unlock 1a2b3c4d", desc: "Déverrouille le state après un crash de session" }
+      { cmd: "terraform force-unlock 1a2b3c4d", desc: "Déverrouille le state après un crash de session" },
+      { cmd: "terraform force-unlock -force 1a2b3c4d", desc: "Force le déverrouillage sans confirmation interactive" }
     ],
     flags: []
   },
@@ -5582,7 +5587,8 @@ const COMMANDS = [
     description: "Exporte toutes les sorties au format JSON, pratique pour les passer à un autre script ou pipeline CI.",
     syntax: "terraform output -json",
     examples: [
-      { cmd: "terraform output -json > outputs.json", desc: "Sauvegarde toutes les sorties en JSON" }
+      { cmd: "terraform output -json > outputs.json", desc: "Sauvegarde toutes les sorties en JSON" },
+      { cmd: "terraform output -json instance_ip", desc: "Exporte une seule sortie en JSON, pas toutes" }
     ],
     flags: ["-json"]
   },
@@ -5593,7 +5599,8 @@ const COMMANDS = [
     description: "Simule une destruction complète sans rien supprimer, pour vérifier l'impact avant un vrai destroy.",
     syntax: "terraform plan -destroy",
     examples: [
-      { cmd: "terraform plan -destroy", desc: "Affiche ce qui serait détruit, sans confirmation" }
+      { cmd: "terraform plan -destroy", desc: "Affiche ce qui serait détruit, sans confirmation" },
+      { cmd: "terraform plan -destroy -out=destroy.tfplan", desc: "Sauvegarde le plan de destruction pour l'appliquer ensuite tel quel" }
     ],
     flags: ["-destroy"]
   },
@@ -5616,7 +5623,8 @@ const COMMANDS = [
     description: "Remplace la référence d'un provider dans le state, utile lors d'un changement de source de provider.",
     syntax: "terraform state replace-provider <ancien> <nouveau>",
     examples: [
-      { cmd: "terraform state replace-provider hashicorp/aws registry.example.com/aws", desc: "Migre vers un provider depuis un registry privé" }
+      { cmd: "terraform state replace-provider hashicorp/aws registry.example.com/aws", desc: "Migre vers un provider depuis un registry privé" },
+      { cmd: "terraform state replace-provider -auto-approve hashicorp/aws registry.example.com/aws", desc: "Sans confirmation manuelle, pour un script" }
     ],
     flags: []
   },
@@ -5639,7 +5647,8 @@ const COMMANDS = [
     description: "Affiche la version de Terraform installée et celle des providers utilisés.",
     syntax: "terraform version",
     examples: [
-      { cmd: "terraform version", desc: "Affiche la version du binaire et des providers du projet" }
+      { cmd: "terraform version", desc: "Affiche la version du binaire et des providers du projet" },
+      { cmd: "terraform version -json", desc: "Sortie JSON, pratique pour vérifier une version minimale en CI" }
     ],
     flags: []
   },
@@ -5650,7 +5659,8 @@ const COMMANDS = [
     description: "Affiche une sortie unique sans guillemets ni formatage, pratique pour l'utiliser directement dans un script shell.",
     syntax: "terraform output -raw <nom>",
     examples: [
-      { cmd: "IP=$(terraform output -raw instance_ip)", desc: "Récupère une sortie directement dans une variable bash" }
+      { cmd: "IP=$(terraform output -raw instance_ip)", desc: "Récupère une sortie directement dans une variable bash" },
+      { cmd: "terraform output -raw db_password | pbcopy", desc: "Copie directement une sortie sensible dans le presse-papier" }
     ],
     flags: ["-raw"]
   },
@@ -5661,7 +5671,8 @@ const COMMANDS = [
     description: "Limite le plan à une ressource précise, pour itérer rapidement sans recalculer tout le graphe.",
     syntax: "terraform plan -target=<adresse>",
     examples: [
-      { cmd: "terraform plan -target=aws_instance.web", desc: "Planifie uniquement cette ressource" }
+      { cmd: "terraform plan -target=aws_instance.web", desc: "Planifie uniquement cette ressource" },
+      { cmd: "terraform apply -target=aws_instance.web", desc: "Le même ciblage fonctionne aussi avec apply" }
     ],
     flags: ["-target"]
   },
@@ -5672,7 +5683,8 @@ const COMMANDS = [
     description: "Depuis Terraform 1.5+, importe des ressources via un bloc déclaratif au lieu de la commande CLI.",
     syntax: "import { to = <adresse> id = \"<id>\" }",
     examples: [
-      { cmd: "import { to = aws_instance.web id = \"i-0abc123def\" }", desc: "Déclare un import dans le code, exécuté au prochain apply" }
+      { cmd: "import { to = aws_instance.web id = \"i-0abc123def\" }", desc: "Déclare un import dans le code, exécuté au prochain apply" },
+      { cmd: "terraform plan -generate-config-out=generated.tf", desc: "Génère automatiquement le code Terraform correspondant à la ressource importée" }
     ],
     flags: []
   },
@@ -5683,7 +5695,8 @@ const COMMANDS = [
     description: "Vérifie que les fichiers sont déjà bien formatés sans les modifier, utile en pipeline CI.",
     syntax: "terraform fmt -check -recursive",
     examples: [
-      { cmd: "terraform fmt -check -recursive", desc: "Échoue si un fichier n'est pas formaté correctement (CI)" }
+      { cmd: "terraform fmt -check -recursive", desc: "Échoue si un fichier n'est pas formaté correctement (CI)" },
+      { cmd: "terraform fmt -recursive", desc: "Sans -check : reformate réellement les fichiers au lieu de juste vérifier" }
     ],
     flags: ["-check", "-recursive"]
   },
@@ -5694,7 +5707,8 @@ const COMMANDS = [
     description: "Désactive temporairement le verrouillage du state, à utiliser avec prudence en cas de blocage.",
     syntax: "terraform plan -lock=false",
     examples: [
-      { cmd: "terraform plan -lock=false", desc: "Planifie sans poser de lock sur le state distant" }
+      { cmd: "terraform plan -lock=false", desc: "Planifie sans poser de lock sur le state distant" },
+      { cmd: "terraform apply -lock=false", desc: "Le même besoin peut se poser aussi lors d'un apply" }
     ],
     flags: ["-lock=false"]
   },
@@ -5705,7 +5719,8 @@ const COMMANDS = [
     description: "Référence rapide pour marquer une sortie comme sensible afin qu'elle soit masquée dans les logs CLI.",
     syntax: "output \"<nom>\" { value = <expr> sensitive = true }",
     examples: [
-      { cmd: "output \"db_password\" { value = random_password.db.result sensitive = true }", desc: "La valeur sera masquée par défaut dans les logs" }
+      { cmd: "output \"db_password\" { value = random_password.db.result sensitive = true }", desc: "La valeur sera masquée par défaut dans les logs" },
+      { cmd: "terraform output db_password", desc: "Affiche quand même la valeur si explicitement demandée par son nom" }
     ],
     flags: ["sensitive = true"]
   },
@@ -5716,7 +5731,8 @@ const COMMANDS = [
     description: "Définit le nombre maximum d'opérations simultanées lors d'un apply (par défaut 10).",
     syntax: "terraform apply -parallelism=<n>",
     examples: [
-      { cmd: "terraform apply -parallelism=20", desc: "Accélère l'apply sur de gros projets avec beaucoup de ressources" }
+      { cmd: "terraform apply -parallelism=20", desc: "Accélère l'apply sur de gros projets avec beaucoup de ressources" },
+      { cmd: "terraform apply -parallelism=1", desc: "Réduit à 1 pour déboguer un ordre d'application suspect" }
     ],
     flags: ["-parallelism"]
   },
@@ -5727,7 +5743,8 @@ const COMMANDS = [
     description: "Affiche le nom du workspace actuellement sélectionné.",
     syntax: "terraform workspace show",
     examples: [
-      { cmd: "terraform workspace show", desc: "Affiche l'environnement actif (dev, staging, prod...)" }
+      { cmd: "terraform workspace show", desc: "Affiche l'environnement actif (dev, staging, prod...)" },
+      { cmd: "terraform workspace list", desc: "Liste tous les workspaces existants, pas juste l'actif" }
     ],
     flags: []
   },
@@ -5738,7 +5755,8 @@ const COMMANDS = [
     description: "Télécharge ou met à jour les modules référencés dans la configuration sans réinitialiser tout le projet.",
     syntax: "terraform get [-update]",
     examples: [
-      { cmd: "terraform get -update", desc: "Met à jour les modules vers leur dernière version compatible" }
+      { cmd: "terraform get -update", desc: "Met à jour les modules vers leur dernière version compatible" },
+      { cmd: "terraform get -update -json", desc: "Sortie JSON pour vérifier par script si un module a changé" }
     ],
     flags: ["-update"]
   },
@@ -5749,7 +5767,8 @@ const COMMANDS = [
     description: "Affiche les avertissements de manière condensée pour ne pas saturer la sortie console.",
     syntax: "terraform plan -compact-warnings",
     examples: [
-      { cmd: "terraform plan -compact-warnings", desc: "Évite l'affichage complet de chaque warning" }
+      { cmd: "terraform plan -compact-warnings", desc: "Évite l'affichage complet de chaque warning" },
+      { cmd: "TF_COMPACT_WARNINGS=true terraform plan", desc: "Même effet via une variable d'environnement, pratique en CI" }
     ],
     flags: ["-compact-warnings"]
   },
@@ -5760,7 +5779,8 @@ const COMMANDS = [
     description: "Assistants de migration automatique entre versions majeures de Terraform.",
     syntax: "terraform 1.5upgrade",
     examples: [
-      { cmd: "terraform 1.5upgrade", desc: "Aide à migrer la syntaxe vers une version récente" }
+      { cmd: "terraform 1.5upgrade", desc: "Aide à migrer la syntaxe vers une version récente" },
+      { cmd: "terraform 0.13upgrade", desc: "Migration spécifique depuis les versions antérieures à 0.13" }
     ],
     flags: []
   },
@@ -5783,7 +5803,8 @@ const COMMANDS = [
     description: "Affiche en détail l'état actuel d'une ressource précise dans le state.",
     syntax: "terraform state show <adresse>",
     examples: [
-      { cmd: "terraform state show aws_instance.web", desc: "Affiche tous les attributs actuels de la ressource" }
+      { cmd: "terraform state show aws_instance.web", desc: "Affiche tous les attributs actuels de la ressource" },
+      { cmd: "terraform state show 'aws_instance.web[0]'", desc: "Fonctionne aussi sur un élément précis d'une ressource multiple" }
     ],
     flags: []
   },
@@ -5794,7 +5815,8 @@ const COMMANDS = [
     description: "Valide la configuration et exporte le résultat en JSON, utile pour parsing automatisé en CI.",
     syntax: "terraform validate -json",
     examples: [
-      { cmd: "terraform validate -json | jq .valid", desc: "Vérifie si la configuration est valide via un pipeline" }
+      { cmd: "terraform validate -json | jq .valid", desc: "Vérifie si la configuration est valide via un pipeline" },
+      { cmd: "terraform validate -json | jq '.diagnostics'", desc: "N'extrait que le détail des erreurs, pas tout le JSON" }
     ],
     flags: ["-json"]
   },
@@ -5805,7 +5827,8 @@ const COMMANDS = [
     description: "Retire la marque de destruction posée par taint, annulant la recréation prévue au prochain apply.",
     syntax: "terraform untaint <adresse>",
     examples: [
-      { cmd: "terraform untaint aws_instance.web", desc: "Annule la recréation prévue pour cette ressource" }
+      { cmd: "terraform untaint aws_instance.web", desc: "Annule la recréation prévue pour cette ressource" },
+      { cmd: "terraform untaint -allow-missing aws_instance.web", desc: "N'échoue pas si la ressource n'existe plus dans le state" }
     ],
     flags: []
   },
@@ -5816,7 +5839,8 @@ const COMMANDS = [
     description: "Applique automatiquement sans confirmation interactive, indispensable en pipeline CI/CD non interactif.",
     syntax: "terraform apply -auto-approve",
     examples: [
-      { cmd: "terraform apply -auto-approve", desc: "Pour pipelines automatisés uniquement, jamais en manuel sur prod sans plan préalable" }
+      { cmd: "terraform apply -auto-approve", desc: "Pour pipelines automatisés uniquement, jamais en manuel sur prod sans plan préalable" },
+      { cmd: "terraform apply -auto-approve -input=false", desc: "Désactive aussi toute question interactive, pas seulement la confirmation" }
     ],
     flags: ["-auto-approve"]
   },
@@ -5827,7 +5851,8 @@ const COMMANDS = [
     description: "Lit les sorties depuis un fichier state précis au lieu du state par défaut du backend.",
     syntax: "terraform output -state=<fichier.tfstate>",
     examples: [
-      { cmd: "terraform output -state=backup.tfstate", desc: "Affiche les sorties d'un state sauvegardé" }
+      { cmd: "terraform output -state=backup.tfstate", desc: "Affiche les sorties d'un state sauvegardé" },
+      { cmd: "terraform output -state=backup.tfstate -json", desc: "Combine avec -json pour un traitement automatisé" }
     ],
     flags: ["-state"]
   },
@@ -5888,7 +5913,8 @@ const COMMANDS = [
     description: "Détruit complètement la machine virtuelle et libère les ressources associées.",
     syntax: "vagrant destroy [-f]",
     examples: [
-      { cmd: "vagrant destroy -f", desc: "Détruit sans demander de confirmation" }
+      { cmd: "vagrant destroy -f", desc: "Détruit sans demander de confirmation" },
+      { cmd: "vagrant destroy web01", desc: "Détruit uniquement la machine 'web01' dans un environnement multi-machine" }
     ],
     flags: ["-f (forcer sans confirmation)"]
   },
@@ -5911,7 +5937,8 @@ const COMMANDS = [
     description: "Relance les scripts de provisioning (shell, Ansible...) sans redémarrer la machine.",
     syntax: "vagrant provision",
     examples: [
-      { cmd: "vagrant provision", desc: "Relance le provisioning sur une machine déjà démarrée" }
+      { cmd: "vagrant provision", desc: "Relance le provisioning sur une machine déjà démarrée" },
+      { cmd: "vagrant reload --provision", desc: "Redémarre la VM puis relance le provisioning en une seule commande" }
     ],
     flags: ["--provision-with <nom>"]
   },
@@ -5922,7 +5949,8 @@ const COMMANDS = [
     description: "Affiche l'état actuel des machines virtuelles définies dans le Vagrantfile.",
     syntax: "vagrant status",
     examples: [
-      { cmd: "vagrant status", desc: "Affiche running/poweroff/not created pour chaque machine" }
+      { cmd: "vagrant status", desc: "Affiche running/poweroff/not created pour chaque machine" },
+      { cmd: "vagrant global-status", desc: "Liste l'état de toutes les VMs Vagrant de la machine, tous projets confondus" }
     ],
     flags: []
   },
@@ -5995,7 +6023,8 @@ const COMMANDS = [
     description: "Empaquette une machine virtuelle en cours en une nouvelle box réutilisable.",
     syntax: "vagrant package --output <fichier.box>",
     examples: [
-      { cmd: "vagrant package --output ma-box.box", desc: "Crée une box personnalisée à partir de la VM actuelle" }
+      { cmd: "vagrant package --output ma-box.box", desc: "Crée une box personnalisée à partir de la VM actuelle" },
+      { cmd: "vagrant package --output ma-box.box --vagrantfile Vagrantfile", desc: "Inclut un Vagrantfile personnalisé dans la box générée" }
     ],
     flags: ["--output", "--base (depuis une VM provider native)"]
   },
@@ -6042,7 +6071,8 @@ const COMMANDS = [
     description: "Vérifie la syntaxe du Vagrantfile sans démarrer de machine.",
     syntax: "vagrant validate",
     examples: [
-      { cmd: "vagrant validate", desc: "Valide le Vagrantfile avant de lancer vagrant up" }
+      { cmd: "vagrant validate", desc: "Valide le Vagrantfile avant de lancer vagrant up" },
+      { cmd: "vagrant validate --ignore-provider", desc: "Valide la syntaxe sans vérifier la compatibilité du provider" }
     ],
     flags: []
   },
@@ -6065,7 +6095,8 @@ const COMMANDS = [
     description: "Affiche les ports redirigés entre l'hôte et la machine virtuelle.",
     syntax: "vagrant port [nom_machine]",
     examples: [
-      { cmd: "vagrant port", desc: "Liste les correspondances de ports hôte/VM" }
+      { cmd: "vagrant port", desc: "Liste les correspondances de ports hôte/VM" },
+      { cmd: "vagrant port --guest 80", desc: "N'affiche que la redirection correspondant au port 80 côté VM" }
     ],
     flags: []
   },
@@ -6076,7 +6107,8 @@ const COMMANDS = [
     description: "Ouvre une session PowerShell distante vers une VM Windows gérée par Vagrant.",
     syntax: "vagrant powershell [nom_machine]",
     examples: [
-      { cmd: "vagrant powershell", desc: "Connexion PowerShell distante vers la VM Windows" }
+      { cmd: "vagrant powershell", desc: "Connexion PowerShell distante vers la VM Windows" },
+      { cmd: "vagrant powershell -c \"Get-Service\"", desc: "Exécute une commande PowerShell unique sans session interactive" }
     ],
     flags: []
   },
@@ -6087,7 +6119,8 @@ const COMMANDS = [
     description: "Démarre la machine sans exécuter les scripts de provisioning (plus rapide pour un simple redémarrage).",
     syntax: "vagrant up --no-provision",
     examples: [
-      { cmd: "vagrant up --no-provision", desc: "Démarre rapidement sans relancer Ansible/shell/etc." }
+      { cmd: "vagrant up --no-provision", desc: "Démarre rapidement sans relancer Ansible/shell/etc." },
+      { cmd: "vagrant reload --no-provision", desc: "Même logique après un redémarrage plutôt qu'un premier démarrage" }
     ],
     flags: ["--no-provision"]
   },
@@ -6098,7 +6131,8 @@ const COMMANDS = [
     description: "Détruit toutes les machines d'un Vagrantfile multi-machine en une seule commande.",
     syntax: "vagrant destroy -f",
     examples: [
-      { cmd: "vagrant destroy -f", desc: "Détruit toutes les VMs définies, sans confirmation" }
+      { cmd: "vagrant destroy -f", desc: "Détruit toutes les VMs définies, sans confirmation" },
+      { cmd: "vagrant destroy web01 db01 -f", desc: "Ne détruit que les machines nommées, pas tout l'environnement" }
     ],
     flags: ["-f"]
   },
@@ -6109,7 +6143,8 @@ const COMMANDS = [
     description: "Vérifie si la box utilisée par le projet dispose d'une version plus récente.",
     syntax: "vagrant box outdated",
     examples: [
-      { cmd: "vagrant box outdated", desc: "Indique si une mise à jour de la box est disponible" }
+      { cmd: "vagrant box outdated", desc: "Indique si une mise à jour de la box est disponible" },
+      { cmd: "vagrant box outdated --global", desc: "Vérifie toutes les box installées, pas seulement celle du projet courant" }
     ],
     flags: ["--global (vérifie toutes les box installées)"]
   },
@@ -6120,7 +6155,8 @@ const COMMANDS = [
     description: "Régénère le fichier .box d'une box déjà installée localement, sans VM active.",
     syntax: "vagrant box repackage <nom> <provider> <version>",
     examples: [
-      { cmd: "vagrant box repackage debian/bookworm64 virtualbox 1.0.0", desc: "Reconstruit le fichier .box localement" }
+      { cmd: "vagrant box repackage debian/bookworm64 virtualbox 1.0.0", desc: "Reconstruit le fichier .box localement" },
+      { cmd: "vagrant box repackage debian/bookworm64 vmware_desktop 1.0.0", desc: "Même chose pour le provider VMware" }
     ],
     flags: []
   },
@@ -6131,7 +6167,8 @@ const COMMANDS = [
     description: "Démarre uniquement une machine précise d'un Vagrantfile qui en définit plusieurs.",
     syntax: "vagrant up <nom_machine>",
     examples: [
-      { cmd: "vagrant up web01", desc: "Démarre uniquement la machine web01, pas les autres" }
+      { cmd: "vagrant up web01", desc: "Démarre uniquement la machine web01, pas les autres" },
+      { cmd: "vagrant ssh web01", desc: "Se connecte ensuite uniquement à cette machine précise" }
     ],
     flags: []
   },
@@ -6142,7 +6179,8 @@ const COMMANDS = [
     description: "Relance le provisioning avec une sortie de debug très détaillée pour diagnostiquer un échec.",
     syntax: "vagrant provision --debug",
     examples: [
-      { cmd: "vagrant provision --debug 2>&1 | tee debug.log", desc: "Capture tout le détail dans un fichier log" }
+      { cmd: "vagrant provision --debug 2>&1 | tee debug.log", desc: "Capture tout le détail dans un fichier log" },
+      { cmd: "vagrant up --debug", desc: "Le flag --debug fonctionne aussi dès le tout premier démarrage" }
     ],
     flags: ["--debug"]
   },
@@ -6153,7 +6191,8 @@ const COMMANDS = [
     description: "Détruit automatiquement la VM si le démarrage ou le provisioning échoue, pour éviter un état incohérent.",
     syntax: "vagrant up --destroy-on-error",
     examples: [
-      { cmd: "vagrant up --destroy-on-error", desc: "Nettoie automatiquement en cas d'échec" }
+      { cmd: "vagrant up --destroy-on-error", desc: "Nettoie automatiquement en cas d'échec" },
+      { cmd: "vagrant up --no-destroy-on-error", desc: "Désactive ce comportement pour inspecter la VM après un échec" }
     ],
     flags: ["--destroy-on-error"]
   },
@@ -6176,7 +6215,8 @@ const COMMANDS = [
     description: "Exécute une commande unique sur la VM via SSH sans ouvrir de session interactive.",
     syntax: "vagrant ssh -c '<commande>'",
     examples: [
-      { cmd: "vagrant ssh -c 'sudo systemctl status nginx'", desc: "Exécute une commande à distance et affiche le résultat" }
+      { cmd: "vagrant ssh -c 'sudo systemctl status nginx'", desc: "Exécute une commande à distance et affiche le résultat" },
+      { cmd: "vagrant ssh -c 'sudo journalctl -u nginx --since \"10 min ago\"'", desc: "Récupère un extrait de log précis sans ouvrir de session" }
     ],
     flags: ["-c"]
   },
@@ -6187,7 +6227,8 @@ const COMMANDS = [
     description: "Démarre les machines d'un environnement multi-machine en parallèle plutôt que séquentiellement.",
     syntax: "vagrant up --parallel",
     examples: [
-      { cmd: "vagrant up --parallel", desc: "Accélère le démarrage de plusieurs VMs simultanément" }
+      { cmd: "vagrant up --parallel", desc: "Accélère le démarrage de plusieurs VMs simultanément" },
+      { cmd: "vagrant up --parallel --provider virtualbox", desc: "Combine le parallélisme avec un provider précis" }
     ],
     flags: ["--parallel"]
   },
@@ -6198,7 +6239,8 @@ const COMMANDS = [
     description: "Active des logs de debug détaillés pour Vagrant via une variable d'environnement.",
     syntax: "VAGRANT_LOG=debug vagrant up",
     examples: [
-      { cmd: "VAGRANT_LOG=debug vagrant up", desc: "Affiche tous les détails internes de l'exécution" }
+      { cmd: "VAGRANT_LOG=debug vagrant up", desc: "Affiche tous les détails internes de l'exécution" },
+      { cmd: "VAGRANT_LOG=info vagrant up", desc: "Niveau 'info' moins verbeux que 'debug', suffisant pour la plupart des diagnostics" }
     ],
     flags: ["debug", "info", "warn"]
   },
@@ -6233,7 +6275,8 @@ const COMMANDS = [
     description: "Référence rapide pour spécifier des ressources différentes selon le provider utilisé.",
     syntax: "config.vm.provider \"virtualbox\" do |vb| vb.memory = \"2048\" end",
     examples: [
-      { cmd: "config.vm.provider \"virtualbox\" do |vb| vb.memory = \"2048\"; vb.cpus = 2 end", desc: "Configure RAM et CPU pour VirtualBox" }
+      { cmd: "config.vm.provider \"virtualbox\" do |vb| vb.memory = \"2048\"; vb.cpus = 2 end", desc: "Configure RAM et CPU pour VirtualBox" },
+      { cmd: "config.vm.provider \"vmware_desktop\" do |v| v.vmx[\"memsize\"] = \"4096\" end", desc: "Même logique adaptée au provider VMware Workstation" }
     ],
     flags: []
   },
@@ -6244,7 +6287,8 @@ const COMMANDS = [
     description: "Affiche des informations détaillées sur les box installées (provider, taille, date).",
     syntax: "vagrant box list --box-info",
     examples: [
-      { cmd: "vagrant box list --box-info", desc: "Détails complets sur chaque box locale" }
+      { cmd: "vagrant box list --box-info", desc: "Détails complets sur chaque box locale" },
+      { cmd: "vagrant box list", desc: "Sans --box-info : juste les noms et versions, plus rapide à lire" }
     ],
     flags: ["--box-info"]
   },
@@ -6255,7 +6299,8 @@ const COMMANDS = [
     description: "Génère la config SSH pour une machine précise d'un environnement multi-machine.",
     syntax: "vagrant ssh-config --host <nom_machine>",
     examples: [
-      { cmd: "vagrant ssh-config --host web01 >> ~/.ssh/config", desc: "Ajoute uniquement la config SSH de web01" }
+      { cmd: "vagrant ssh-config --host web01 >> ~/.ssh/config", desc: "Ajoute uniquement la config SSH de web01" },
+      { cmd: "vagrant ssh-config", desc: "Sans --host : génère la config SSH de toutes les machines du projet" }
     ],
     flags: ["--host"]
   },
@@ -6266,7 +6311,8 @@ const COMMANDS = [
     description: "Exécute uniquement un provisioner précis parmi plusieurs déclarés (shell, ansible, etc.).",
     syntax: "vagrant provision --provision-with <nom>",
     examples: [
-      { cmd: "vagrant provision --provision-with ansible", desc: "Relance uniquement le provisioning Ansible" }
+      { cmd: "vagrant provision --provision-with ansible", desc: "Relance uniquement le provisioning Ansible" },
+      { cmd: "vagrant up --provision-with shell,ansible", desc: "Exécute plusieurs provisioners précis, dans l'ordre indiqué" }
     ],
     flags: ["--provision-with"]
   },
@@ -6277,7 +6323,8 @@ const COMMANDS = [
     description: "Force l'arrêt brutal de la VM sans attendre un shutdown propre du système invité.",
     syntax: "vagrant halt --force",
     examples: [
-      { cmd: "vagrant halt --force", desc: "Coupe la VM immédiatement, équivalent d'un débranchement" }
+      { cmd: "vagrant halt --force", desc: "Coupe la VM immédiatement, équivalent d'un débranchement" },
+      { cmd: "vagrant halt", desc: "Sans --force : tente d'abord un arrêt propre via ACPI" }
     ],
     flags: ["--force / -f"]
   },
@@ -6300,7 +6347,8 @@ const COMMANDS = [
     description: "Télécharge une box pour un provider spécifique lorsque plusieurs sont disponibles.",
     syntax: "vagrant box add <nom> --provider <provider>",
     examples: [
-      { cmd: "vagrant box add debian/bookworm64 --provider libvirt", desc: "Télécharge la version libvirt/KVM de la box" }
+      { cmd: "vagrant box add debian/bookworm64 --provider libvirt", desc: "Télécharge la version libvirt/KVM de la box" },
+      { cmd: "vagrant box add debian/bookworm64 --provider vmware_desktop", desc: "Version VMware Workstation de la même box" }
     ],
     flags: ["--provider"]
   },
@@ -6311,7 +6359,8 @@ const COMMANDS = [
     description: "Vérifie ou désactive la vérification du dossier courant avant exécution (utile en script automatisé).",
     syntax: "VAGRANT_CWD=<chemin> vagrant up --no-check-cwd",
     examples: [
-      { cmd: "VAGRANT_CWD=/projets/lab vagrant up", desc: "Force le dossier de travail Vagrant depuis un script externe" }
+      { cmd: "VAGRANT_CWD=/projets/lab vagrant up", desc: "Force le dossier de travail Vagrant depuis un script externe" },
+      { cmd: "vagrant up --no-check-cwd", desc: "Désactive la vérification pour lancer depuis n'importe quel dossier" }
     ],
     flags: ["--no-check-cwd"]
   },
@@ -6336,7 +6385,8 @@ const COMMANDS = [
     description: "Détecte les versions des services tournant sur les ports ouverts.",
     syntax: "nmap -sV <cible>",
     examples: [
-      { cmd: "nmap -sV 192.168.1.10", desc: "Identifie les versions des services (ex: Apache 2.4.x)" }
+      { cmd: "nmap -sV 192.168.1.10", desc: "Identifie les versions des services (ex: Apache 2.4.x)" },
+      { cmd: "nmap -sV --version-light 192.168.1.10", desc: "Détection de version rapide, moins exhaustive mais plus rapide" }
     ],
     flags: ["-sV"]
   },
@@ -6347,7 +6397,8 @@ const COMMANDS = [
     description: "Tente de détecter le système d'exploitation de la cible via empreinte réseau.",
     syntax: "nmap -O <cible>",
     examples: [
-      { cmd: "sudo nmap -O 192.168.1.10", desc: "Détecte l'OS distant (nécessite les droits root)" }
+      { cmd: "sudo nmap -O 192.168.1.10", desc: "Détecte l'OS distant (nécessite les droits root)" },
+      { cmd: "sudo nmap -O --osscan-limit 192.168.1.0/24", desc: "Ne tente la détection d'OS que sur les hôtes ayant au moins un port ouvert et un fermé" }
     ],
     flags: ["-O"]
   },
@@ -6370,7 +6421,8 @@ const COMMANDS = [
     description: "Effectue un scan SYN furtif (half-open), plus discret qu'un scan TCP complet.",
     syntax: "nmap -sS <cible>",
     examples: [
-      { cmd: "sudo nmap -sS 192.168.1.10", desc: "Scan SYN, nécessite les droits root" }
+      { cmd: "sudo nmap -sS 192.168.1.10", desc: "Scan SYN, nécessite les droits root" },
+      { cmd: "sudo nmap -sS -p 1-1000 192.168.1.10", desc: "Limite le scan SYN aux 1000 premiers ports plutôt que les 1000 par défaut de nmap" }
     ],
     flags: ["-sS"]
   },
@@ -6381,7 +6433,8 @@ const COMMANDS = [
     description: "Scanne les ports UDP au lieu de TCP (plus lent, souvent oublié dans les audits).",
     syntax: "nmap -sU <cible>",
     examples: [
-      { cmd: "sudo nmap -sU -p 53,161 192.168.1.10", desc: "Scanne les ports UDP DNS et SNMP" }
+      { cmd: "sudo nmap -sU -p 53,161 192.168.1.10", desc: "Scanne les ports UDP DNS et SNMP" },
+      { cmd: "sudo nmap -sU --top-ports 20 192.168.1.0/24", desc: "Scan UDP rapide sur les 20 ports UDP les plus courants seulement" }
     ],
     flags: ["-sU"]
   },
@@ -6392,7 +6445,8 @@ const COMMANDS = [
     description: "Active la détection agressive : OS, versions, scripts par défaut et traceroute en une seule commande.",
     syntax: "nmap -A <cible>",
     examples: [
-      { cmd: "sudo nmap -A 192.168.1.10", desc: "Scan complet et détaillé (plus lent, plus visible)" }
+      { cmd: "sudo nmap -A 192.168.1.10", desc: "Scan complet et détaillé (plus lent, plus visible)" },
+      { cmd: "sudo nmap -A -p 80,443 192.168.1.10", desc: "Limite le scan agressif à des ports précis pour aller plus vite" }
     ],
     flags: ["-A"]
   },
@@ -6427,7 +6481,8 @@ const COMMANDS = [
     description: "Désactive la découverte d'hôte (ping) et force le scan même si la cible ne répond pas au ping.",
     syntax: "nmap -Pn <cible>",
     examples: [
-      { cmd: "nmap -Pn 192.168.1.10", desc: "Scanne même si l'hôte bloque les ping ICMP" }
+      { cmd: "nmap -Pn 192.168.1.10", desc: "Scanne même si l'hôte bloque les ping ICMP" },
+      { cmd: "nmap -Pn -sS 192.168.1.0/24", desc: "Combine avec un scan SYN pour scanner tout un réseau qui bloque le ping" }
     ],
     flags: ["-Pn"]
   },
@@ -6438,7 +6493,8 @@ const COMMANDS = [
     description: "Découvre les hôtes actifs d'un réseau sans scanner leurs ports (ping scan).",
     syntax: "nmap -sn <réseau>",
     examples: [
-      { cmd: "nmap -sn 192.168.1.0/24", desc: "Liste rapidement les machines actives du réseau" }
+      { cmd: "nmap -sn 192.168.1.0/24", desc: "Liste rapidement les machines actives du réseau" },
+      { cmd: "nmap -sn 192.168.1.0/24 -oG - | grep Up", desc: "Filtre directement la sortie pour ne garder que les hôtes actifs" }
     ],
     flags: ["-sn"]
   },
@@ -6461,7 +6517,8 @@ const COMMANDS = [
     description: "Exécute les scripts NSE par défaut (énumération basique, détection de vulnérabilités courantes).",
     syntax: "nmap -sC <cible>",
     examples: [
-      { cmd: "nmap -sC -sV 192.168.1.10", desc: "Combine scripts par défaut et détection de versions" }
+      { cmd: "nmap -sC -sV 192.168.1.10", desc: "Combine scripts par défaut et détection de versions" },
+      { cmd: "nmap --script=default,safe -sV 192.168.1.10", desc: "Équivalent explicite de -sC en nommant les catégories de scripts" }
     ],
     flags: ["-sC"]
   },
@@ -6472,7 +6529,8 @@ const COMMANDS = [
     description: "Scanne uniquement les N ports les plus couramment utilisés, pour un scan rapide et représentatif.",
     syntax: "nmap --top-ports <n> <cible>",
     examples: [
-      { cmd: "nmap --top-ports 100 192.168.1.10", desc: "Scanne les 100 ports les plus fréquents" }
+      { cmd: "nmap --top-ports 100 192.168.1.10", desc: "Scanne les 100 ports les plus fréquents" },
+      { cmd: "nmap --top-ports 1000 -oG - 192.168.1.0/24 | grep open", desc: "Scan des 1000 ports les plus fréquents, filtré pour ne montrer que les ports ouverts" }
     ],
     flags: ["--top-ports"]
   },
@@ -6483,7 +6541,8 @@ const COMMANDS = [
     description: "Force l'utilisation d'une interface réseau précise pour le scan.",
     syntax: "nmap -e <interface> <cible>",
     examples: [
-      { cmd: "nmap -e eth1 192.168.1.0/24", desc: "Scanne via une interface réseau spécifique" }
+      { cmd: "nmap -e eth1 192.168.1.0/24", desc: "Scanne via une interface réseau spécifique" },
+      { cmd: "nmap -e eth1 -Pn 192.168.1.10", desc: "Combine avec -Pn pour forcer le scan via cette interface même sans réponse au ping" }
     ],
     flags: ["-e"]
   },
@@ -6494,7 +6553,8 @@ const COMMANDS = [
     description: "Effectue un scan ACK, utile pour cartographier les règles de pare-feu plutôt que détecter des ports ouverts.",
     syntax: "nmap -sA <cible>",
     examples: [
-      { cmd: "sudo nmap -sA 192.168.1.10", desc: "Identifie si un pare-feu filtre certains ports" }
+      { cmd: "sudo nmap -sA 192.168.1.10", desc: "Identifie si un pare-feu filtre certains ports" },
+      { cmd: "sudo nmap -sA -p 1-65535 192.168.1.10", desc: "Cartographie les règles de pare-feu sur l'ensemble des ports" }
     ],
     flags: ["-sA"]
   },
@@ -6505,7 +6565,8 @@ const COMMANDS = [
     description: "Affiche la raison technique (type de paquet reçu) justifiant l'état de chaque port.",
     syntax: "nmap --reason <cible>",
     examples: [
-      { cmd: "nmap --reason 192.168.1.10", desc: "Explique pourquoi chaque port est jugé ouvert/fermé/filtré" }
+      { cmd: "nmap --reason 192.168.1.10", desc: "Explique pourquoi chaque port est jugé ouvert/fermé/filtré" },
+      { cmd: "nmap --reason -p 22,80,443 192.168.1.10", desc: "Limite l'explication détaillée à quelques ports précis" }
     ],
     flags: ["--reason"]
   },
@@ -6516,7 +6577,8 @@ const COMMANDS = [
     description: "Effectue le scan en IPv6 au lieu d'IPv4.",
     syntax: "nmap -6 <cible_ipv6>",
     examples: [
-      { cmd: "nmap -6 fe80::1", desc: "Scanne une cible en IPv6" }
+      { cmd: "nmap -6 fe80::1", desc: "Scanne une cible en IPv6" },
+      { cmd: "nmap -6 -sV fe80::1%eth0", desc: "Ajoute la détection de version, en précisant l'interface pour une IPv6 locale" }
     ],
     flags: ["-6"]
   },
@@ -6527,7 +6589,8 @@ const COMMANDS = [
     description: "Scanne une liste de cibles définies dans un fichier texte plutôt que sur la ligne de commande.",
     syntax: "nmap -iL <fichier.txt>",
     examples: [
-      { cmd: "nmap -iL cibles.txt", desc: "Scanne toutes les IP/hôtes listés dans le fichier" }
+      { cmd: "nmap -iL cibles.txt", desc: "Scanne toutes les IP/hôtes listés dans le fichier" },
+      { cmd: "nmap -iL cibles.txt -oA resultats", desc: "Scanne la liste et exporte directement dans les 3 formats" }
     ],
     flags: ["-iL"]
   },
@@ -6538,7 +6601,8 @@ const COMMANDS = [
     description: "Trace le chemin réseau (routeurs traversés) jusqu'à la cible en plus du scan.",
     syntax: "nmap --traceroute <cible>",
     examples: [
-      { cmd: "nmap --traceroute 192.168.1.10", desc: "Affiche les sauts réseau jusqu'à la cible" }
+      { cmd: "nmap --traceroute 192.168.1.10", desc: "Affiche les sauts réseau jusqu'à la cible" },
+      { cmd: "nmap --traceroute -sn 192.168.1.10", desc: "Combine avec un simple ping scan pour juste voir le chemin, sans scanner les ports" }
     ],
     flags: ["--traceroute"]
   },
@@ -6549,7 +6613,8 @@ const COMMANDS = [
     description: "Augmente le niveau de détail affiché pendant le scan (progression, infos de debug).",
     syntax: "nmap -v <cible>",
     examples: [
-      { cmd: "nmap -vv 192.168.1.0/24", desc: "Affiche un maximum de détails pendant le scan" }
+      { cmd: "nmap -vv 192.168.1.0/24", desc: "Affiche un maximum de détails pendant le scan" },
+      { cmd: "nmap -v --stats-every 10s 192.168.1.0/24", desc: "Affiche un point d'avancement toutes les 10 secondes sur un gros scan" }
     ],
     flags: ["-v", "-vv"]
   },
@@ -6560,7 +6625,8 @@ const COMMANDS = [
     description: "N'affiche que les ports trouvés ouverts, en masquant les ports fermés/filtrés du résultat.",
     syntax: "nmap --open <cible>",
     examples: [
-      { cmd: "nmap --open 192.168.1.0/24", desc: "Affiche uniquement les hôtes avec au moins un port ouvert" }
+      { cmd: "nmap --open 192.168.1.0/24", desc: "Affiche uniquement les hôtes avec au moins un port ouvert" },
+      { cmd: "nmap --open -p- 192.168.1.10", desc: "Combine avec un scan de tous les ports (-p-) pour ne garder que les ouverts" }
     ],
     flags: ["--open"]
   },
@@ -6571,7 +6637,8 @@ const COMMANDS = [
     description: "Effectue un scan TCP Connect complet (établit la connexion entière), ne nécessite pas de droits root.",
     syntax: "nmap -sT <cible>",
     examples: [
-      { cmd: "nmap -sT 192.168.1.10", desc: "Scan TCP classique, utilisable sans privilèges root" }
+      { cmd: "nmap -sT 192.168.1.10", desc: "Scan TCP classique, utilisable sans privilèges root" },
+      { cmd: "nmap -sT -p 1-1000 192.168.1.0/24", desc: "Scan Connect complet sur un sous-réseau entier, sans droits root" }
     ],
     flags: ["-sT"]
   },
@@ -6582,7 +6649,8 @@ const COMMANDS = [
     description: "Personnalise la méthode de découverte d'hôte en envoyant des paquets SYN (-PS) ou ACK (-PA) sur des ports précis.",
     syntax: "nmap -PS<ports> <cible> | nmap -PA<ports> <cible>",
     examples: [
-      { cmd: "nmap -PS22,80,443 192.168.1.0/24", desc: "Découvre les hôtes via SYN sur ces ports" }
+      { cmd: "nmap -PS22,80,443 192.168.1.0/24", desc: "Découvre les hôtes via SYN sur ces ports" },
+      { cmd: "nmap -PA80,443 192.168.1.0/24", desc: "Même découverte mais via des paquets ACK plutôt que SYN" }
     ],
     flags: ["-PS (TCP SYN ping)", "-PA (TCP ACK ping)"]
   },
@@ -6593,7 +6661,8 @@ const COMMANDS = [
     description: "Utilise spécifiquement le ping ICMP Echo classique pour la découverte d'hôtes.",
     syntax: "nmap -PE <cible>",
     examples: [
-      { cmd: "nmap -PE 192.168.1.0/24", desc: "Découverte via ping ICMP standard uniquement" }
+      { cmd: "nmap -PE 192.168.1.0/24", desc: "Découverte via ping ICMP standard uniquement" },
+      { cmd: "nmap -PE -PS22,80 192.168.1.0/24", desc: "Combine ping ICMP classique et découverte SYN pour plus de fiabilité" }
     ],
     flags: ["-PE"]
   },
@@ -6604,7 +6673,8 @@ const COMMANDS = [
     description: "Force une détection d'OS plus agressive et insistante lorsque l'empreinte n'est pas claire.",
     syntax: "nmap -O --osscan-guess <cible>",
     examples: [
-      { cmd: "nmap -O --osscan-guess 192.168.1.10", desc: "Tente de deviner l'OS même avec des résultats ambigus" }
+      { cmd: "nmap -O --osscan-guess 192.168.1.10", desc: "Tente de deviner l'OS même avec des résultats ambigus" },
+      { cmd: "sudo nmap -O --osscan-guess --max-os-tries 3 192.168.1.10", desc: "Limite le nombre de tentatives pour ne pas ralentir excessivement le scan" }
     ],
     flags: ["--osscan-guess"]
   },
@@ -6615,7 +6685,8 @@ const COMMANDS = [
     description: "Affiche chaque paquet envoyé et reçu en détail, utile pour déboguer un scan ou apprendre le protocole.",
     syntax: "nmap --packet-trace <cible>",
     examples: [
-      { cmd: "nmap --packet-trace -p 80 192.168.1.10", desc: "Montre les paquets bruts échangés" }
+      { cmd: "nmap --packet-trace -p 80 192.168.1.10", desc: "Montre les paquets bruts échangés" },
+      { cmd: "sudo nmap --packet-trace -sS -p 22 192.168.1.10", desc: "Combine avec un scan SYN pour voir précisément les paquets d'un handshake TCP" }
     ],
     flags: ["--packet-trace"]
   },
@@ -6626,7 +6697,8 @@ const COMMANDS = [
     description: "Effectue un scan en utilisant des leurres (decoys) pour masquer l'origine réelle du scan dans les logs cibles.",
     syntax: "nmap -D <decoy1,decoy2,ME> <cible>",
     examples: [
-      { cmd: "nmap -D 10.0.0.1,10.0.0.2,ME 192.168.1.10", desc: "Mélange l'IP réelle avec des IP leurres dans les logs" }
+      { cmd: "nmap -D 10.0.0.1,10.0.0.2,ME 192.168.1.10", desc: "Mélange l'IP réelle avec des IP leurres dans les logs" },
+      { cmd: "nmap -D RND:10 192.168.1.10", desc: "Génère 10 leurres aléatoires automatiquement plutôt que de les lister à la main" }
     ],
     flags: ["-D"]
   },
@@ -6637,7 +6709,8 @@ const COMMANDS = [
     description: "Usurpe l'adresse MAC source du scan, utile en test d'intrusion sur réseau local.",
     syntax: "nmap --spoof-mac <mac|0|vendor> <cible>",
     examples: [
-      { cmd: "nmap --spoof-mac 0 192.168.1.10", desc: "Génère une MAC aléatoire pour le scan" }
+      { cmd: "nmap --spoof-mac 0 192.168.1.10", desc: "Génère une MAC aléatoire pour le scan" },
+      { cmd: "nmap --spoof-mac Cisco 192.168.1.10", desc: "Usurpe une MAC correspondant à un fabricant précis plutôt qu'aléatoire" }
     ],
     flags: ["--spoof-mac"]
   },
@@ -6648,7 +6721,8 @@ const COMMANDS = [
     description: "Effectue un scan SCTP INIT, pour les protocoles utilisant SCTP (téléphonie, signalisation).",
     syntax: "nmap -sY <cible>",
     examples: [
-      { cmd: "sudo nmap -sY 192.168.1.10", desc: "Scan spécifique au protocole SCTP" }
+      { cmd: "sudo nmap -sY 192.168.1.10", desc: "Scan spécifique au protocole SCTP" },
+      { cmd: "sudo nmap -sY -p 2905 192.168.1.10", desc: "Cible un port SCTP précis plutôt qu'un scan complet" }
     ],
     flags: ["-sY"]
   },
@@ -6659,7 +6733,8 @@ const COMMANDS = [
     description: "Contrôle précisément le débit d'envoi de paquets par seconde, pour accélérer ou ralentir un scan.",
     syntax: "nmap --min-rate <n> <cible>",
     examples: [
-      { cmd: "nmap --min-rate 1000 192.168.1.0/24", desc: "Force un débit minimum pour accélérer un gros scan" }
+      { cmd: "nmap --min-rate 1000 192.168.1.0/24", desc: "Force un débit minimum pour accélérer un gros scan" },
+      { cmd: "nmap --max-rate 100 192.168.1.10", desc: "Ralentit volontairement le scan pour rester discret ou ménager la cible" }
     ],
     flags: ["--min-rate", "--max-rate"]
   },
@@ -6670,7 +6745,8 @@ const COMMANDS = [
     description: "Ajuste l'intensité de la détection de version des services (0=rapide/léger, 9=complet/lent).",
     syntax: "nmap -sV --version-intensity <0-9> <cible>",
     examples: [
-      { cmd: "nmap -sV --version-intensity 9 192.168.1.10", desc: "Détection de version maximale, plus lente mais plus précise" }
+      { cmd: "nmap -sV --version-intensity 9 192.168.1.10", desc: "Détection de version maximale, plus lente mais plus précise" },
+      { cmd: "nmap -sV --version-intensity 0 192.168.1.10", desc: "Détection minimale, la plus rapide possible" }
     ],
     flags: ["--version-intensity"]
   },
@@ -6681,7 +6757,8 @@ const COMMANDS = [
     description: "Mode rapide : scanne uniquement les 100 ports les plus courants au lieu de 1000.",
     syntax: "nmap -F <cible>",
     examples: [
-      { cmd: "nmap -F 192.168.1.0/24", desc: "Scan rapide pour un premier aperçu du réseau" }
+      { cmd: "nmap -F 192.168.1.0/24", desc: "Scan rapide pour un premier aperçu du réseau" },
+      { cmd: "nmap -F -sV 192.168.1.0/24", desc: "Combine le mode rapide avec la détection de version pour un aperçu efficace" }
     ],
     flags: ["-F"]
   },
@@ -6692,7 +6769,8 @@ const COMMANDS = [
     description: "Envoie des paquets avec une somme de contrôle volontairement invalide, pour tester les IDS/pare-feu.",
     syntax: "nmap --badsum <cible>",
     examples: [
-      { cmd: "nmap --badsum 192.168.1.10", desc: "Teste si un pare-feu/IDS filtre les paquets corrompus" }
+      { cmd: "nmap --badsum 192.168.1.10", desc: "Teste si un pare-feu/IDS filtre les paquets corrompus" },
+      { cmd: "nmap --badsum -p 80 192.168.1.10", desc: "Limite le test à un port précis pour vérifier rapidement le comportement du pare-feu" }
     ],
     flags: ["--badsum"]
   },
@@ -6703,7 +6781,8 @@ const COMMANDS = [
     description: "Exporte simultanément les résultats dans les trois formats (texte, XML, grepable) en une commande.",
     syntax: "nmap <cible> -oA <préfixe>",
     examples: [
-      { cmd: "nmap 192.168.1.0/24 -oA scan-complet", desc: "Génère scan-complet.nmap, .xml et .gnmap" }
+      { cmd: "nmap 192.168.1.0/24 -oA scan-complet", desc: "Génère scan-complet.nmap, .xml et .gnmap" },
+      { cmd: "nmap -sV 192.168.1.0/24 -oA rapport-$(date +%Y%m%d)", desc: "Nomme les fichiers de sortie automatiquement avec la date du jour" }
     ],
     flags: ["-oA"]
   },
@@ -6714,7 +6793,8 @@ const COMMANDS = [
     description: "Affiche la documentation d'un script NSE précis avant de l'utiliser.",
     syntax: "nmap --script-help <script>",
     examples: [
-      { cmd: "nmap --script-help vuln", desc: "Affiche ce que fait la catégorie de scripts vuln" }
+      { cmd: "nmap --script-help vuln", desc: "Affiche ce que fait la catégorie de scripts vuln" },
+      { cmd: "nmap --script-help \"http-*\"", desc: "Affiche la doc de tous les scripts commençant par 'http-'" }
     ],
     flags: ["--script-help"]
   },
@@ -6725,7 +6805,8 @@ const COMMANDS = [
     description: "Reprend un scan interrompu à partir d'un fichier de sortie existant (-oN/-oG).",
     syntax: "nmap --resume <fichier_sortie>",
     examples: [
-      { cmd: "nmap --resume scan-resultats.txt", desc: "Reprend là où le scan s'était arrêté" }
+      { cmd: "nmap --resume scan-resultats.txt", desc: "Reprend là où le scan s'était arrêté" },
+      { cmd: "nmap --resume scan-resultats.txt -v", desc: "Reprend le scan interrompu avec affichage détaillé de la progression" }
     ],
     flags: ["--resume"]
   },
@@ -6736,7 +6817,8 @@ const COMMANDS = [
     description: "Effectue un scan SCTP COOKIE-ECHO, variante furtive du scan SCTP INIT.",
     syntax: "nmap -sZ <cible>",
     examples: [
-      { cmd: "sudo nmap -sZ 192.168.1.10", desc: "Scan SCTP plus discret que -sY" }
+      { cmd: "sudo nmap -sZ 192.168.1.10", desc: "Scan SCTP plus discret que -sY" },
+      { cmd: "sudo nmap -sZ -p 2905 192.168.1.0/24", desc: "Cible le port SCTP standard sur tout un sous-réseau" }
     ],
     flags: ["-sZ"]
   },
@@ -6747,7 +6829,8 @@ const COMMANDS = [
     description: "Force l'utilisation de serveurs DNS spécifiques pour la résolution de noms pendant le scan.",
     syntax: "nmap --dns-servers <ip1,ip2> <cible>",
     examples: [
-      { cmd: "nmap --dns-servers 8.8.8.8 exemple.com", desc: "Utilise un DNS précis plutôt que celui du système" }
+      { cmd: "nmap --dns-servers 8.8.8.8 exemple.com", desc: "Utilise un DNS précis plutôt que celui du système" },
+      { cmd: "nmap --dns-servers 1.1.1.1,8.8.8.8 exemple.com", desc: "Précise plusieurs serveurs DNS de secours" }
     ],
     flags: ["--dns-servers"]
   },
@@ -6758,7 +6841,8 @@ const COMMANDS = [
     description: "Force l'utilisation du résolveur DNS du système plutôt que celui intégré à nmap.",
     syntax: "nmap --system-dns <cible>",
     examples: [
-      { cmd: "nmap --system-dns exemple.com", desc: "Utilise les paramètres DNS du système d'exploitation" }
+      { cmd: "nmap --system-dns exemple.com", desc: "Utilise les paramètres DNS du système d'exploitation" },
+      { cmd: "nmap --system-dns -sn 192.168.1.0/24", desc: "Utile en interne quand le DNS du système résout mieux les noms locaux" }
     ],
     flags: ["--system-dns"]
   },
@@ -6769,7 +6853,8 @@ const COMMANDS = [
     description: "Force un port source précis pour le scan, utile pour contourner certaines règles de pare-feu trop permissives.",
     syntax: "nmap -g <port> <cible>",
     examples: [
-      { cmd: "nmap -g 53 192.168.1.10", desc: "Scan en se faisant passer pour du trafic DNS (port source 53)" }
+      { cmd: "nmap -g 53 192.168.1.10", desc: "Scan en se faisant passer pour du trafic DNS (port source 53)" },
+      { cmd: "nmap --source-port 53 -p 1-1000 192.168.1.10", desc: "Combine le port source forcé avec un scan de plage de ports précise" }
     ],
     flags: ["-g", "--source-port"]
   },
@@ -6780,7 +6865,8 @@ const COMMANDS = [
     description: "Ajoute les résultats à un fichier de sortie existant au lieu de l'écraser.",
     syntax: "nmap <cible> -oN <fichier> --append-output",
     examples: [
-      { cmd: "nmap 192.168.1.0/24 -oN scans.txt --append-output", desc: "Cumule les résultats de plusieurs scans dans un seul fichier" }
+      { cmd: "nmap 192.168.1.0/24 -oN scans.txt --append-output", desc: "Cumule les résultats de plusieurs scans dans un seul fichier" },
+      { cmd: "nmap 192.168.1.0/24 -oG scans.gnmap --append-output", desc: "Fonctionne aussi avec le format grepable, pas seulement -oN" }
     ],
     flags: ["--append-output"]
   },
@@ -6805,7 +6891,8 @@ const COMMANDS = [
     description: "Liste les interfaces réseau disponibles pour la capture.",
     syntax: "tshark -D",
     examples: [
-      { cmd: "tshark -D", desc: "Affiche la liste numérotée des interfaces" }
+      { cmd: "tshark -D", desc: "Affiche la liste numérotée des interfaces" },
+      { cmd: "tshark -D | grep -i wifi", desc: "Cherche rapidement l'interface Wi-Fi parmi la liste" }
     ],
     flags: ["-D"]
   },
@@ -6864,7 +6951,8 @@ const COMMANDS = [
     description: "Limite la capture à un nombre de paquets précis avant de s'arrêter automatiquement.",
     syntax: "tshark -i <interface> -c <nombre>",
     examples: [
-      { cmd: "tshark -i eth0 -c 100", desc: "Capture exactement 100 paquets puis s'arrête" }
+      { cmd: "tshark -i eth0 -c 100", desc: "Capture exactement 100 paquets puis s'arrête" },
+      { cmd: "tshark -i eth0 -c 50 -w echantillon.pcap", desc: "Capture un échantillon de 50 paquets directement dans un fichier" }
     ],
     flags: ["-c (nombre de paquets)"]
   },
@@ -6875,7 +6963,8 @@ const COMMANDS = [
     description: "Affiche des statistiques de trafic agrégées (débit, nombre de paquets) sur des intervalles de temps.",
     syntax: "tshark -r <fichier> -q -z io,stat,<intervalle>",
     examples: [
-      { cmd: "tshark -r capture.pcap -q -z io,stat,1", desc: "Statistiques par tranche de 1 seconde" }
+      { cmd: "tshark -r capture.pcap -q -z io,stat,1", desc: "Statistiques par tranche de 1 seconde" },
+      { cmd: "tshark -r capture.pcap -q -z io,stat,10,ip.addr==192.168.1.10", desc: "Statistiques par tranches de 10s, filtrées sur une IP précise" }
     ],
     flags: ["-q (quiet)", "-z io,stat,<secondes>"]
   },
@@ -6886,7 +6975,8 @@ const COMMANDS = [
     description: "Affiche le contenu de chaque paquet en hexadécimal et ASCII en plus du résumé.",
     syntax: "tshark -r <fichier> -x",
     examples: [
-      { cmd: "tshark -r capture.pcap -x", desc: "Affiche le dump hex/ASCII de chaque paquet" }
+      { cmd: "tshark -r capture.pcap -x", desc: "Affiche le dump hex/ASCII de chaque paquet" },
+      { cmd: "tshark -r capture.pcap -x -c 5", desc: "Limite le dump hex/ASCII aux 5 premiers paquets" }
     ],
     flags: ["-x"]
   },
@@ -6897,7 +6987,8 @@ const COMMANDS = [
     description: "Affiche l'arborescence complète des protocoles décodés pour chaque paquet (mode très détaillé).",
     syntax: "tshark -r <fichier> -V",
     examples: [
-      { cmd: "tshark -r capture.pcap -V -c 1", desc: "Détail complet du premier paquet uniquement" }
+      { cmd: "tshark -r capture.pcap -V -c 1", desc: "Détail complet du premier paquet uniquement" },
+      { cmd: "tshark -r capture.pcap -V -Y 'tcp.port==443'", desc: "Détail complet, mais seulement pour les paquets HTTPS" }
     ],
     flags: ["-V (verbose, arbre de protocoles)"]
   },
@@ -6908,7 +6999,8 @@ const COMMANDS = [
     description: "Reconstitue et affiche le contenu complet d'un flux TCP (utile pour suivre une conversation HTTP).",
     syntax: "tshark -r <fichier> -q -z follow,tcp,ascii,<stream_id>",
     examples: [
-      { cmd: "tshark -r capture.pcap -q -z follow,tcp,ascii,0", desc: "Affiche le contenu du flux TCP n°0" }
+      { cmd: "tshark -r capture.pcap -q -z follow,tcp,ascii,0", desc: "Affiche le contenu du flux TCP n°0" },
+      { cmd: "tshark -r capture.pcap -q -z follow,tcp,hex,0", desc: "Affiche le flux en hexadécimal plutôt qu'en ASCII" }
     ],
     flags: ["-z follow,tcp,ascii,<id>"]
   },
@@ -6931,7 +7023,8 @@ const COMMANDS = [
     description: "Affiche un tableau récapitulatif des conversations entre paires d'adresses IP.",
     syntax: "tshark -r <fichier> -q -z conv,ip",
     examples: [
-      { cmd: "tshark -r capture.pcap -q -z conv,ip", desc: "Liste qui parle à qui et combien de données échangées" }
+      { cmd: "tshark -r capture.pcap -q -z conv,ip", desc: "Liste qui parle à qui et combien de données échangées" },
+      { cmd: "tshark -r capture.pcap -q -z conv,ip -Y 'ip.addr==192.168.1.10'", desc: "Limite les conversations affichées à celles impliquant une IP précise" }
     ],
     flags: ["-z conv,ip", "-z conv,tcp"]
   },
@@ -6942,7 +7035,8 @@ const COMMANDS = [
     description: "Affiche des statistiques sur les requêtes HTTP capturées (codes de réponse, méthodes, hôtes).",
     syntax: "tshark -r <fichier> -q -z http,tree",
     examples: [
-      { cmd: "tshark -r capture.pcap -q -z http,tree", desc: "Répartition des requêtes/réponses HTTP" }
+      { cmd: "tshark -r capture.pcap -q -z http,tree", desc: "Répartition des requêtes/réponses HTTP" },
+      { cmd: "tshark -r capture.pcap -q -z http,tree,ip.addr==192.168.1.10", desc: "Statistiques HTTP filtrées sur un hôte précis" }
     ],
     flags: ["-z http,tree"]
   },
@@ -6953,7 +7047,8 @@ const COMMANDS = [
     description: "Désactive la résolution de noms (DNS, ports, MAC) pour accélérer l'affichage et éviter le bruit réseau.",
     syntax: "tshark -i <interface> -n",
     examples: [
-      { cmd: "tshark -i eth0 -n", desc: "Affiche les IP brutes sans résolution DNS" }
+      { cmd: "tshark -i eth0 -n", desc: "Affiche les IP brutes sans résolution DNS" },
+      { cmd: "tshark -i eth0 -n -Y dns", desc: "Combine avec un filtre DNS pour voir les requêtes brutes sans résolution" }
     ],
     flags: ["-n"]
   },
@@ -6964,7 +7059,8 @@ const COMMANDS = [
     description: "Effectue une capture en deux passes : capture brute puis applique un filtre d'affichage en post-traitement.",
     syntax: "tshark -i <interface> -2 -R '<filtre>'",
     examples: [
-      { cmd: "tshark -i eth0 -2 -R 'tcp.analysis.retransmission'", desc: "Filtre les retransmissions TCP après capture" }
+      { cmd: "tshark -i eth0 -2 -R 'tcp.analysis.retransmission'", desc: "Filtre les retransmissions TCP après capture" },
+      { cmd: "tshark -r capture.pcap -2 -R 'http.response.code >= 400'", desc: "Applique le filtre d'affichage sur un fichier déjà capturé plutôt qu'en direct" }
     ],
     flags: ["-2 (deux passes)", "-R (filtre post-capture)"]
   },
@@ -6975,7 +7071,8 @@ const COMMANDS = [
     description: "Limite la taille capturée de chaque paquet (snaplen), utile pour réduire la taille du fichier de capture.",
     syntax: "tshark -i <interface> -s <octets>",
     examples: [
-      { cmd: "tshark -i eth0 -s 96", desc: "Capture seulement les 96 premiers octets de chaque paquet (en-têtes)" }
+      { cmd: "tshark -i eth0 -s 96", desc: "Capture seulement les 96 premiers octets de chaque paquet (en-têtes)" },
+      { cmd: "tshark -i eth0 -s 0 -w full.pcap", desc: "0 = pas de limite, capture chaque paquet en entier" }
     ],
     flags: ["-s (snaplen)"]
   },
@@ -6986,7 +7083,8 @@ const COMMANDS = [
     description: "Génère la liste complète des noms de champs disponibles pour l'extraction (-T fields -e).",
     syntax: "tshark -G fields",
     examples: [
-      { cmd: "tshark -G fields | grep http", desc: "Cherche les champs disponibles liés à HTTP" }
+      { cmd: "tshark -G fields | grep http", desc: "Cherche les champs disponibles liés à HTTP" },
+      { cmd: "tshark -G fields | grep tcp.flags", desc: "Cherche les champs disponibles liés aux flags TCP" }
     ],
     flags: ["-G fields"]
   },
@@ -6997,7 +7095,8 @@ const COMMANDS = [
     description: "Affiche les avertissements et erreurs détectés par le système expert de Wireshark (anomalies réseau).",
     syntax: "tshark -r <fichier> -q -z expert",
     examples: [
-      { cmd: "tshark -r capture.pcap -q -z expert", desc: "Résume les problèmes détectés (retransmissions, erreurs...)" }
+      { cmd: "tshark -r capture.pcap -q -z expert", desc: "Résume les problèmes détectés (retransmissions, erreurs...)" },
+      { cmd: "tshark -r capture.pcap -q -z expert,warn", desc: "Ne montre que les avertissements, pas les infos mineures" }
     ],
     flags: ["-z expert"]
   },
@@ -7008,7 +7107,8 @@ const COMMANDS = [
     description: "Extrait les fichiers transférés via HTTP/SMB/FTP capturés dans le trafic réseau.",
     syntax: "tshark -r <fichier> --export-objects http,<dossier>",
     examples: [
-      { cmd: "tshark -r capture.pcap --export-objects http,./extraits", desc: "Extrait tous les fichiers téléchargés en HTTP" }
+      { cmd: "tshark -r capture.pcap --export-objects http,./extraits", desc: "Extrait tous les fichiers téléchargés en HTTP" },
+      { cmd: "tshark -r capture.pcap --export-objects smb,./extraits-smb", desc: "Extrait les fichiers transférés via SMB plutôt que HTTP" }
     ],
     flags: ["--export-objects <protocole>,<dossier>"]
   },
@@ -7019,7 +7119,8 @@ const COMMANDS = [
     description: "Désactive le mode promiscuité, ne capture que le trafic destiné directement à la machine.",
     syntax: "tshark -i <interface> -p",
     examples: [
-      { cmd: "tshark -i eth0 -p", desc: "Capture uniquement le trafic propre à la machine" }
+      { cmd: "tshark -i eth0 -p", desc: "Capture uniquement le trafic propre à la machine" },
+      { cmd: "tshark -i eth0 -p -w capture-locale.pcap", desc: "Combine avec l'écriture dans un fichier pour ne garder que le trafic propre à la machine" }
     ],
     flags: ["-p"]
   },
@@ -7030,7 +7131,8 @@ const COMMANDS = [
     description: "Affiche des statistiques sur les requêtes DNS capturées (types de requêtes, taux de réponse).",
     syntax: "tshark -r <fichier> -q -z dns,tree",
     examples: [
-      { cmd: "tshark -r capture.pcap -q -z dns,tree", desc: "Répartition des requêtes DNS observées" }
+      { cmd: "tshark -r capture.pcap -q -z dns,tree", desc: "Répartition des requêtes DNS observées" },
+      { cmd: "tshark -r capture.pcap -q -z dns,tree -Y 'dns.flags.rcode != 0'", desc: "Ne garde que les requêtes DNS en erreur" }
     ],
     flags: ["-z dns,tree"]
   },
@@ -7041,7 +7143,8 @@ const COMMANDS = [
     description: "Liste tous les hôtes IP distincts observés dans la capture avec leurs statistiques de trafic.",
     syntax: "tshark -r <fichier> -q -z endpoints,ip",
     examples: [
-      { cmd: "tshark -r capture.pcap -q -z endpoints,ip", desc: "Inventaire de tous les hôtes IP présents dans la capture" }
+      { cmd: "tshark -r capture.pcap -q -z endpoints,ip", desc: "Inventaire de tous les hôtes IP présents dans la capture" },
+      { cmd: "tshark -r capture.pcap -q -z endpoints,ip -Y 'ip.addr==10.0.0.0/8'", desc: "Limite l'inventaire à une plage d'adresses privées" }
     ],
     flags: ["-z endpoints,ip", "-z endpoints,tcp"]
   },
@@ -7052,7 +7155,8 @@ const COMMANDS = [
     description: "Affiche la hiérarchie des protocoles détectés dans la capture avec leur répartition en bytes.",
     syntax: "tshark -r <fichier> -q -z io,phs",
     examples: [
-      { cmd: "tshark -r capture.pcap -q -z io,phs", desc: "Vue en arbre des protocoles utilisés et leur proportion" }
+      { cmd: "tshark -r capture.pcap -q -z io,phs", desc: "Vue en arbre des protocoles utilisés et leur proportion" },
+      { cmd: "tshark -r capture.pcap -q -z io,phs -Y 'ip.src==192.168.1.10'", desc: "Hiérarchie des protocoles limitée au trafic d'une seule source" }
     ],
     flags: ["-z io,phs"]
   },
@@ -7063,7 +7167,8 @@ const COMMANDS = [
     description: "Active la colorisation des paquets dans le terminal selon le protocole (comme dans l'interface Wireshark).",
     syntax: "tshark -r <fichier> --color",
     examples: [
-      { cmd: "tshark -r capture.pcap --color", desc: "Affiche les paquets avec les couleurs du thème Wireshark" }
+      { cmd: "tshark -r capture.pcap --color", desc: "Affiche les paquets avec les couleurs du thème Wireshark" },
+      { cmd: "tshark -i eth0 --color -Y http", desc: "Combine la colorisation avec un filtre en direct" }
     ],
     flags: ["--color"]
   },
@@ -7074,7 +7179,8 @@ const COMMANDS = [
     description: "Active la rotation de fichier de capture automatique lorsqu'une taille est atteinte (ring buffer).",
     syntax: "tshark -i <interface> -b filesize:<Ko> -b files:<n> -w <fichier.pcap>",
     examples: [
-      { cmd: "tshark -i eth0 -b filesize:10240 -b files:5 -w capture.pcap", desc: "Capture en rotation : 5 fichiers de 10 Mo max" }
+      { cmd: "tshark -i eth0 -b filesize:10240 -b files:5 -w capture.pcap", desc: "Capture en rotation : 5 fichiers de 10 Mo max" },
+      { cmd: "tshark -i eth0 -b duration:3600 -w capture.pcap", desc: "Rotation basée sur la durée (1h) plutôt que la taille du fichier" }
     ],
     flags: ["-b filesize:<Ko>", "-b files:<n>", "-b duration:<s>"]
   },
@@ -7085,7 +7191,8 @@ const COMMANDS = [
     description: "Affiche les statistiques des URI demandées via HTTP.",
     syntax: "tshark -r <fichier> -q -z http_req,tree",
     examples: [
-      { cmd: "tshark -r capture.pcap -q -z http_req,tree", desc: "Liste les URLs les plus demandées dans la capture" }
+      { cmd: "tshark -r capture.pcap -q -z http_req,tree", desc: "Liste les URLs les plus demandées dans la capture" },
+      { cmd: "tshark -r capture.pcap -q -z http_req,tree -Y 'ip.dst==10.0.0.5'", desc: "Limite les statistiques d'URI à un serveur précis" }
     ],
     flags: ["-z http_req,tree"]
   },
@@ -7096,7 +7203,8 @@ const COMMANDS = [
     description: "Filtre les paquets TLS/SSL de handshake pour analyser les négociations de chiffrement.",
     syntax: "tshark -r <fichier> -Y 'ssl.handshake'",
     examples: [
-      { cmd: "tshark -r capture.pcap -Y 'ssl.handshake.type == 1'", desc: "Affiche uniquement les Client Hello TLS" }
+      { cmd: "tshark -r capture.pcap -Y 'ssl.handshake.type == 1'", desc: "Affiche uniquement les Client Hello TLS" },
+      { cmd: "tshark -r capture.pcap -Y 'tls.handshake.type == 2'", desc: "Filtre les Server Hello plutôt que les Client Hello" }
     ],
     flags: []
   },
@@ -7107,7 +7215,8 @@ const COMMANDS = [
     description: "Filtre les anomalies TCP détectées par l'analyse de Wireshark (retransmissions, fins de fenêtre, etc.).",
     syntax: "tshark -r <fichier> -Y 'tcp.analysis.flags'",
     examples: [
-      { cmd: "tshark -r capture.pcap -Y 'tcp.analysis.flags' -T fields -e frame.number -e tcp.analysis.flags", desc: "Liste les paquets TCP anormaux" }
+      { cmd: "tshark -r capture.pcap -Y 'tcp.analysis.flags' -T fields -e frame.number -e tcp.analysis.flags", desc: "Liste les paquets TCP anormaux" },
+      { cmd: "tshark -r capture.pcap -Y 'tcp.analysis.retransmission'", desc: "Cible uniquement les retransmissions plutôt que toutes les anomalies TCP" }
     ],
     flags: []
   },
@@ -7118,7 +7227,8 @@ const COMMANDS = [
     description: "Affiche les conversations TCP (paires d'endpoints) avec les octets et paquets échangés dans chaque sens.",
     syntax: "tshark -r <fichier> -q -z conv,tcp",
     examples: [
-      { cmd: "tshark -r capture.pcap -q -z conv,tcp", desc: "Liste toutes les sessions TCP et leur volume de données" }
+      { cmd: "tshark -r capture.pcap -q -z conv,tcp", desc: "Liste toutes les sessions TCP et leur volume de données" },
+      { cmd: "tshark -r capture.pcap -q -z conv,tcp,ip.addr==192.168.1.10", desc: "Limite les conversations TCP affichées à un hôte précis" }
     ],
     flags: ["-z conv,tcp"]
   },
@@ -7129,7 +7239,8 @@ const COMMANDS = [
     description: "Extrait les horodatages précis de chaque paquet, utile pour corréler des événements réseau et système.",
     syntax: "tshark -r <fichier> -T fields -e frame.time -e ip.src -e ip.dst",
     examples: [
-      { cmd: "tshark -r capture.pcap -T fields -e frame.time -e ip.src -e ip.dst", desc: "Extrait timestamp, IP source et destination de chaque paquet" }
+      { cmd: "tshark -r capture.pcap -T fields -e frame.time -e ip.src -e ip.dst", desc: "Extrait timestamp, IP source et destination de chaque paquet" },
+      { cmd: "tshark -r capture.pcap -T fields -e frame.time_delta -e ip.src", desc: "Extrait le délai entre paquets plutôt que l'horodatage absolu" }
     ],
     flags: ["-e frame.time"]
   },
@@ -7140,7 +7251,8 @@ const COMMANDS = [
     description: "Filtre et affiche uniquement les paquets ARP pour analyser la résolution d'adresses ou détecter un ARP spoofing.",
     syntax: "tshark -r <fichier> -Y 'arp'",
     examples: [
-      { cmd: "tshark -r capture.pcap -Y 'arp' -T fields -e arp.src.hw_mac -e arp.src.proto_ipv4", desc: "Extrait les couples MAC/IP des requêtes ARP" }
+      { cmd: "tshark -r capture.pcap -Y 'arp' -T fields -e arp.src.hw_mac -e arp.src.proto_ipv4", desc: "Extrait les couples MAC/IP des requêtes ARP" },
+      { cmd: "tshark -r capture.pcap -Y 'arp.duplicate-address-detected'", desc: "Détecte spécifiquement les conflits d'adresses IP via ARP" }
     ],
     flags: []
   },
@@ -7151,7 +7263,8 @@ const COMMANDS = [
     description: "Filtre les paquets ICMP (ping, erreurs réseau) pour diagnostiquer des problèmes de connectivité.",
     syntax: "tshark -r <fichier> -Y 'icmp'",
     examples: [
-      { cmd: "tshark -r capture.pcap -Y 'icmp.type == 8'", desc: "Affiche uniquement les Echo Request (ping)" }
+      { cmd: "tshark -r capture.pcap -Y 'icmp.type == 8'", desc: "Affiche uniquement les Echo Request (ping)" },
+      { cmd: "tshark -r capture.pcap -Y 'icmp.type == 3'", desc: "Affiche les messages 'destination unreachable' plutôt que les ping" }
     ],
     flags: []
   },
@@ -7162,7 +7275,8 @@ const COMMANDS = [
     description: "Désactive le décodage d'un protocole précis, utile si un dissecteur cause des faux positifs.",
     syntax: "tshark --disable-protocol <protocole>",
     examples: [
-      { cmd: "tshark -r capture.pcap --disable-protocol http2", desc: "Désactive le décodage HTTP/2 pour ce fichier" }
+      { cmd: "tshark -r capture.pcap --disable-protocol http2", desc: "Désactive le décodage HTTP/2 pour ce fichier" },
+      { cmd: "tshark -r capture.pcap --disable-protocol tls", desc: "Désactive le décodage TLS, utile si un dissecteur plante sur du trafic chiffré" }
     ],
     flags: ["--disable-protocol"]
   },
@@ -7173,7 +7287,8 @@ const COMMANDS = [
     description: "Active le vidage immédiat de la sortie standard après chaque paquet, utile pour piper en temps réel.",
     syntax: "tshark -i <interface> -l | grep <motif>",
     examples: [
-      { cmd: "tshark -i eth0 -l -Y http | grep 'GET'", desc: "Filtre les requêtes HTTP GET en temps réel" }
+      { cmd: "tshark -i eth0 -l -Y http | grep 'GET'", desc: "Filtre les requêtes HTTP GET en temps réel" },
+      { cmd: "tshark -i eth0 -l -Y 'tcp.flags.syn==1' | tee syn.log", desc: "Journalise en direct chaque nouvelle tentative de connexion TCP" }
     ],
     flags: ["-l (line-buffered)"]
   },
@@ -7184,7 +7299,8 @@ const COMMANDS = [
     description: "Analyse les flux RTP (protocole audio/vidéo en temps réel, VoIP) présents dans la capture.",
     syntax: "tshark -r <fichier> -q -z rtp,streams",
     examples: [
-      { cmd: "tshark -r capture.pcap -q -z rtp,streams", desc: "Liste les flux VoIP/RTP et leurs statistiques de qualité" }
+      { cmd: "tshark -r capture.pcap -q -z rtp,streams", desc: "Liste les flux VoIP/RTP et leurs statistiques de qualité" },
+      { cmd: "tshark -r capture.pcap -q -z rtp,streams,short", desc: "Affichage condensé des flux RTP, plus rapide à lire" }
     ],
     flags: ["-z rtp,streams"]
   },
@@ -7195,7 +7311,8 @@ const COMMANDS = [
     description: "Extrait les noms de domaines résolus via DNS dans la capture, utile pour auditer les requêtes DNS.",
     syntax: "tshark -r <fichier> -T fields -e dns.qry.name -Y dns",
     examples: [
-      { cmd: "tshark -r capture.pcap -T fields -e dns.qry.name -Y 'dns.flags.response == 0' | sort -u", desc: "Liste les domaines demandés sans doublons" }
+      { cmd: "tshark -r capture.pcap -T fields -e dns.qry.name -Y 'dns.flags.response == 0' | sort -u", desc: "Liste les domaines demandés sans doublons" },
+      { cmd: "tshark -r capture.pcap -T fields -e dns.qry.name -Y 'dns.qry.name contains \"exemple\"'", desc: "Ne garde que les requêtes contenant un mot-clé précis" }
     ],
     flags: []
   },
@@ -7206,7 +7323,8 @@ const COMMANDS = [
     description: "Analyse les temps de réponse des commandes SMB (partages réseau Windows) pour détecter des lenteurs.",
     syntax: "tshark -r <fichier> -q -z smb,srt",
     examples: [
-      { cmd: "tshark -r capture.pcap -q -z smb,srt", desc: "Statistiques de temps de réponse SMB" }
+      { cmd: "tshark -r capture.pcap -q -z smb,srt", desc: "Statistiques de temps de réponse SMB" },
+      { cmd: "tshark -r capture.pcap -q -z smb,srt,ip.addr==10.0.0.5", desc: "Limite les stats SMB à un serveur de fichiers précis" }
     ],
     flags: ["-z smb,srt"]
   },
@@ -7217,7 +7335,8 @@ const COMMANDS = [
     description: "Alias de -Y, applique un filtre de lecture en post-traitement d'un fichier pcap.",
     syntax: "tshark -r <fichier> --read-filter '<filtre>'",
     examples: [
-      { cmd: "tshark -r capture.pcap --read-filter 'ip.src == 192.168.1.10'", desc: "Lit et filtre le fichier comme -Y" }
+      { cmd: "tshark -r capture.pcap --read-filter 'ip.src == 192.168.1.10'", desc: "Lit et filtre le fichier comme -Y" },
+      { cmd: "tshark -r capture.pcap --read-filter 'ip.src == 192.168.1.10' -T fields -e frame.number", desc: "Combine avec l'extraction de champs pour ne remonter que les numéros de paquets" }
     ],
     flags: ["--read-filter"]
   },
@@ -7228,7 +7347,8 @@ const COMMANDS = [
     description: "Compare deux captures pcap pour détecter les paquets différents entre deux runs.",
     syntax: "tshark -z compare",
     examples: [
-      { cmd: "tshark -r a.pcap -q -z compare,r,b.pcap", desc: "Compare les paquets de deux fichiers de capture" }
+      { cmd: "tshark -r a.pcap -q -z compare,r,b.pcap", desc: "Compare les paquets de deux fichiers de capture" },
+      { cmd: "tshark -r a.pcap -q -z compare,c,b.pcap", desc: "Compare en affichant le contenu détaillé des différences, pas juste leur nombre" }
     ],
     flags: ["-z compare"]
   },
@@ -7239,7 +7359,8 @@ const COMMANDS = [
     description: "Filtre les réponses HTTP d'erreur (4xx/5xx) pour identifier rapidement les problèmes côté serveur.",
     syntax: "tshark -r <fichier> -Y 'http.response.code >= 400'",
     examples: [
-      { cmd: "tshark -r capture.pcap -Y 'http.response.code >= 400' -T fields -e http.response.code -e http.request.uri", desc: "Liste les erreurs HTTP avec leur URL" }
+      { cmd: "tshark -r capture.pcap -Y 'http.response.code >= 400' -T fields -e http.response.code -e http.request.uri", desc: "Liste les erreurs HTTP avec leur URL" },
+      { cmd: "tshark -r capture.pcap -Y 'http.response.code == 500'", desc: "Cible précisément les erreurs serveur 500, pas toute la plage 4xx/5xx" }
     ],
     flags: []
   },
@@ -7250,7 +7371,8 @@ const COMMANDS = [
     description: "Ajoute une ligne d'en-tête CSV avec les noms de colonnes lors de l'extraction de champs.",
     syntax: "tshark -r <fichier> -T fields -e ip.src -E header=y -E separator=,",
     examples: [
-      { cmd: "tshark -r capture.pcap -T fields -e ip.src -e ip.dst -E header=y -E separator=, > export.csv", desc: "Exporte en CSV avec en-têtes" }
+      { cmd: "tshark -r capture.pcap -T fields -e ip.src -e ip.dst -E header=y -E separator=, > export.csv", desc: "Exporte en CSV avec en-têtes" },
+      { cmd: "tshark -r capture.pcap -T fields -e frame.time -e ip.src -e ip.dst -E header=y -E quote=d > export.csv", desc: "Ajoute des guillemets doubles autour de chaque valeur du CSV" }
     ],
     flags: ["-E header=y", "-E separator=,", "-E quote=d"]
   },
@@ -7347,7 +7469,8 @@ const COMMANDS = [
     description: "Génère les manifests YAML Kubernetes finaux d'un chart sans rien déployer (dry-run local).",
     syntax: "helm template <release> <chart>",
     examples: [
-      { cmd: "helm template mon-app ./chart -f values-prod.yaml", desc: "Génère le YAML final pour vérification" }
+      { cmd: "helm template mon-app ./chart -f values-prod.yaml", desc: "Génère le YAML final pour vérification" },
+      { cmd: "helm template mon-app ./chart | kubectl apply --dry-run=client -f -", desc: "Génère le YAML puis le valide côté serveur sans rien appliquer" }
     ],
     flags: ["-f", "--set", "--debug"]
   },
@@ -7370,7 +7493,8 @@ const COMMANDS = [
     description: "Affiche l'état actuel d'une release Helm déployée.",
     syntax: "helm status <release>",
     examples: [
-      { cmd: "helm status mon-app", desc: "État et notes de déploiement de la release" }
+      { cmd: "helm status mon-app", desc: "État et notes de déploiement de la release" },
+      { cmd: "helm status mon-app --show-desc", desc: "Ajoute la description du chart à l'état affiché" }
     ],
     flags: ["--revision <n>"]
   },
@@ -7381,7 +7505,8 @@ const COMMANDS = [
     description: "Vérifie qu'un chart local est correctement structuré et ne contient pas d'erreurs.",
     syntax: "helm lint <chemin_chart>",
     examples: [
-      { cmd: "helm lint ./mon-chart", desc: "Valide la structure du chart avant publication" }
+      { cmd: "helm lint ./mon-chart", desc: "Valide la structure du chart avant publication" },
+      { cmd: "helm lint ./mon-chart --strict", desc: "Fait échouer le lint sur les simples avertissements, pas juste les erreurs" }
     ],
     flags: []
   },
@@ -7404,7 +7529,8 @@ const COMMANDS = [
     description: "Génère la structure de dossiers standard pour créer un nouveau chart Helm.",
     syntax: "helm create <nom_chart>",
     examples: [
-      { cmd: "helm create mon-app", desc: "Crée l'arborescence (Chart.yaml, values.yaml, templates/)" }
+      { cmd: "helm create mon-app", desc: "Crée l'arborescence (Chart.yaml, values.yaml, templates/)" },
+      { cmd: "helm create mon-app --starter mon-modele", desc: "Part d'un chart modèle personnalisé plutôt que du gabarit par défaut" }
     ],
     flags: []
   },
@@ -7415,7 +7541,8 @@ const COMMANDS = [
     description: "Affiche l'historique des révisions d'une release, nécessaire avant un rollback.",
     syntax: "helm history <release>",
     examples: [
-      { cmd: "helm history mon-app", desc: "Liste les révisions avec leur statut" }
+      { cmd: "helm history mon-app", desc: "Liste les révisions avec leur statut" },
+      { cmd: "helm history mon-app --max 5", desc: "Limite l'affichage aux 5 dernières révisions" }
     ],
     flags: ["--max (limiter le nombre de révisions affichées)"]
   },
@@ -7438,7 +7565,8 @@ const COMMANDS = [
     description: "Affiche les manifests Kubernetes réellement déployés par une release.",
     syntax: "helm get manifest <release>",
     examples: [
-      { cmd: "helm get manifest mon-app", desc: "Montre le YAML final appliqué au cluster" }
+      { cmd: "helm get manifest mon-app", desc: "Montre le YAML final appliqué au cluster" },
+      { cmd: "helm get manifest mon-app | grep -A5 kind:", desc: "Filtre pour ne voir que le type de chaque ressource déployée" }
     ],
     flags: []
   },
@@ -7461,7 +7589,8 @@ const COMMANDS = [
     description: "Affiche les différences qu'un upgrade appliquerait, sans rien modifier (nécessite le plugin helm-diff).",
     syntax: "helm diff upgrade <release> <chart>",
     examples: [
-      { cmd: "helm diff upgrade mon-app ./chart", desc: "Montre les changements avant un vrai upgrade" }
+      { cmd: "helm diff upgrade mon-app ./chart", desc: "Montre les changements avant un vrai upgrade" },
+      { cmd: "helm diff upgrade mon-app ./chart --set replicas=5", desc: "Prévisualise l'impact d'un changement précis avant de l'appliquer" }
     ],
     flags: []
   },
@@ -7472,7 +7601,8 @@ const COMMANDS = [
     description: "Exécute les tests définis dans un chart pour vérifier qu'une release fonctionne correctement.",
     syntax: "helm test <release>",
     examples: [
-      { cmd: "helm test mon-app", desc: "Lance les hooks de test du chart" }
+      { cmd: "helm test mon-app", desc: "Lance les hooks de test du chart" },
+      { cmd: "helm test mon-app --logs", desc: "Affiche aussi les logs des pods de test, pas juste le résultat" }
     ],
     flags: ["--logs (affiche les logs des tests)"]
   },
@@ -7483,7 +7613,8 @@ const COMMANDS = [
     description: "Télécharge un chart depuis un repo sans l'installer, utile pour l'inspecter ou le modifier.",
     syntax: "helm pull <chart> [--untar]",
     examples: [
-      { cmd: "helm pull bitnami/nginx --untar", desc: "Télécharge et extrait le chart localement" }
+      { cmd: "helm pull bitnami/nginx --untar", desc: "Télécharge et extrait le chart localement" },
+      { cmd: "helm pull bitnami/nginx --version 15.0.0 --untar", desc: "Télécharge une version précise plutôt que la dernière" }
     ],
     flags: ["--untar", "--version"]
   },
@@ -7494,7 +7625,8 @@ const COMMANDS = [
     description: "Affiche les variables d'environnement et chemins de configuration utilisés par Helm.",
     syntax: "helm env",
     examples: [
-      { cmd: "helm env", desc: "Affiche HELM_CACHE_HOME, HELM_CONFIG_HOME, etc." }
+      { cmd: "helm env", desc: "Affiche HELM_CACHE_HOME, HELM_CONFIG_HOME, etc." },
+      { cmd: "HELM_NAMESPACE=$(helm env | grep NAMESPACE)", desc: "Récupère une variable précise pour un script" }
     ],
     flags: []
   },
@@ -7517,7 +7649,8 @@ const COMMANDS = [
     description: "Effectue un upgrade et revient automatiquement en arrière si le déploiement échoue.",
     syntax: "helm upgrade --atomic <release> <chart>",
     examples: [
-      { cmd: "helm upgrade --atomic --timeout 5m mon-app ./chart", desc: "Upgrade avec rollback automatique en cas d'échec" }
+      { cmd: "helm upgrade --atomic --timeout 5m mon-app ./chart", desc: "Upgrade avec rollback automatique en cas d'échec" },
+      { cmd: "helm upgrade --atomic --cleanup-on-fail mon-app ./chart", desc: "Supprime aussi les ressources déjà créées en cas d'échec" }
     ],
     flags: ["--atomic", "--timeout"]
   },
@@ -7528,7 +7661,8 @@ const COMMANDS = [
     description: "Attend que toutes les ressources déployées soient prêtes avant de déclarer le succès.",
     syntax: "helm upgrade --wait <release> <chart>",
     examples: [
-      { cmd: "helm upgrade --wait --timeout 10m mon-app ./chart", desc: "Attend que les pods soient en état Running" }
+      { cmd: "helm upgrade --wait --timeout 10m mon-app ./chart", desc: "Attend que les pods soient en état Running" },
+      { cmd: "helm upgrade --wait --wait-for-jobs mon-app ./chart", desc: "Attend en plus que les Jobs associés se terminent" }
     ],
     flags: ["--wait", "--timeout"]
   },
@@ -7539,7 +7673,8 @@ const COMMANDS = [
     description: "Affiche les hooks (pre-install, post-upgrade...) définis dans un chart déployé.",
     syntax: "helm get hooks <release>",
     examples: [
-      { cmd: "helm get hooks mon-app", desc: "Liste les hooks associés à la release" }
+      { cmd: "helm get hooks mon-app", desc: "Liste les hooks associés à la release" },
+      { cmd: "helm get hooks mon-app | grep helm.sh/hook", desc: "Filtre pour ne voir que le type de chaque hook" }
     ],
     flags: []
   },
@@ -7550,7 +7685,8 @@ const COMMANDS = [
     description: "Liste tous les dépôts de charts configurés localement.",
     syntax: "helm repo list",
     examples: [
-      { cmd: "helm repo list", desc: "Affiche les repos ajoutés avec leur URL" }
+      { cmd: "helm repo list", desc: "Affiche les repos ajoutés avec leur URL" },
+      { cmd: "helm repo list -o json", desc: "Sortie JSON exploitable par un script" }
     ],
     flags: []
   },
@@ -7561,7 +7697,8 @@ const COMMANDS = [
     description: "Simule une installation sans rien déployer, en contactant le cluster pour valider les manifests.",
     syntax: "helm install --dry-run <release> <chart>",
     examples: [
-      { cmd: "helm install --dry-run test-release ./chart", desc: "Simule en validant la config contre le cluster" }
+      { cmd: "helm install --dry-run test-release ./chart", desc: "Simule en validant la config contre le cluster" },
+      { cmd: "helm install --dry-run --debug test-release ./chart", desc: "Ajoute les logs de debug détaillés du rendu" }
     ],
     flags: ["--dry-run", "--debug"]
   },
@@ -7572,7 +7709,8 @@ const COMMANDS = [
     description: "Force une valeur à être traitée comme une chaîne même si elle ressemble à un nombre ou booléen.",
     syntax: "helm upgrade --set-string <clé>=<valeur> <release> <chart>",
     examples: [
-      { cmd: "helm upgrade --set-string tag='1.0' mon-app ./chart", desc: "Force le tag à être une string, pas un nombre" }
+      { cmd: "helm upgrade --set-string tag='1.0' mon-app ./chart", desc: "Force le tag à être une string, pas un nombre" },
+      { cmd: "helm install mon-app ./chart --set-string version='1.2'", desc: "Fonctionne aussi dès l'installation initiale, pas seulement à l'upgrade" }
     ],
     flags: ["--set-string"]
   },
@@ -7583,7 +7721,8 @@ const COMMANDS = [
     description: "Affiche les métadonnées d'un chart (nom, version, description, dépendances).",
     syntax: "helm show chart <chart>",
     examples: [
-      { cmd: "helm show chart bitnami/postgresql", desc: "Affiche Chart.yaml du chart postgresql" }
+      { cmd: "helm show chart bitnami/postgresql", desc: "Affiche Chart.yaml du chart postgresql" },
+      { cmd: "helm show values bitnami/postgresql", desc: "La même commande avec 'values' affiche la config par défaut plutôt que les métadonnées" }
     ],
     flags: ["chart", "values", "readme", "all"]
   },
@@ -7594,7 +7733,8 @@ const COMMANDS = [
     description: "Recherche un chart sur Artifact Hub (répertoire central de tous les charts publics Helm).",
     syntax: "helm search hub <motif>",
     examples: [
-      { cmd: "helm search hub wordpress", desc: "Cherche tous les charts wordpress disponibles publiquement" }
+      { cmd: "helm search hub wordpress", desc: "Cherche tous les charts wordpress disponibles publiquement" },
+      { cmd: "helm search hub wordpress --max-col-width 80", desc: "Élargit l'affichage pour lire les descriptions complètes" }
     ],
     flags: ["--max-col-width"]
   },
@@ -7605,7 +7745,8 @@ const COMMANDS = [
     description: "Génère automatiquement un nom de release unique, sans avoir à le spécifier manuellement.",
     syntax: "helm install --generate-name <chart>",
     examples: [
-      { cmd: "helm install --generate-name bitnami/nginx", desc: "Crée nginx-1718000000 ou similaire automatiquement" }
+      { cmd: "helm install --generate-name bitnami/nginx", desc: "Crée nginx-1718000000 ou similaire automatiquement" },
+      { cmd: "helm install --generate-name --dry-run bitnami/nginx", desc: "Prévisualise le nom généré sans installer pour de vrai" }
     ],
     flags: ["--generate-name"]
   },
@@ -7616,7 +7757,8 @@ const COMMANDS = [
     description: "Réutilise les valeurs de la release précédente lors d'un upgrade, en ne précisant que les valeurs à changer.",
     syntax: "helm upgrade --reuse-values <release> <chart>",
     examples: [
-      { cmd: "helm upgrade --reuse-values --set image.tag=2.0 mon-app ./chart", desc: "Met à jour uniquement le tag d'image" }
+      { cmd: "helm upgrade --reuse-values --set image.tag=2.0 mon-app ./chart", desc: "Met à jour uniquement le tag d'image" },
+      { cmd: "helm upgrade --reset-then-reuse-values mon-app ./chart", desc: "Repart des valeurs par défaut du chart puis réapplique celles déjà personnalisées" }
     ],
     flags: ["--reuse-values", "--reset-values"]
   },
@@ -7627,7 +7769,8 @@ const COMMANDS = [
     description: "Vérifie la signature cryptographique d'un chart téléchargé pour s'assurer de son intégrité.",
     syntax: "helm verify <chart.tgz>",
     examples: [
-      { cmd: "helm verify mon-chart-1.0.0.tgz", desc: "Vérifie la signature du fichier .tgz" }
+      { cmd: "helm verify mon-chart-1.0.0.tgz", desc: "Vérifie la signature du fichier .tgz" },
+      { cmd: "helm install mon-app ./mon-chart-1.0.0.tgz --verify", desc: "Vérifie la signature automatiquement au moment de l'installation" }
     ],
     flags: ["--keyring"]
   },
@@ -7650,7 +7793,8 @@ const COMMANDS = [
     description: "Déploie dans un namespace spécifique et le crée s'il n'existe pas encore.",
     syntax: "helm install <release> <chart> --namespace <ns> --create-namespace",
     examples: [
-      { cmd: "helm install mon-app ./chart --namespace monitoring --create-namespace", desc: "Crée le namespace monitoring si besoin puis déploie" }
+      { cmd: "helm install mon-app ./chart --namespace monitoring --create-namespace", desc: "Crée le namespace monitoring si besoin puis déploie" },
+      { cmd: "helm upgrade --install mon-app ./chart --namespace monitoring --create-namespace", desc: "Installe si absent, met à jour sinon — idempotent" }
     ],
     flags: ["--namespace", "--create-namespace"]
   },
@@ -7661,7 +7805,8 @@ const COMMANDS = [
     description: "Affiche les notes post-installation définies dans le chart, contenant souvent les instructions de connexion.",
     syntax: "helm get notes <release>",
     examples: [
-      { cmd: "helm get notes mon-app", desc: "Affiche les instructions post-déploiement du chart" }
+      { cmd: "helm get notes mon-app", desc: "Affiche les instructions post-déploiement du chart" },
+      { cmd: "helm install mon-app ./chart --no-hooks", desc: "À l'inverse, désactive tous les hooks (dont l'affichage des notes) lors de l'installation" }
     ],
     flags: []
   },
@@ -7672,7 +7817,8 @@ const COMMANDS = [
     description: "Désinstalle la release mais conserve son historique pour permettre un rollback ultérieur.",
     syntax: "helm uninstall <release> --keep-history",
     examples: [
-      { cmd: "helm uninstall mon-app --keep-history", desc: "Supprime les ressources mais garde l'historique dans Helm" }
+      { cmd: "helm uninstall mon-app --keep-history", desc: "Supprime les ressources mais garde l'historique dans Helm" },
+      { cmd: "helm rollback mon-app 1", desc: "Une fois l'historique conservé, un rollback vers une ancienne révision reste possible" }
     ],
     flags: ["--keep-history"]
   },
@@ -7683,7 +7829,8 @@ const COMMANDS = [
     description: "Reconstruit le dossier charts/ depuis Chart.lock plutôt que depuis Chart.yaml.",
     syntax: "helm dependency build <chemin_chart>",
     examples: [
-      { cmd: "helm dependency build ./mon-chart", desc: "Reconstruit depuis le fichier lock pour reproductibilité" }
+      { cmd: "helm dependency build ./mon-chart", desc: "Reconstruit depuis le fichier lock pour reproductibilité" },
+      { cmd: "helm dependency update ./mon-chart", desc: "Recalcule aussi Chart.lock depuis Chart.yaml, contrairement à build qui se fie au lock existant" }
     ],
     flags: []
   },
@@ -7694,7 +7841,8 @@ const COMMANDS = [
     description: "Sauvegarde un chart local dans le cache OCI Helm ou l'exporte vers un dossier.",
     syntax: "helm chart save <chemin> <registry>/<chart>:<tag>",
     examples: [
-      { cmd: "helm chart save ./mon-chart registry.example.com/charts/mon-chart:1.0", desc: "Sauvegarde dans le cache OCI local" }
+      { cmd: "helm chart save ./mon-chart registry.example.com/charts/mon-chart:1.0", desc: "Sauvegarde dans le cache OCI local" },
+      { cmd: "helm chart export registry.example.com/charts/mon-chart:1.0 -d ./exported", desc: "Exporte depuis le cache OCI vers un dossier local" }
     ],
     flags: []
   },
@@ -7705,7 +7853,8 @@ const COMMANDS = [
     description: "Définit le délai maximum d'attente pour que les ressources soient prêtes lors d'un install/upgrade.",
     syntax: "helm install <release> <chart> --timeout <durée>",
     examples: [
-      { cmd: "helm install mon-app ./chart --timeout 10m0s", desc: "Attend 10 minutes avant de déclarer un échec" }
+      { cmd: "helm install mon-app ./chart --timeout 10m0s", desc: "Attend 10 minutes avant de déclarer un échec" },
+      { cmd: "helm upgrade mon-app ./chart --timeout 2m0s", desc: "Un timeout plus court, utile pour échouer vite en CI" }
     ],
     flags: ["--timeout"]
   },
@@ -7716,7 +7865,8 @@ const COMMANDS = [
     description: "Affiche uniquement les releases en état d'échec.",
     syntax: "helm list --failed",
     examples: [
-      { cmd: "helm list --failed -A", desc: "Liste toutes les releases en échec sur tous les namespaces" }
+      { cmd: "helm list --failed -A", desc: "Liste toutes les releases en échec sur tous les namespaces" },
+      { cmd: "helm list --pending", desc: "Affiche les releases bloquées en cours d'installation/upgrade plutôt qu'en échec" }
     ],
     flags: ["--failed", "--pending", "--deployed"]
   },
@@ -7727,7 +7877,8 @@ const COMMANDS = [
     description: "Charge le contenu d'un fichier comme valeur d'une clé (pratique pour injecter des certificats ou configs).",
     syntax: "helm install <release> <chart> --set-file <clé>=<fichier>",
     examples: [
-      { cmd: "helm install mon-app ./chart --set-file config.tls=cert.pem", desc: "Injecte le contenu d'un certificat comme valeur" }
+      { cmd: "helm install mon-app ./chart --set-file config.tls=cert.pem", desc: "Injecte le contenu d'un certificat comme valeur" },
+      { cmd: "helm upgrade mon-app ./chart --set-file config.tls=nouveau-cert.pem", desc: "Remplace un certificat déjà en place lors d'une mise à jour" }
     ],
     flags: ["--set-file"]
   },
@@ -7752,7 +7903,8 @@ const COMMANDS = [
     description: "Affiche l'identité IAM actuellement utilisée par la CLI (utile pour vérifier la config).",
     syntax: "aws sts get-caller-identity",
     examples: [
-      { cmd: "aws sts get-caller-identity", desc: "Affiche le compte, l'ARN et l'utilisateur courants" }
+      { cmd: "aws sts get-caller-identity", desc: "Affiche le compte, l'ARN et l'utilisateur courants" },
+      { cmd: "aws sts get-caller-identity --profile prod", desc: "Vérifie l'identité utilisée par un profil précis avant toute action risquée" }
     ],
     flags: []
   },
@@ -7824,7 +7976,8 @@ const COMMANDS = [
     description: "Suit en temps réel les logs CloudWatch d'un groupe de logs donné.",
     syntax: "aws logs tail <groupe_logs> [--follow]",
     examples: [
-      { cmd: "aws logs tail /aws/lambda/ma-fonction --follow", desc: "Suit les logs d'une fonction Lambda en direct" }
+      { cmd: "aws logs tail /aws/lambda/ma-fonction --follow", desc: "Suit les logs d'une fonction Lambda en direct" },
+      { cmd: "aws logs tail /aws/lambda/ma-fonction --since 1h --filter-pattern ERROR", desc: "Ne montre que les erreurs de la dernière heure" }
     ],
     flags: ["--follow", "--since"]
   },
@@ -7835,7 +7988,8 @@ const COMMANDS = [
     description: "Déploie une stack d'infrastructure définie dans un template CloudFormation.",
     syntax: "aws cloudformation deploy --template-file <fichier> --stack-name <nom>",
     examples: [
-      { cmd: "aws cloudformation deploy --template-file infra.yaml --stack-name mon-app", desc: "Déploie ou met à jour la stack" }
+      { cmd: "aws cloudformation deploy --template-file infra.yaml --stack-name mon-app", desc: "Déploie ou met à jour la stack" },
+      { cmd: "aws cloudformation deploy --template-file infra.yaml --stack-name mon-app --capabilities CAPABILITY_IAM", desc: "Nécessaire quand le template crée des rôles/permissions IAM" }
     ],
     flags: ["--template-file", "--stack-name", "--parameter-overrides"]
   },
@@ -7846,7 +8000,8 @@ const COMMANDS = [
     description: "Récupère un token d'authentification pour connecter Docker à un registry ECR privé.",
     syntax: "aws ecr get-login-password | docker login --username AWS --password-stdin <registry>",
     examples: [
-      { cmd: "aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin 123456789.dkr.ecr.eu-west-3.amazonaws.com", desc: "Connecte Docker à ECR" }
+      { cmd: "aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin 123456789.dkr.ecr.eu-west-3.amazonaws.com", desc: "Connecte Docker à ECR" },
+      { cmd: "aws ecr get-login-password --region eu-west-3", desc: "Sans le pipe vers docker login : affiche juste le token brut" }
     ],
     flags: ["--region"]
   },
@@ -7857,7 +8012,8 @@ const COMMANDS = [
     description: "Exécute une fonction Lambda manuellement depuis la CLI, utile pour tester.",
     syntax: "aws lambda invoke --function-name <nom> <fichier_sortie>",
     examples: [
-      { cmd: "aws lambda invoke --function-name ma-fonction sortie.json", desc: "Invoque la fonction et écrit la réponse dans un fichier" }
+      { cmd: "aws lambda invoke --function-name ma-fonction sortie.json", desc: "Invoque la fonction et écrit la réponse dans un fichier" },
+      { cmd: "aws lambda invoke --function-name ma-fonction --payload '{\"key\":\"value\"}' --cli-binary-format raw-in-base64-out sortie.json", desc: "Passe un payload JSON personnalisé en entrée" }
     ],
     flags: ["--function-name", "--payload"]
   },
@@ -7880,7 +8036,8 @@ const COMMANDS = [
     description: "Crée et lance une nouvelle instance EC2 avec ses paramètres (AMI, type, clé SSH...).",
     syntax: "aws ec2 run-instances --image-id <ami> --instance-type <type> --key-name <clé>",
     examples: [
-      { cmd: "aws ec2 run-instances --image-id ami-0abcd1234 --instance-type t3.micro --key-name ma-cle", desc: "Lance une instance basique" }
+      { cmd: "aws ec2 run-instances --image-id ami-0abcd1234 --instance-type t3.micro --key-name ma-cle", desc: "Lance une instance basique" },
+      { cmd: "aws ec2 run-instances --image-id ami-0abcd1234 --instance-type t3.micro --count 3 --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=web}]'", desc: "Lance 3 instances identiques, taguées d'un coup" }
     ],
     flags: ["--image-id", "--instance-type", "--key-name", "--security-group-ids"]
   },
@@ -7891,7 +8048,8 @@ const COMMANDS = [
     description: "Termine (détruit définitivement) une ou plusieurs instances EC2.",
     syntax: "aws ec2 terminate-instances --instance-ids <id>",
     examples: [
-      { cmd: "aws ec2 terminate-instances --instance-ids i-0abc123def", desc: "Détruit l'instance définitivement" }
+      { cmd: "aws ec2 terminate-instances --instance-ids i-0abc123def", desc: "Détruit l'instance définitivement" },
+      { cmd: "aws ec2 terminate-instances --instance-ids i-0abc123def i-0def456ghi", desc: "Termine plusieurs instances en une seule commande" }
     ],
     flags: ["--instance-ids"]
   },
@@ -7914,7 +8072,8 @@ const COMMANDS = [
     description: "Crée un nouveau bucket S3 avec des options avancées (région, ACL, versioning).",
     syntax: "aws s3api create-bucket --bucket <nom> --region <région>",
     examples: [
-      { cmd: "aws s3api create-bucket --bucket mon-bucket-unique --region eu-west-3 --create-bucket-configuration LocationConstraint=eu-west-3", desc: "Crée un bucket en région Paris" }
+      { cmd: "aws s3api create-bucket --bucket mon-bucket-unique --region eu-west-3 --create-bucket-configuration LocationConstraint=eu-west-3", desc: "Crée un bucket en région Paris" },
+      { cmd: "aws s3 mb s3://mon-bucket-unique --region eu-west-3", desc: "Équivalent simplifié sans les options avancées de s3api" }
     ],
     flags: ["--bucket", "--region", "--create-bucket-configuration"]
   },
@@ -7937,7 +8096,8 @@ const COMMANDS = [
     description: "Récupère des métriques de monitoring CloudWatch (CPU, réseau, etc.) sur une période donnée.",
     syntax: "aws cloudwatch get-metric-statistics --namespace <ns> --metric-name <métrique>",
     examples: [
-      { cmd: "aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name CPUUtilization --dimensions Name=InstanceId,Value=i-0abc123def --start-time 2026-06-20T00:00:00Z --end-time 2026-06-20T23:59:59Z --period 3600 --statistics Average", desc: "Récupère l'utilisation CPU horaire" }
+      { cmd: "aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name CPUUtilization --dimensions Name=InstanceId,Value=i-0abc123def --start-time 2026-06-20T00:00:00Z --end-time 2026-06-20T23:59:59Z --period 3600 --statistics Average", desc: "Récupère l'utilisation CPU horaire" },
+      { cmd: "aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name CPUUtilization --statistics Average --period 300 --start-time 2026-07-01T00:00:00Z --end-time 2026-07-02T00:00:00Z --dimensions Name=InstanceId,Value=i-0abc123def", desc: "Moyenne sur des créneaux de 5 minutes plutôt que le max" }
     ],
     flags: ["--namespace", "--metric-name", "--period", "--statistics"]
   },
@@ -7960,7 +8120,8 @@ const COMMANDS = [
     description: "Ouvre une session shell distante vers une instance EC2 via SSM, sans avoir besoin de SSH/clé exposée.",
     syntax: "aws ssm start-session --target <instance_id>",
     examples: [
-      { cmd: "aws ssm start-session --target i-0abc123def", desc: "Ouvre un shell distant sécurisé sans port SSH ouvert" }
+      { cmd: "aws ssm start-session --target i-0abc123def", desc: "Ouvre un shell distant sécurisé sans port SSH ouvert" },
+      { cmd: "aws ssm start-session --target i-0abc123def --document-name AWS-StartPortForwardingSession --parameters '{\"portNumber\":[\"3389\"],\"localPortNumber\":[\"9999\"]}'", desc: "Redirige un port distant (ex. RDP) vers la machine locale via le tunnel SSM" }
     ],
     flags: ["--target"]
   },
@@ -7971,7 +8132,8 @@ const COMMANDS = [
     description: "Récupère la valeur d'un secret stocké dans AWS Secrets Manager.",
     syntax: "aws secretsmanager get-secret-value --secret-id <nom>",
     examples: [
-      { cmd: "aws secretsmanager get-secret-value --secret-id prod/db/password", desc: "Récupère un mot de passe stocké de façon sécurisée" }
+      { cmd: "aws secretsmanager get-secret-value --secret-id prod/db/password", desc: "Récupère un mot de passe stocké de façon sécurisée" },
+      { cmd: "aws secretsmanager get-secret-value --secret-id prod/db/password --query SecretString --output text", desc: "N'extrait que la valeur brute du secret, sans le JSON englobant" }
     ],
     flags: ["--secret-id"]
   },
@@ -7982,7 +8144,8 @@ const COMMANDS = [
     description: "Configure kubectl pour pointer vers un cluster EKS (Kubernetes managé AWS).",
     syntax: "aws eks update-kubeconfig --name <cluster> --region <région>",
     examples: [
-      { cmd: "aws eks update-kubeconfig --name cluster-prod --region eu-west-3", desc: "Configure kubectl pour ce cluster EKS" }
+      { cmd: "aws eks update-kubeconfig --name cluster-prod --region eu-west-3", desc: "Configure kubectl pour ce cluster EKS" },
+      { cmd: "aws eks update-kubeconfig --name cluster-prod --region eu-west-3 --alias prod", desc: "Nomme le contexte kubectl généré, pratique avec plusieurs clusters" }
     ],
     flags: ["--name", "--region"]
   },
@@ -8005,7 +8168,8 @@ const COMMANDS = [
     description: "Liste les sous-réseaux (subnets) d'un ou plusieurs VPC.",
     syntax: "aws ec2 describe-subnets [--filters <filtre>]",
     examples: [
-      { cmd: "aws ec2 describe-subnets --filters \"Name=vpc-id,Values=vpc-0abc123\"", desc: "Liste les subnets d'un VPC précis" }
+      { cmd: "aws ec2 describe-subnets --filters \"Name=vpc-id,Values=vpc-0abc123\"", desc: "Liste les subnets d'un VPC précis" },
+      { cmd: "aws ec2 describe-subnets --query 'Subnets[*].[SubnetId,CidrBlock]' --output table", desc: "Affiche seulement l'ID et le CIDR, sous forme de tableau lisible" }
     ],
     flags: ["--filters"]
   },
@@ -8028,7 +8192,8 @@ const COMMANDS = [
     description: "Génère une paire de clés d'accès (access key / secret key) pour un utilisateur IAM.",
     syntax: "aws iam create-access-key --user-name <user>",
     examples: [
-      { cmd: "aws iam create-access-key --user-name tom", desc: "Crée des credentials programmatiques pour tom" }
+      { cmd: "aws iam create-access-key --user-name tom", desc: "Crée des credentials programmatiques pour tom" },
+      { cmd: "aws iam list-access-keys --user-name tom", desc: "Vérifie les clés déjà existantes avant d'en créer une nouvelle" }
     ],
     flags: ["--user-name"]
   },
@@ -8039,7 +8204,8 @@ const COMMANDS = [
     description: "Génère une paire de clés SSH EC2 et retourne la clé privée.",
     syntax: "aws ec2 create-key-pair --key-name <nom> --query 'KeyMaterial' --output text > clé.pem",
     examples: [
-      { cmd: "aws ec2 create-key-pair --key-name ma-cle --query 'KeyMaterial' --output text > ma-cle.pem && chmod 400 ma-cle.pem", desc: "Crée et sauvegarde la clé privée correctement" }
+      { cmd: "aws ec2 create-key-pair --key-name ma-cle --query 'KeyMaterial' --output text > ma-cle.pem && chmod 400 ma-cle.pem", desc: "Crée et sauvegarde la clé privée correctement" },
+      { cmd: "aws ec2 describe-key-pairs", desc: "Liste les paires de clés déjà existantes avant d'en créer une nouvelle" }
     ],
     flags: ["--key-name"]
   },
@@ -8062,7 +8228,8 @@ const COMMANDS = [
     description: "Liste les load balancers (ALB/NLB/CLB) du compte et leur configuration.",
     syntax: "aws elbv2 describe-load-balancers",
     examples: [
-      { cmd: "aws elbv2 describe-load-balancers", desc: "Liste les ALB/NLB du compte" }
+      { cmd: "aws elbv2 describe-load-balancers", desc: "Liste les ALB/NLB du compte" },
+      { cmd: "aws elbv2 describe-target-health --target-group-arn arn:aws:elasticloadbalancing:eu-west-3:123456:targetgroup/mon-tg/abc123", desc: "Vérifie l'état de santé des cibles derrière le load balancer" }
     ],
     flags: []
   },
@@ -8073,7 +8240,8 @@ const COMMANDS = [
     description: "Publie un message sur un topic SNS (notification push, email, SMS...).",
     syntax: "aws sns publish --topic-arn <arn> --message '<message>'",
     examples: [
-      { cmd: "aws sns publish --topic-arn arn:aws:sns:eu-west-3:123456:alertes --message 'Déploiement terminé'", desc: "Envoie une notification sur le topic" }
+      { cmd: "aws sns publish --topic-arn arn:aws:sns:eu-west-3:123456:alertes --message 'Déploiement terminé'", desc: "Envoie une notification sur le topic" },
+      { cmd: "aws sns publish --topic-arn arn:aws:sns:eu-west-3:123456:alertes --subject 'Alerte prod' --message file://message.txt", desc: "Envoie le contenu d'un fichier comme corps du message, avec un sujet" }
     ],
     flags: ["--topic-arn", "--message", "--subject"]
   },
@@ -8084,7 +8252,8 @@ const COMMANDS = [
     description: "Envoie un message dans une file d'attente SQS.",
     syntax: "aws sqs send-message --queue-url <url> --message-body '<message>'",
     examples: [
-      { cmd: "aws sqs send-message --queue-url https://sqs.eu-west-3.amazonaws.com/123/ma-queue --message-body '{\"task\":\"process\"}'", desc: "Envoie un message JSON dans la queue" }
+      { cmd: "aws sqs send-message --queue-url https://sqs.eu-west-3.amazonaws.com/123/ma-queue --message-body '{\"task\":\"process\"}'", desc: "Envoie un message JSON dans la queue" },
+      { cmd: "aws sqs receive-message --queue-url https://sqs.eu-west-3.amazonaws.com/123/ma-queue", desc: "Récupère les messages en attente dans la même file" }
     ],
     flags: ["--queue-url", "--message-body"]
   },
@@ -8095,7 +8264,8 @@ const COMMANDS = [
     description: "Crée une alarme CloudWatch qui déclenche une action quand une métrique dépasse un seuil.",
     syntax: "aws cloudwatch put-metric-alarm --alarm-name <nom> --metric-name <métrique>",
     examples: [
-      { cmd: "aws cloudwatch put-metric-alarm --alarm-name HighCPU --metric-name CPUUtilization --namespace AWS/EC2 --threshold 80 --comparison-operator GreaterThanThreshold --evaluation-periods 2 --period 300 --statistic Average --alarm-actions <arn_sns>", desc: "Alerte si CPU > 80% pendant 10 min" }
+      { cmd: "aws cloudwatch put-metric-alarm --alarm-name HighCPU --metric-name CPUUtilization --namespace AWS/EC2 --threshold 80 --comparison-operator GreaterThanThreshold --evaluation-periods 2 --period 300 --statistic Average --alarm-actions <arn_sns>", desc: "Alerte si CPU > 80% pendant 10 min" },
+      { cmd: "aws cloudwatch describe-alarms --alarm-names HighCPU", desc: "Vérifie l'état actuel de l'alarme une fois créée (OK/ALARM/INSUFFICIENT_DATA)" }
     ],
     flags: ["--threshold", "--comparison-operator", "--alarm-actions"]
   },
@@ -8106,7 +8276,8 @@ const COMMANDS = [
     description: "Active le versioning S3 sur un bucket pour conserver un historique des modifications.",
     syntax: "aws s3api put-bucket-versioning --bucket <nom> --versioning-configuration Status=Enabled",
     examples: [
-      { cmd: "aws s3api put-bucket-versioning --bucket mon-bucket --versioning-configuration Status=Enabled", desc: "Active le versioning pour protéger contre les suppressions accidentelles" }
+      { cmd: "aws s3api put-bucket-versioning --bucket mon-bucket --versioning-configuration Status=Enabled", desc: "Active le versioning pour protéger contre les suppressions accidentelles" },
+      { cmd: "aws s3api get-bucket-versioning --bucket mon-bucket", desc: "Vérifie si le versioning est déjà actif avant d'y toucher" }
     ],
     flags: []
   },
@@ -8117,7 +8288,8 @@ const COMMANDS = [
     description: "Crée un nouveau dépôt d'images Docker dans Amazon ECR.",
     syntax: "aws ecr create-repository --repository-name <nom>",
     examples: [
-      { cmd: "aws ecr create-repository --repository-name mon-app", desc: "Crée un repo ECR pour l'image" }
+      { cmd: "aws ecr create-repository --repository-name mon-app", desc: "Crée un repo ECR pour l'image" },
+      { cmd: "aws ecr describe-repositories", desc: "Liste les dépôts déjà existants avant d'en créer un nouveau" }
     ],
     flags: ["--repository-name", "--image-scanning-configuration"]
   },
@@ -8128,7 +8300,8 @@ const COMMANDS = [
     description: "Liste les groupes d'auto-scaling EC2 et leur configuration (min/max/current).",
     syntax: "aws autoscaling describe-auto-scaling-groups",
     examples: [
-      { cmd: "aws autoscaling describe-auto-scaling-groups", desc: "Liste les groupes et leur capacité" }
+      { cmd: "aws autoscaling describe-auto-scaling-groups", desc: "Liste les groupes et leur capacité" },
+      { cmd: "aws autoscaling set-desired-capacity --auto-scaling-group-name mon-asg --desired-capacity 4", desc: "Ajuste manuellement le nombre d'instances souhaité" }
     ],
     flags: []
   },
@@ -8151,7 +8324,8 @@ const COMMANDS = [
     description: "Liste les dépôts Git hébergés dans AWS CodeCommit.",
     syntax: "aws codecommit list-repositories",
     examples: [
-      { cmd: "aws codecommit list-repositories", desc: "Liste tous les repos CodeCommit du compte" }
+      { cmd: "aws codecommit list-repositories", desc: "Liste tous les repos CodeCommit du compte" },
+      { cmd: "aws codecommit get-repository --repository-name mon-repo", desc: "Détaille un dépôt précis (URL clone, description, date de création)" }
     ],
     flags: []
   },
@@ -8162,7 +8336,8 @@ const COMMANDS = [
     description: "Déclenche manuellement l'exécution d'un pipeline CI/CD AWS CodePipeline.",
     syntax: "aws codepipeline start-pipeline-execution --name <pipeline>",
     examples: [
-      { cmd: "aws codepipeline start-pipeline-execution --name mon-pipeline", desc: "Lance le pipeline immédiatement" }
+      { cmd: "aws codepipeline start-pipeline-execution --name mon-pipeline", desc: "Lance le pipeline immédiatement" },
+      { cmd: "aws codepipeline get-pipeline-state --name mon-pipeline", desc: "Vérifie l'état actuel de chaque étape du pipeline" }
     ],
     flags: ["--name"]
   },
@@ -8197,7 +8372,8 @@ const COMMANDS = [
     description: "Génère une URL présignée temporaire pour partager un objet S3 privé sans credentials.",
     syntax: "aws s3 presign s3://<bucket>/<objet> --expires-in <secondes>",
     examples: [
-      { cmd: "aws s3 presign s3://mon-bucket/rapport.pdf --expires-in 3600", desc: "Génère un lien valide 1 heure pour télécharger le fichier" }
+      { cmd: "aws s3 presign s3://mon-bucket/rapport.pdf --expires-in 3600", desc: "Génère un lien valide 1 heure pour télécharger le fichier" },
+      { cmd: "aws s3 presign s3://mon-bucket/rapport.pdf --expires-in 300", desc: "Lien valide seulement 5 minutes, pour un partage ponctuel" }
     ],
     flags: ["--expires-in"]
   },
@@ -8208,7 +8384,8 @@ const COMMANDS = [
     description: "Recherche des AMI (images machine) disponibles selon des filtres (OS, architecture, état).",
     syntax: "aws ec2 describe-images --owners <owner> --filters <filtre>",
     examples: [
-      { cmd: "aws ec2 describe-images --owners amazon --filters 'Name=name,Values=amzn2-ami-hvm-*-x86_64-gp2' --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId'", desc: "Trouve l'AMI Amazon Linux 2 la plus récente" }
+      { cmd: "aws ec2 describe-images --owners amazon --filters 'Name=name,Values=amzn2-ami-hvm-*-x86_64-gp2' --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId'", desc: "Trouve l'AMI Amazon Linux 2 la plus récente" },
+      { cmd: "aws ec2 describe-images --image-ids ami-0abcd1234", desc: "Cherche une AMI précise par son ID plutôt que par filtres" }
     ],
     flags: ["--owners", "--filters"]
   },
@@ -8245,7 +8422,8 @@ const COMMANDS = [
     description: "Crée un groupe de ressources, le conteneur logique de base de toute infrastructure Azure.",
     syntax: "az group create --name <nom> --location <région>",
     examples: [
-      { cmd: "az group create --name rg-prod --location francecentral", desc: "Crée un groupe de ressources en France" }
+      { cmd: "az group create --name rg-prod --location francecentral", desc: "Crée un groupe de ressources en France" },
+      { cmd: "az group list --output table", desc: "Vérifie les groupes déjà existants avant d'en créer un nouveau" }
     ],
     flags: ["--name", "--location"]
   },
@@ -8256,7 +8434,8 @@ const COMMANDS = [
     description: "Crée une machine virtuelle Azure avec ses paramètres réseau et de sécurité de base.",
     syntax: "az vm create --resource-group <rg> --name <nom> --image <image>",
     examples: [
-      { cmd: "az vm create --resource-group rg-prod --name vm-web01 --image Debian12 --admin-username tom --generate-ssh-keys", desc: "Crée une VM Debian avec clé SSH générée" }
+      { cmd: "az vm create --resource-group rg-prod --name vm-web01 --image Debian12 --admin-username tom --generate-ssh-keys", desc: "Crée une VM Debian avec clé SSH générée" },
+      { cmd: "az vm create --resource-group rg-prod --name vm-web02 --image Debian12 --size Standard_B2s --admin-username tom --generate-ssh-keys", desc: "Choisit explicitement la taille de la VM plutôt que la valeur par défaut" }
     ],
     flags: ["--resource-group", "--image", "--size", "--admin-username"]
   },
@@ -8279,7 +8458,8 @@ const COMMANDS = [
     description: "Crée un compte de stockage Azure (blob, fichiers, files d'attente, tables).",
     syntax: "az storage account create --name <nom> --resource-group <rg> --sku <sku>",
     examples: [
-      { cmd: "az storage account create --name stockagedonnees --resource-group rg-prod --sku Standard_LRS", desc: "Crée un compte de stockage standard" }
+      { cmd: "az storage account create --name stockagedonnees --resource-group rg-prod --sku Standard_LRS", desc: "Crée un compte de stockage standard" },
+      { cmd: "az storage account create --name stockagedonnees --resource-group rg-prod --sku Standard_GRS --kind StorageV2", desc: "Réplication géo-redondante plutôt que locale, pour la reprise après sinistre" }
     ],
     flags: ["--sku", "--location", "--kind"]
   },
@@ -8290,7 +8470,8 @@ const COMMANDS = [
     description: "Récupère les identifiants d'un cluster AKS (Kubernetes managé Azure) pour configurer kubectl.",
     syntax: "az aks get-credentials --resource-group <rg> --name <cluster>",
     examples: [
-      { cmd: "az aks get-credentials --resource-group rg-prod --name aks-prod", desc: "Configure kubectl pour pointer vers ce cluster AKS" }
+      { cmd: "az aks get-credentials --resource-group rg-prod --name aks-prod", desc: "Configure kubectl pour pointer vers ce cluster AKS" },
+      { cmd: "az aks get-credentials --resource-group rg-prod --name aks-prod --admin", desc: "Récupère les identifiants admin, avec plus de droits que le compte utilisateur standard" }
     ],
     flags: ["--resource-group", "--name", "--overwrite-existing"]
   },
@@ -8301,7 +8482,8 @@ const COMMANDS = [
     description: "Crée une application web Azure App Service à partir d'un plan d'hébergement existant.",
     syntax: "az webapp create --resource-group <rg> --plan <plan> --name <nom>",
     examples: [
-      { cmd: "az webapp create --resource-group rg-prod --plan plan-web --name mon-app-web", desc: "Crée une web app" }
+      { cmd: "az webapp create --resource-group rg-prod --plan plan-web --name mon-app-web", desc: "Crée une web app" },
+      { cmd: "az webapp list --resource-group rg-prod --output table", desc: "Vérifie les web apps déjà déployées dans ce groupe" }
     ],
     flags: ["--resource-group", "--plan", "--runtime"]
   },
@@ -8312,7 +8494,8 @@ const COMMANDS = [
     description: "Ajoute une règle à un groupe de sécurité réseau (NSG), équivalent Azure d'un pare-feu de sous-réseau.",
     syntax: "az network nsg rule create --resource-group <rg> --nsg-name <nsg> --name <règle> --priority <n>",
     examples: [
-      { cmd: "az network nsg rule create --resource-group rg-prod --nsg-name nsg-web --name AllowSSH --priority 100 --destination-port-ranges 22 --access Allow", desc: "Autorise le port 22" }
+      { cmd: "az network nsg rule create --resource-group rg-prod --nsg-name nsg-web --name AllowSSH --priority 100 --destination-port-ranges 22 --access Allow", desc: "Autorise le port 22" },
+      { cmd: "az network nsg rule list --resource-group rg-prod --nsg-name nsg-web --output table", desc: "Vérifie les règles déjà en place avant d'en ajouter une nouvelle" }
     ],
     flags: ["--priority", "--access", "--destination-port-ranges"]
   },
@@ -8323,7 +8506,8 @@ const COMMANDS = [
     description: "Attribue un rôle RBAC à un utilisateur, groupe ou application sur une ressource donnée.",
     syntax: "az role assignment create --assignee <identité> --role <rôle> --scope <portée>",
     examples: [
-      { cmd: "az role assignment create --assignee tom@nexa.com --role Contributor --scope /subscriptions/xxx/resourceGroups/rg-prod", desc: "Donne le rôle Contributor sur un groupe de ressources" }
+      { cmd: "az role assignment create --assignee tom@nexa.com --role Contributor --scope /subscriptions/xxx/resourceGroups/rg-prod", desc: "Donne le rôle Contributor sur un groupe de ressources" },
+      { cmd: "az role assignment list --assignee tom@nexa.com --output table", desc: "Vérifie les rôles déjà attribués à cet utilisateur" }
     ],
     flags: ["--assignee", "--role", "--scope"]
   },
@@ -8334,7 +8518,8 @@ const COMMANDS = [
     description: "Liste toutes les ressources Azure d'un abonnement ou groupe de ressources.",
     syntax: "az resource list [--resource-group <rg>]",
     examples: [
-      { cmd: "az resource list --resource-group rg-prod --output table", desc: "Liste les ressources d'un groupe en format tableau" }
+      { cmd: "az resource list --resource-group rg-prod --output table", desc: "Liste les ressources d'un groupe en format tableau" },
+      { cmd: "az resource list --resource-group rg-prod --query \"[?type=='Microsoft.Compute/virtualMachines']\"", desc: "Filtre pour n'afficher qu'un type de ressource précis" }
     ],
     flags: ["--resource-group", "--output table|json"]
   },
@@ -8345,7 +8530,8 @@ const COMMANDS = [
     description: "Déploie un template ARM/Bicep dans un groupe de ressources (équivalent CloudFormation côté Azure).",
     syntax: "az deployment group create --resource-group <rg> --template-file <fichier>",
     examples: [
-      { cmd: "az deployment group create --resource-group rg-prod --template-file infra.bicep", desc: "Déploie une infrastructure définie en Bicep" }
+      { cmd: "az deployment group create --resource-group rg-prod --template-file infra.bicep", desc: "Déploie une infrastructure définie en Bicep" },
+      { cmd: "az deployment group validate --resource-group rg-prod --template-file infra.bicep", desc: "Valide le template avant de le déployer pour de vrai" }
     ],
     flags: ["--template-file", "--parameters"]
   },
@@ -8356,7 +8542,8 @@ const COMMANDS = [
     description: "Supprime un groupe de ressources et toutes les ressources qu'il contient.",
     syntax: "az group delete --name <nom> [--yes]",
     examples: [
-      { cmd: "az group delete --name rg-test --yes --no-wait", desc: "Supprime sans confirmation, en arrière-plan" }
+      { cmd: "az group delete --name rg-test --yes --no-wait", desc: "Supprime sans confirmation, en arrière-plan" },
+      { cmd: "az group delete --name rg-test", desc: "Sans --yes ni --no-wait : demande confirmation et attend la fin de la suppression" }
     ],
     flags: ["--yes (sans confirmation)", "--no-wait"]
   },
@@ -8367,7 +8554,8 @@ const COMMANDS = [
     description: "Affiche les adresses IP publiques et privées des machines virtuelles.",
     syntax: "az vm list-ip-addresses --resource-group <rg>",
     examples: [
-      { cmd: "az vm list-ip-addresses --resource-group rg-prod --output table", desc: "Liste les IP de toutes les VM d'un groupe" }
+      { cmd: "az vm list-ip-addresses --resource-group rg-prod --output table", desc: "Liste les IP de toutes les VM d'un groupe" },
+      { cmd: "az vm list-ip-addresses --resource-group rg-prod --name vm-web01", desc: "Limite l'affichage à une seule VM plutôt que tout le groupe" }
     ],
     flags: ["--resource-group"]
   },
@@ -8390,7 +8578,8 @@ const COMMANDS = [
     description: "Crée un serveur de base de données SQL managé Azure.",
     syntax: "az sql server create --name <nom> --resource-group <rg> --admin-user <user> --admin-password <mdp>",
     examples: [
-      { cmd: "az sql server create --name sql-prod --resource-group rg-prod --admin-user sqladmin --admin-password \"P@ssw0rd!\"", desc: "Crée un serveur SQL" }
+      { cmd: "az sql server create --name sql-prod --resource-group rg-prod --admin-user sqladmin --admin-password \"P@ssw0rd!\"", desc: "Crée un serveur SQL" },
+      { cmd: "az sql db create --resource-group rg-prod --server sql-prod --name ma-base --service-objective S0", desc: "Crée ensuite une base de données sur ce serveur" }
     ],
     flags: ["--admin-user", "--admin-password", "--location"]
   },
@@ -8401,7 +8590,8 @@ const COMMANDS = [
     description: "Récupère les métriques de monitoring (CPU, réseau...) d'une ressource Azure.",
     syntax: "az monitor metrics list --resource <id_ressource> --metric <métrique>",
     examples: [
-      { cmd: "az monitor metrics list --resource <id_vm> --metric \"Percentage CPU\"", desc: "Récupère l'utilisation CPU d'une VM" }
+      { cmd: "az monitor metrics list --resource <id_vm> --metric \"Percentage CPU\"", desc: "Récupère l'utilisation CPU d'une VM" },
+      { cmd: "az monitor metrics list --resource <id_vm> --metric \"Percentage CPU\" --start-time 2026-07-01T00:00:00Z --interval PT1H", desc: "Sur une période et un intervalle précis, plutôt que l'instantané par défaut" }
     ],
     flags: ["--resource", "--metric", "--interval"]
   },
@@ -8412,7 +8602,8 @@ const COMMANDS = [
     description: "Crée une Function App pour héberger du code serverless sur Azure.",
     syntax: "az functionapp create --resource-group <rg> --name <nom> --storage-account <stockage>",
     examples: [
-      { cmd: "az functionapp create --resource-group rg-prod --name ma-fonction --storage-account stockagedonnees --runtime python --consumption-plan-location francecentral", desc: "Crée une fonction serverless Python" }
+      { cmd: "az functionapp create --resource-group rg-prod --name ma-fonction --storage-account stockagedonnees --runtime python --consumption-plan-location francecentral", desc: "Crée une fonction serverless Python" },
+      { cmd: "az functionapp list --resource-group rg-prod --output table", desc: "Vérifie les Function Apps déjà déployées dans ce groupe" }
     ],
     flags: ["--runtime", "--consumption-plan-location", "--storage-account"]
   },
@@ -8423,7 +8614,8 @@ const COMMANDS = [
     description: "Construit une image Docker directement dans le cloud via Azure Container Registry, sans Docker local.",
     syntax: "az acr build --registry <registry> --image <image> .",
     examples: [
-      { cmd: "az acr build --registry monregistry --image monapp:1.0 .", desc: "Build et push l'image en une commande, sans Docker local" }
+      { cmd: "az acr build --registry monregistry --image monapp:1.0 .", desc: "Build et push l'image en une commande, sans Docker local" },
+      { cmd: "az acr build --registry monregistry --image monapp:{{.Run.ID}} .", desc: "Tague automatiquement chaque build avec un identifiant unique" }
     ],
     flags: ["--registry", "--image"]
   },
@@ -8434,7 +8626,8 @@ const COMMANDS = [
     description: "Crée un groupe de machines virtuelles identiques (scale set) avec autoscaling.",
     syntax: "az vmss create --resource-group <rg> --name <nom> --image <image> --instance-count <n>",
     examples: [
-      { cmd: "az vmss create --resource-group rg-prod --name vmss-web --image Debian12 --instance-count 3", desc: "Crée 3 VMs identiques avec load balancing" }
+      { cmd: "az vmss create --resource-group rg-prod --name vmss-web --image Debian12 --instance-count 3", desc: "Crée 3 VMs identiques avec load balancing" },
+      { cmd: "az vmss scale --resource-group rg-prod --name vmss-web --new-capacity 6", desc: "Ajuste ensuite le nombre d'instances du scale set" }
     ],
     flags: ["--instance-count", "--image", "--upgrade-policy-mode"]
   },
@@ -8445,7 +8638,8 @@ const COMMANDS = [
     description: "Applique une politique de gouvernance (Azure Policy) sur un scope donné, pour imposer des règles.",
     syntax: "az policy assignment create --policy <politique> --scope <portée>",
     examples: [
-      { cmd: "az policy assignment create --policy \"deny-public-ip\" --scope /subscriptions/xxx/resourceGroups/rg-prod", desc: "Interdit la création d'IP publiques sur le groupe" }
+      { cmd: "az policy assignment create --policy \"deny-public-ip\" --scope /subscriptions/xxx/resourceGroups/rg-prod", desc: "Interdit la création d'IP publiques sur le groupe" },
+      { cmd: "az policy assignment list --scope /subscriptions/xxx/resourceGroups/rg-prod", desc: "Vérifie les politiques déjà appliquées sur ce groupe" }
     ],
     flags: ["--policy", "--scope"]
   },
@@ -8456,7 +8650,8 @@ const COMMANDS = [
     description: "Ajoute ou met à jour des tags (métadonnées) sur une ressource Azure, utile pour l'organisation et la facturation.",
     syntax: "az tag update --resource-id <id> --operation merge --tags <clé>=<valeur>",
     examples: [
-      { cmd: "az tag update --resource-id <id_vm> --operation merge --tags Environnement=Production Service=Web", desc: "Ajoute des tags à une ressource" }
+      { cmd: "az tag update --resource-id <id_vm> --operation merge --tags Environnement=Production Service=Web", desc: "Ajoute des tags à une ressource" },
+      { cmd: "az tag list --resource-id <id_vm>", desc: "Affiche les tags déjà présents avant de les modifier" }
     ],
     flags: ["--operation merge|replace|delete"]
   },
@@ -8467,7 +8662,8 @@ const COMMANDS = [
     description: "Crée un réseau virtuel (VNet) Azure avec son bloc d'adresses CIDR.",
     syntax: "az network vnet create --resource-group <rg> --name <nom> --address-prefix <cidr>",
     examples: [
-      { cmd: "az network vnet create --resource-group rg-prod --name vnet-prod --address-prefix 10.0.0.0/16", desc: "Crée un VNet avec le bloc 10.0.0.0/16" }
+      { cmd: "az network vnet create --resource-group rg-prod --name vnet-prod --address-prefix 10.0.0.0/16", desc: "Crée un VNet avec le bloc 10.0.0.0/16" },
+      { cmd: "az network vnet list --resource-group rg-prod --output table", desc: "Vérifie les VNets déjà existants avant d'en créer un nouveau" }
     ],
     flags: ["--address-prefix", "--subnet-name", "--subnet-prefix"]
   },
@@ -8478,7 +8674,8 @@ const COMMANDS = [
     description: "Crée un sous-réseau dans un VNet Azure existant.",
     syntax: "az network subnet create --resource-group <rg> --vnet-name <vnet> --name <nom> --address-prefix <cidr>",
     examples: [
-      { cmd: "az network subnet create --resource-group rg-prod --vnet-name vnet-prod --name subnet-web --address-prefix 10.0.1.0/24", desc: "Crée un subnet pour les serveurs web" }
+      { cmd: "az network subnet create --resource-group rg-prod --vnet-name vnet-prod --name subnet-web --address-prefix 10.0.1.0/24", desc: "Crée un subnet pour les serveurs web" },
+      { cmd: "az network vnet subnet list --resource-group rg-prod --vnet-name vnet-prod --output table", desc: "Liste les sous-réseaux déjà présents dans ce VNet" }
     ],
     flags: ["--address-prefix", "--network-security-group"]
   },
@@ -8489,7 +8686,8 @@ const COMMANDS = [
     description: "Crée un cluster Kubernetes managé (AKS) avec ses paramètres de nœuds et réseau.",
     syntax: "az aks create --resource-group <rg> --name <nom> --node-count <n>",
     examples: [
-      { cmd: "az aks create --resource-group rg-prod --name aks-prod --node-count 3 --generate-ssh-keys", desc: "Crée un cluster AKS à 3 nœuds" }
+      { cmd: "az aks create --resource-group rg-prod --name aks-prod --node-count 3 --generate-ssh-keys", desc: "Crée un cluster AKS à 3 nœuds" },
+      { cmd: "az aks create --resource-group rg-prod --name aks-prod --node-count 3 --enable-cluster-autoscaler --min-count 2 --max-count 6", desc: "Active l'autoscaling du cluster entre 2 et 6 nœuds" }
     ],
     flags: ["--node-count", "--node-vm-size", "--generate-ssh-keys"]
   },
@@ -8500,7 +8698,8 @@ const COMMANDS = [
     description: "Ajuste le nombre de nœuds d'un cluster AKS existant.",
     syntax: "az aks scale --resource-group <rg> --name <cluster> --node-count <n>",
     examples: [
-      { cmd: "az aks scale --resource-group rg-prod --name aks-prod --node-count 5", desc: "Passe le cluster à 5 nœuds" }
+      { cmd: "az aks scale --resource-group rg-prod --name aks-prod --node-count 5", desc: "Passe le cluster à 5 nœuds" },
+      { cmd: "az aks nodepool scale --resource-group rg-prod --cluster-name aks-prod --name nodepool1 --node-count 5", desc: "Scale un pool de nœuds précis plutôt que le cluster entier" }
     ],
     flags: ["--node-count"]
   },
@@ -8511,7 +8710,8 @@ const COMMANDS = [
     description: "Déploie une application conteneurisée via Azure Container Apps (serverless containers).",
     syntax: "az containerapp create --name <nom> --resource-group <rg> --image <image>",
     examples: [
-      { cmd: "az containerapp create --name mon-app --resource-group rg-prod --image nginx:latest --target-port 80 --ingress external", desc: "Déploie nginx en serverless avec accès externe" }
+      { cmd: "az containerapp create --name mon-app --resource-group rg-prod --image nginx:latest --target-port 80 --ingress external", desc: "Déploie nginx en serverless avec accès externe" },
+      { cmd: "az containerapp update --name mon-app --resource-group rg-prod --image mon-app:2.0", desc: "Met à jour l'image d'une Container App déjà déployée" }
     ],
     flags: ["--image", "--target-port", "--ingress", "--cpu", "--memory"]
   },
@@ -8522,7 +8722,8 @@ const COMMANDS = [
     description: "Exécute une requête KQL (Kusto) sur un workspace Log Analytics pour analyser les logs.",
     syntax: "az monitor log-analytics query --workspace <id> --analytics-query '<kql>'",
     examples: [
-      { cmd: "az monitor log-analytics query --workspace <id_workspace> --analytics-query 'AzureActivity | limit 10'", desc: "Récupère les 10 dernières activités du tenant" }
+      { cmd: "az monitor log-analytics query --workspace <id_workspace> --analytics-query 'AzureActivity | limit 10'", desc: "Récupère les 10 dernières activités du tenant" },
+      { cmd: "az monitor log-analytics query --workspace <id_workspace> --analytics-query 'AzureActivity | where Level == \"Error\" | limit 20'", desc: "Ne remonte que les évènements en erreur" }
     ],
     flags: ["--workspace", "--analytics-query"]
   },
@@ -8533,7 +8734,8 @@ const COMMANDS = [
     description: "Crée un coffre Recovery Services pour gérer les sauvegardes de VMs et bases de données Azure.",
     syntax: "az backup vault create --resource-group <rg> --name <nom> --location <région>",
     examples: [
-      { cmd: "az backup vault create --resource-group rg-prod --name vault-prod --location francecentral", desc: "Crée un coffre de sauvegarde" }
+      { cmd: "az backup vault create --resource-group rg-prod --name vault-prod --location francecentral", desc: "Crée un coffre de sauvegarde" },
+      { cmd: "az backup vault list --resource-group rg-prod --output table", desc: "Vérifie les coffres de sauvegarde déjà créés dans ce groupe" }
     ],
     flags: ["--location"]
   },
@@ -8544,7 +8746,8 @@ const COMMANDS = [
     description: "Crée un disque managé Azure (SSD ou HDD) à attacher à une VM.",
     syntax: "az disk create --resource-group <rg> --name <nom> --size-gb <n> --sku <sku>",
     examples: [
-      { cmd: "az disk create --resource-group rg-prod --name disk-data --size-gb 128 --sku Premium_LRS", desc: "Crée un SSD premium de 128 Go" }
+      { cmd: "az disk create --resource-group rg-prod --name disk-data --size-gb 128 --sku Premium_LRS", desc: "Crée un SSD premium de 128 Go" },
+      { cmd: "az disk list --resource-group rg-prod --output table", desc: "Liste les disques déjà existants dans ce groupe" }
     ],
     flags: ["--size-gb", "--sku Standard_LRS|Premium_LRS|UltraSSD_LRS"]
   },
@@ -8555,7 +8758,8 @@ const COMMANDS = [
     description: "Attache un disque managé existant à une VM Azure.",
     syntax: "az vm disk attach --resource-group <rg> --vm-name <vm> --name <disque>",
     examples: [
-      { cmd: "az vm disk attach --resource-group rg-prod --vm-name vm-web01 --name disk-data", desc: "Attache le disque à la VM" }
+      { cmd: "az vm disk attach --resource-group rg-prod --vm-name vm-web01 --name disk-data", desc: "Attache le disque à la VM" },
+      { cmd: "az vm disk detach --resource-group rg-prod --vm-name vm-web01 --name disk-data", desc: "Détache le disque, opération inverse" }
     ],
     flags: ["--vm-name", "--name"]
   },
@@ -8566,7 +8770,8 @@ const COMMANDS = [
     description: "Crée une adresse IP publique statique à associer à une VM ou un load balancer.",
     syntax: "az network public-ip create --resource-group <rg> --name <nom> --allocation-method Static",
     examples: [
-      { cmd: "az network public-ip create --resource-group rg-prod --name ip-web01 --allocation-method Static --sku Standard", desc: "Crée une IP publique statique standard" }
+      { cmd: "az network public-ip create --resource-group rg-prod --name ip-web01 --allocation-method Static --sku Standard", desc: "Crée une IP publique statique standard" },
+      { cmd: "az network public-ip list --resource-group rg-prod --output table", desc: "Vérifie les IP publiques déjà allouées dans ce groupe" }
     ],
     flags: ["--allocation-method", "--sku"]
   },
@@ -8577,7 +8782,8 @@ const COMMANDS = [
     description: "Crée un load balancer Azure pour distribuer le trafic entre plusieurs VMs.",
     syntax: "az network lb create --resource-group <rg> --name <nom>",
     examples: [
-      { cmd: "az network lb create --resource-group rg-prod --name lb-web --sku Standard --public-ip-address ip-web", desc: "Crée un load balancer Standard avec IP publique" }
+      { cmd: "az network lb create --resource-group rg-prod --name lb-web --sku Standard --public-ip-address ip-web", desc: "Crée un load balancer Standard avec IP publique" },
+      { cmd: "az network lb rule create --resource-group rg-prod --lb-name lb-web --name http-rule --protocol Tcp --frontend-port 80 --backend-port 80", desc: "Ajoute une règle de routage sur le load balancer une fois créé" }
     ],
     flags: ["--sku", "--public-ip-address"]
   },
@@ -8600,7 +8806,8 @@ const COMMANDS = [
     description: "Crée un groupe Azure Active Directory (Entra ID) pour gérer des permissions collectives.",
     syntax: "az ad group create --display-name <nom> --mail-nickname <alias>",
     examples: [
-      { cmd: "az ad group create --display-name \"Equipe DevOps\" --mail-nickname devops", desc: "Crée un groupe pour l'équipe DevOps" }
+      { cmd: "az ad group create --display-name \"Equipe DevOps\" --mail-nickname devops", desc: "Crée un groupe pour l'équipe DevOps" },
+      { cmd: "az ad group member add --group \"Equipe DevOps\" --member-id <object-id-utilisateur>", desc: "Ajoute un membre au groupe une fois celui-ci créé" }
     ],
     flags: ["--display-name", "--mail-nickname"]
   },
@@ -8611,7 +8818,8 @@ const COMMANDS = [
     description: "Crée une instance Azure Spring Apps pour déployer des microservices Spring Boot managés.",
     syntax: "az spring create --name <nom> --resource-group <rg>",
     examples: [
-      { cmd: "az spring create --name spring-prod --resource-group rg-prod", desc: "Crée une instance Spring Apps" }
+      { cmd: "az spring create --name spring-prod --resource-group rg-prod", desc: "Crée une instance Spring Apps" },
+      { cmd: "az spring app create --name mon-service --resource-group rg-prod --service spring-prod", desc: "Déploie ensuite une application dans cette instance Spring Apps" }
     ],
     flags: []
   },
@@ -8622,7 +8830,8 @@ const COMMANDS = [
     description: "Crée un profil Azure CDN pour distribuer du contenu statique via un réseau mondial de points de présence.",
     syntax: "az cdn profile create --resource-group <rg> --name <nom> --sku <sku>",
     examples: [
-      { cmd: "az cdn profile create --resource-group rg-prod --name cdn-mon-app --sku Standard_Microsoft", desc: "Crée un profil CDN Microsoft Standard" }
+      { cmd: "az cdn profile create --resource-group rg-prod --name cdn-mon-app --sku Standard_Microsoft", desc: "Crée un profil CDN Microsoft Standard" },
+      { cmd: "az cdn endpoint create --resource-group rg-prod --profile-name cdn-mon-app --name mon-app-endpoint --origin monsite.z6.web.core.windows.net", desc: "Crée un endpoint CDN pointant vers l'origine du contenu" }
     ],
     flags: ["--sku Standard_Microsoft|Standard_Akamai|Premium_Verizon"]
   },
@@ -8633,7 +8842,8 @@ const COMMANDS = [
     description: "Crée un abonnement aux événements Azure Event Grid pour réagir aux changements de ressources.",
     syntax: "az eventgrid event-subscription create --name <nom> --source-resource-id <id> --endpoint <url>",
     examples: [
-      { cmd: "az eventgrid event-subscription create --name mon-sub --source-resource-id <id_topic> --endpoint https://mon-app/webhook", desc: "Déclenche un webhook lors d'événements" }
+      { cmd: "az eventgrid event-subscription create --name mon-sub --source-resource-id <id_topic> --endpoint https://mon-app/webhook", desc: "Déclenche un webhook lors d'événements" },
+      { cmd: "az eventgrid event-subscription list --source-resource-id <id_topic>", desc: "Vérifie les abonnements déjà en place sur cette source d'évènements" }
     ],
     flags: ["--source-resource-id", "--endpoint"]
   },
@@ -8644,7 +8854,8 @@ const COMMANDS = [
     description: "Liste les images VM disponibles dans Azure Marketplace selon l'OS, l'éditeur ou l'offre.",
     syntax: "az vm image list [--publisher <pub>] [--offer <offre>]",
     examples: [
-      { cmd: "az vm image list --publisher Canonical --offer UbuntuServer --all --output table", desc: "Liste les images Ubuntu disponibles" }
+      { cmd: "az vm image list --publisher Canonical --offer UbuntuServer --all --output table", desc: "Liste les images Ubuntu disponibles" },
+      { cmd: "az vm image list --publisher Canonical --offer UbuntuServer --sku 22_04-lts --all", desc: "Filtre sur une version précise (SKU) plutôt que toute l'offre" }
     ],
     flags: ["--publisher", "--offer", "--sku", "--all"]
   },
@@ -8655,7 +8866,8 @@ const COMMANDS = [
     description: "Crée un compte Azure AI Services (anciennement Cognitive Services) pour utiliser les API d'IA Azure.",
     syntax: "az cognitiveservices account create --name <nom> --resource-group <rg> --kind <service> --sku <sku>",
     examples: [
-      { cmd: "az cognitiveservices account create --name ai-mon-app --resource-group rg-prod --kind OpenAI --sku S0 --location swedencentral", desc: "Crée un endpoint Azure OpenAI" }
+      { cmd: "az cognitiveservices account create --name ai-mon-app --resource-group rg-prod --kind OpenAI --sku S0 --location swedencentral", desc: "Crée un endpoint Azure OpenAI" },
+      { cmd: "az cognitiveservices account list --resource-group rg-prod --output table", desc: "Vérifie les comptes AI Services déjà créés dans ce groupe" }
     ],
     flags: ["--kind", "--sku", "--location"]
   },
@@ -8666,7 +8878,8 @@ const COMMANDS = [
     description: "Crée un service Azure SignalR pour ajouter des communications temps réel à une application web.",
     syntax: "az signalr create --name <nom> --resource-group <rg> --sku <sku>",
     examples: [
-      { cmd: "az signalr create --name signalr-mon-app --resource-group rg-prod --sku Standard_S1", desc: "Crée un service SignalR Standard" }
+      { cmd: "az signalr create --name signalr-mon-app --resource-group rg-prod --sku Standard_S1", desc: "Crée un service SignalR Standard" },
+      { cmd: "az signalr key list --name signalr-mon-app --resource-group rg-prod", desc: "Récupère les clés de connexion une fois le service créé" }
     ],
     flags: ["--sku Free_F1|Standard_S1"]
   },
@@ -8677,7 +8890,8 @@ const COMMANDS = [
     description: "Crée un projet Azure DevOps via l'extension CLI az devops (repos, pipelines, boards centralisés).",
     syntax: "az devops project create --name <nom> --org <organisation>",
     examples: [
-      { cmd: "az devops project create --name mon-projet --org https://dev.azure.com/nexa", desc: "Crée un projet dans l'organisation Azure DevOps" }
+      { cmd: "az devops project create --name mon-projet --org https://dev.azure.com/nexa", desc: "Crée un projet dans l'organisation Azure DevOps" },
+      { cmd: "az devops project list --org https://dev.azure.com/nexa", desc: "Vérifie les projets déjà existants dans l'organisation" }
     ],
     flags: ["--name", "--org", "--visibility public|private"]
   }
