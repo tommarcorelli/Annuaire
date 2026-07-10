@@ -109,7 +109,8 @@
     konami:      { icon: '🌈', title: 'Konami Master',   desc: '↑↑↓↓←→←→BA · mode rainbow activé !' },
     night_owl:   { icon: '🦉', title: 'Night Owl',       desc: 'Mode sombre activé.' },
     bright_side: { icon: '☀️', title: 'Bright Side',     desc: 'Mode jour activé. Shōnen vibes.' },
-    scenario_master: { icon: '🧭', title: 'Mission Master', desc: 'Tous les scénarios terminés. Respect.' }
+    scenario_master: { icon: '🧭', title: 'Mission Master', desc: 'Tous les scénarios terminés. Respect.' },
+    install_master: { icon: '💿', title: 'OS Whisperer', desc: 'Tous les guides d\'installation terminés. Rien ne te fait plus peur.' }
   };
 
   function unlocked() {
@@ -213,6 +214,14 @@
   // ───────────────────────────────────────────────
   document.addEventListener('mpx:all-scenarios-done', function () {
     unlock('scenario_master');
+  });
+
+  // ───────────────────────────────────────────────
+  // 8ter. INSTALLATION : achievement quand tous les guides sont terminés
+  //       (événement émis par installation.html)
+  // ───────────────────────────────────────────────
+  document.addEventListener('mpx:all-installs-done', function () {
+    unlock('install_master');
   });
 
   // ───────────────────────────────────────────────

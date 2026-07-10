@@ -145,6 +145,42 @@
       line-height: 1.5;
     }
     .st-note b { color: var(--accent-2); }
+    .sc-trouble {
+      margin-top: 18px;
+      padding: 14px 16px;
+      background: var(--bg);
+      border: 1px dashed var(--border2);
+      border-left: 3px solid var(--accent);
+    }
+    .sc-trouble-title {
+      font-family: var(--pixel, var(--display));
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .sc-trouble-item { margin-bottom: 10px; }
+    .sc-trouble-item:last-child { margin-bottom: 0; }
+    .sc-trouble-q {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink, var(--text));
+    }
+    .sc-trouble-q::before { content: "✗ "; color: var(--accent); }
+    .sc-trouble-a {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin: 3px 0 0 16px;
+      line-height: 1.5;
+    }
+    .sc-trouble-a b, .sc-trouble-a code { color: var(--accent-2); }
+    .sc-trouble-a code {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg2);
+      padding: 1px 5px;
+      border: 1px solid var(--border2);
+    }
     .sc-links {
       font-family: 'JetBrains Mono', monospace;
       font-size: 11.5px;
@@ -156,6 +192,24 @@
       border-bottom: 1px dashed currentColor;
     }
     .sc-links a:hover { opacity: 0.75; }
+
+    .sc-dl { margin: -10px 0 12px; }
+    .sc-dl a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--bg);
+      background: var(--c, var(--accent));
+      padding: 5px 12px;
+      text-decoration: none;
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0 #000;
+      transition: transform 0.1s;
+    }
+    .sc-dl a:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 #000; }
 
     /* Liens auto-générés vers les fiches de l'annuaire (scenarios-data.js) */
     .sc-cmds {
@@ -283,6 +337,7 @@
       <div class="sc-body">
         <p class="sc-intro">La base la plus courante en homelab et en prod : installeur graphique simple, dépôts stables, énorme documentation en cas de blocage.</p>
         <p class="sc-links"><a href="commands.html?os=debian">⌘ commandes Debian/Ubuntu</a></p>
+        <p class="sc-dl"><a href="https://www.debian.org/download" target="_blank" rel="noopener">📥 Télécharger l'ISO officielle</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Télécharger l'image et vérifier son empreinte</div>
@@ -313,6 +368,21 @@
             <p class="st-note">Confirme l'IP obtenue et que le service SSH tourne avant de débrancher l'écran/clavier.</p>
           </li>
         </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">La clé USB n'apparaît pas dans le menu de boot</div>
+            <div class="sc-trouble-a">Vérifie le mode Legacy/UEFI dans le BIOS — une clé créée en mode UEFI ne boot pas toujours en Legacy, et inversement.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Écran noir juste après le démarrage du live-USB (souvent avec un GPU Nvidia)</div>
+            <div class="sc-trouble-a">Au menu de boot, appuie sur <b>e</b> (ou Tab) et ajoute <code>nomodeset</code> à la ligne de démarrage avant de continuer.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Aucune carte réseau détectée pendant l'installation</div>
+            <div class="sc-trouble-a">Le firmware du contrôleur réseau manque souvent sur l'image "netinst" standard — retélécharge l'image incluant les <b>firmware non-free</b>.</div>
+          </div>
+        </div>
       </div>
     </details>
 
@@ -329,6 +399,7 @@
       <div class="sc-body">
         <p class="sc-intro">Le mode diskless (tout en RAM, rien sur disque tant qu'on ne commit pas) déroute au début — c'est un choix volontaire, pas un bug.</p>
         <p class="sc-links"><a href="commands.html?os=alpine">⌘ commandes Alpine</a></p>
+        <p class="sc-dl"><a href="https://alpinelinux.org/downloads/" target="_blank" rel="noopener">📥 Télécharger l'ISO officielle</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Télécharger l'image "standard" (pas "virt" sauf usage cloud/conteneur pur)</div>
@@ -353,6 +424,21 @@
             <p class="st-note">En mode diskless, n'oublie jamais <code>lbu commit</code> après un changement, sinon tout repart de zéro au redémarrage.</p>
           </li>
         </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">setup-alpine échoue au moment de choisir le disque</div>
+            <div class="sc-trouble-a">Vérifie d'abord que le disque cible existe bien avec <code>fdisk -l</code> ou <code>lsblk</code> avant de relancer l'assistant.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Toute la configuration disparaît après un redémarrage</div>
+            <div class="sc-trouble-a">C'est le mode diskless normal (tout vit en RAM) — il faut lancer <code>lbu commit</code> après chaque changement pour que ce soit sauvegardé sur le disque.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Pas d'environnement graphique après l'installation</div>
+            <div class="sc-trouble-a">Normal : l'image "standard" n'installe volontairement aucune interface graphique — il faut l'ajouter soi-même via <code>apk add xorg-server ...</code> si besoin.</div>
+          </div>
+        </div>
       </div>
     </details>
 
@@ -369,6 +455,7 @@
       <div class="sc-body">
         <p class="sc-intro">Pas d'installeur graphique par défaut : chaque étape est une commande volontaire. Plus long, mais on comprend exactement ce qui a été fait — l'esprit même d'Arch.</p>
         <p class="sc-links"><a href="commands.html?os=arch">⌘ commandes Arch Linux</a></p>
+        <p class="sc-dl"><a href="https://archlinux.org/download/" target="_blank" rel="noopener">📥 Télécharger l'ISO officielle</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Vérifier la connectivité réseau depuis le live-ISO</div>
@@ -402,6 +489,21 @@
             <code>pacman -Syu</code>
           </li>
         </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">pacstrap échoue avec une erreur de clé de signature (archlinux-keyring)</div>
+            <div class="sc-trouble-a">Rafraîchis les clés avant de continuer : <code>pacman -Sy archlinux-keyring</code> puis relance <code>pacstrap</code>.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Le système ne démarre plus après le premier redémarrage</div>
+            <div class="sc-trouble-a">Vérifie que <code>/boot/efi</code> était bien monté avant <code>grub-install</code>, et que <code>grub-mkconfig -o /boot/grub/grub.cfg</code> a bien été exécuté dans le chroot.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Pas de réseau une fois dans le système fraîchement installé</div>
+            <div class="sc-trouble-a">Les services réseau ne sont pas activés par défaut après un <code>pacstrap</code> minimal — active <code>systemctl enable --now NetworkManager</code> (ou <code>systemd-networkd</code>).</div>
+          </div>
+        </div>
       </div>
     </details>
 
@@ -418,6 +520,7 @@
       <div class="sc-body">
         <p class="sc-intro">Anaconda (l'installeur graphique) est bien plus complet que celui de Debian — SELinux et le partitionnement avancé se configurent dès l'install, autant en profiter.</p>
         <p class="sc-links"><a href="commands.html?os=rhel">⌘ commandes RHEL</a></p>
+        <p class="sc-dl"><a href="https://rockylinux.org/download" target="_blank" rel="noopener">📥 Télécharger l'ISO officielle</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Vérifier l'empreinte de l'image téléchargée</div>
@@ -446,6 +549,21 @@
             <code>firewall-cmd --permanent --add-service=ssh && firewall-cmd --reload</code>
           </li>
         </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Un service refuse de démarrer sans message d'erreur clair</div>
+            <div class="sc-trouble-a">Le coupable est souvent SELinux plutôt qu'une vraie erreur de config — vérifie avec <code>ausearch -m avc -ts recent</code> avant de désactiver quoi que ce soit.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">subscription-manager register échoue</div>
+            <div class="sc-trouble-a">Vérifie la connectivité vers le Customer Portal Red Hat et l'exactitude des identifiants — un proxy d'entreprise bloque parfois cette connexion.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Plus assez d'espace sur / après l'installation</div>
+            <div class="sc-trouble-a">Étends le volume logique à chaud : <code>lvextend -L +10G /dev/mapper/rhel-root</code> puis <code>xfs_growfs /</code>.</div>
+          </div>
+        </div>
       </div>
     </details>
 
@@ -462,6 +580,7 @@
       <div class="sc-body">
         <p class="sc-intro">bsdinstall est un installeur en mode texte, simple une fois qu'on a compris que ZFS est presque toujours le bon choix de système de fichiers par défaut.</p>
         <p class="sc-links"><a href="commands.html?os=freebsd">⌘ commandes FreeBSD</a></p>
+        <p class="sc-dl"><a href="https://www.freebsd.org/where/" target="_blank" rel="noopener">📥 Télécharger l'ISO officielle</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Créer le support d'installation</div>
@@ -485,6 +604,21 @@
             <code>pkg install vim</code>
           </li>
         </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">pkg install échoue avec "unable to update repository"</div>
+            <div class="sc-trouble-a">Vérifie <code>/etc/pkg/FreeBSD.conf</code> et la connectivité réseau ; un <code>pkg update -f</code> force la resynchronisation du catalogue.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Pas de réseau après l'installation</div>
+            <div class="sc-trouble-a">Vérifie le nom exact de l'interface avec <code>ifconfig</code> (souvent <code>em0</code> ou <code>re0</code>, pas <code>eth0</code>) et corrige <code>/etc/rc.conf</code> en conséquence.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Le système ne démarre pas après une install ZFS</div>
+            <div class="sc-trouble-a">Vérifie que le bootloader ZFS a bien été installé sur le bon disque pendant bsdinstall — un oubli fréquent en partitionnement manuel.</div>
+          </div>
+        </div>
       </div>
     </details>
 
@@ -501,6 +635,7 @@
       <div class="sc-body">
         <p class="sc-intro">Le Media Creation Tool officiel évite les images modifiées qui traînent ailleurs — surtout pour une VM de test ou un lab qu'on veut fiable.</p>
         <p class="sc-links"><a href="commands.html?os=windows">⌘ commandes Windows</a></p>
+        <p class="sc-dl"><a href="https://www.microsoft.com/en-us/software-download/windows11" target="_blank" rel="noopener">📥 Télécharger l'ISO officielle</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Créer le support avec l'outil officiel Microsoft</div>
@@ -524,6 +659,21 @@
             <code>Get-ComputerInfo | Select WindowsProductName, OsVersion</code>
           </li>
         </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">"Cette clé USB ne peut pas être utilisée pour démarrer sur cet ordinateur"</div>
+            <div class="sc-trouble-a">Le mode de partition (GPT/UEFI vs MBR/Legacy) de la clé ne correspond pas au mode configuré dans le BIOS — bascule l'un des deux pour qu'ils correspondent.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Écran bleu INACCESSIBLE_BOOT_DEVICE pendant l'installation</div>
+            <div class="sc-trouble-a">Active le mode AHCI pour le contrôleur de stockage dans le BIOS avant de relancer l'installation (RAID/IDE posent souvent ce problème).</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Pas de Wi-Fi disponible pendant l'installation pour se connecter à un compte Microsoft</div>
+            <div class="sc-trouble-a">Utilise un câble Ethernet, ou termine l'installation en compte local via <code>OOBE\BYPASSNRO</code> et configure le Wi-Fi après coup.</div>
+          </div>
+        </div>
       </div>
     </details>
 
@@ -540,6 +690,7 @@
       <div class="sc-body">
         <p class="sc-intro">Le choix "Core" (sans interface graphique) économise des ressources et réduit la surface d'attaque — tout se pilote alors en PowerShell ou à distance.</p>
         <p class="sc-links"><a href="commands.html?os=windows-server">⌘ commandes Windows Server</a></p>
+        <p class="sc-dl"><a href="https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025" target="_blank" rel="noopener">📥 Télécharger l'ISO officielle</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Démarrer l'installeur et choisir l'édition</div>
@@ -565,6 +716,21 @@
             <code>Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools</code>
           </li>
         </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">L'installation du rôle AD DS échoue</div>
+            <div class="sc-trouble-a">Vérifie qu'un serveur DNS fonctionnel est déjà configuré (souvent lui-même) avant de promouvoir le serveur en contrôleur de domaine.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Impossible de rejoindre le domaine depuis une autre machine</div>
+            <div class="sc-trouble-a">Vérifie d'abord l'heure système des deux machines — Kerberos refuse l'authentification au-delà de quelques minutes de décalage.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Écran noir prolongé après le premier redémarrage post-installation</div>
+            <div class="sc-trouble-a">C'est normal pendant la phase de finalisation ("Getting devices ready") — patiente plusieurs minutes avant de forcer un redémarrage.</div>
+          </div>
+        </div>
       </div>
     </details>
 
@@ -581,6 +747,7 @@
       <div class="sc-body">
         <p class="sc-intro">Pas d'ISO classique sur Mac : tout passe par le mode de récupération intégré, qui télécharge le système directement depuis les serveurs Apple.</p>
         <p class="sc-links"><a href="commands.html?os=macos">⌘ commandes macOS</a></p>
+        <p class="sc-dl"><a href="https://support.apple.com/en-us/102655" target="_blank" rel="noopener">📥 Télécharger l'ISO officielle</a></p>
         <ol class="sc-steps">
           <li>
             <div class="st-desc">Redémarrer en mode de récupération</div>
@@ -603,9 +770,83 @@
             <code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code>
           </li>
         </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Erreur réseau pendant le téléchargement en mode récupération</div>
+            <div class="sc-trouble-a">Réessaie sur un autre réseau — certains pare-feux/DNS d'entreprise bloquent les serveurs de récupération Apple.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Le Mac ne démarre pas en mode récupération</div>
+            <div class="sc-trouble-a">La combinaison diffère selon le modèle : bouton d'alimentation maintenu sur Apple Silicon, Cmd+R au démarrage sur Intel.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">"brew: command not found" après l'installation de Homebrew</div>
+            <div class="sc-trouble-a">Sur Apple Silicon, Homebrew s'installe dans <code>/opt/homebrew</code> et pas <code>/usr/local</code> — ajoute-le au PATH avec la commande affichée en fin d'installation.</div>
+          </div>
+        </div>
       </div>
     </details>
 
+    <!-- ═══ PROXMOX VE ═══ -->
+    <details class="sc" id="inst-proxmox" style="--c:#E57000">
+      <summary>
+        <span class="sc-ico">🖥️</span>
+        <div class="sc-head">
+          <div class="sc-name">Installer Proxmox VE</div>
+          <div class="sc-meta">Proxmox VE — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Contrairement à Docker ou Kubernetes qui s'installent sur un OS existant, Proxmox VE est lui-même l'OS : un hyperviseur Debian qui prend toute la machine dès l'installation.</p>
+        <p class="sc-links"><a href="commands.html?os=proxmox">⌘ commandes Proxmox VE</a></p>
+        <p class="sc-dl"><a href="https://www.proxmox.com/en/downloads" target="_blank" rel="noopener">📥 Télécharger l'ISO officielle</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Télécharger l'ISO et vérifier son empreinte</div>
+            <code>sha256sum proxmox-ve_9.2-1.iso</code>
+          </li>
+          <li>
+            <div class="st-desc">Créer la clé USB bootable</div>
+            <code>sudo dd if=proxmox-ve_9.2-1.iso of=/dev/sdX bs=4M status=progress</code>
+          </li>
+          <li>
+            <div class="st-desc">Choisir le système de fichiers pendant l'installation</div>
+            <p class="st-note">ZFS (RAID1/RAIDZ selon le nombre de disques) si tu as au moins 2 disques et de la RAM à revendre ; ext4 sur LVM-thin sinon, plus simple sur un seul disque.</p>
+          </li>
+          <li>
+            <div class="st-desc">Configurer le réseau du nœud pendant l'installation</div>
+            <p class="st-note">Une IP fixe est fortement recommandée — l'interface web et la gestion du cluster en dépendent directement.</p>
+          </li>
+          <li>
+            <div class="st-desc">Se connecter à l'interface web une fois redémarré</div>
+            <code>https://IP-DU-SERVEUR:8006</code>
+          </li>
+          <li>
+            <div class="st-desc">Basculer sur le dépôt gratuit "no-subscription"</div>
+            <code>echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" > /etc/apt/sources.list.d/pve-no-subscription.list</code>
+            <code>apt update && apt full-upgrade -y</code>
+            <p class="st-note">Sans ça, <code>apt update</code> échoue en cherchant le dépôt "enterprise" qui nécessite un abonnement payant.</p>
+          </li>
+        </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">apt update échoue en cherchant le dépôt "enterprise"</div>
+            <div class="sc-trouble-a">Normal sans abonnement payant — bascule sur le dépôt <code>pve-no-subscription</code> comme indiqué à l'étape 6.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">L'interface web sur le port 8006 ne répond pas</div>
+            <div class="sc-trouble-a">Vérifie l'IP configurée pendant l'installation et qu'aucun pare-feu intermédiaire ne bloque le port 8006.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Avertissement ZFS sur l'absence de RAM ECC</div>
+            <div class="sc-trouble-a">C'est un avertissement, pas un blocage — ZFS fonctionne sans ECC, avec juste un risque (minime) de corruption silencieuse en cas d'erreur mémoire non détectée.</div>
+          </div>
+        </div>
+      </div>
+    </details>
 
   </div>
 
@@ -668,7 +909,7 @@
         if (n === all.length) {
           // Asynchrone : laisse arcade-fun.js (chargé après) poser son écouteur
           setTimeout(function() {
-            document.dispatchEvent(new CustomEvent('mpx:all-scenarios-done'));
+            document.dispatchEvent(new CustomEvent('mpx:all-installs-done'));
           }, 0);
         }
       }
