@@ -1,5 +1,5 @@
 /* MANPAGES.EXE — packages-data.js
-   Données des 74 paquets — partagées entre packages.html et la
+   Données des 78 paquets — partagées entre packages.html et la
    recherche globale de l'accueil (global-search.js). */
 
 var PACKAGES = [
@@ -58,6 +58,10 @@ var PACKAGES = [
   {name:"vagrant",cat:"DevOps",desc:"VMs de développement reproductibles",debian:"apt install vagrant",alpine:null,arch:"yay -S vagrant",rhel:"dnf install vagrant",freebsd:"pkg install vagrant",macos:"brew install --cask vagrant",windows:"winget install Hashicorp.Vagrant"},
   {name:"make",cat:"DevOps",desc:"Automatisation de compilation et tâches",debian:"apt install make",alpine:"apk add make",arch:"pacman -S make",rhel:"dnf install make",freebsd:"pkg install gmake",macos:"brew install make",windows:"winget install GnuWin32.Make"},
   {name:"act",cat:"DevOps",desc:"Exécute GitHub Actions localement",debian:null,alpine:null,arch:"yay -S act",rhel:null,freebsd:null,macos:"brew install act",windows:"winget install nektos.act"},
+  {name:"awscli",cat:"DevOps",desc:"CLI officielle Amazon Web Services",debian:"apt install awscli",alpine:"apk add aws-cli",arch:"pacman -S aws-cli",rhel:"dnf install awscli",freebsd:"pkg install py39-awscli",macos:"brew install awscli",windows:"winget install Amazon.AWSCLI"},
+  {name:"azure-cli",cat:"DevOps",desc:"CLI officielle Microsoft Azure",debian:"apt install azure-cli",alpine:null,arch:"yay -S azure-cli",rhel:"dnf install azure-cli",freebsd:null,macos:"brew install azure-cli",windows:"winget install Microsoft.AzureCLI"},
+  {name:"gcloud-cli",cat:"DevOps",desc:"CLI officielle Google Cloud Platform",debian:"apt install google-cloud-cli",alpine:null,arch:"yay -S google-cloud-cli",rhel:"dnf install google-cloud-cli",freebsd:null,macos:"brew install --cask google-cloud-sdk",windows:"winget install Google.CloudSDK"},
+  {name:"k9s",cat:"DevOps",desc:"Interface terminal pour naviguer un cluster Kubernetes",debian:null,alpine:"apk add k9s",arch:"pacman -S k9s",rhel:null,freebsd:"pkg install k9s",macos:"brew install k9s",windows:"winget install k9s"},
   // RÉSEAU
   {name:"nmap",cat:"Réseau",desc:"Scanner de ports et inventaire réseau",debian:"apt install nmap",alpine:"apk add nmap",arch:"pacman -S nmap",rhel:"dnf install nmap",freebsd:"pkg install nmap",macos:"brew install nmap",windows:"winget install Insecure.Nmap"},
   {name:"wireshark",cat:"Réseau",desc:"Analyseur de paquets réseau (GUI + tshark)",debian:"apt install wireshark",alpine:"apk add wireshark",arch:"pacman -S wireshark-qt",rhel:"dnf install wireshark",freebsd:"pkg install wireshark",macos:"brew install --cask wireshark",windows:"winget install WiresharkFoundation.Wireshark"},

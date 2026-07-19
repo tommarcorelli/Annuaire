@@ -1,8 +1,9 @@
 /* MANPAGES.EXE — terminal.js
    Terminal interactif : on tape une commande, l'app affiche la fiche
-   correspondante en direct. Autocomplétion + historique depuis les
-   896 commandes de data.js / data-extra.js. Aucune commande n'est
-   réellement exécutée — c'est un explorateur, pas un vrai shell. */
+   correspondante en direct. Autocomplétion + historique depuis
+   l'annuaire de commandes (data.js / data-extra.js / data-extra2.js).
+   Aucune commande n'est réellement exécutée — c'est un explorateur,
+   pas un vrai shell. */
 
 (function () {
   'use strict';
@@ -43,6 +44,14 @@
     vim:        { label: 'Vim',             color: '#019733' },
     npm:        { label: 'npm/Node',        color: '#CB3837' },
     python:     { label: 'Python/pip',      color: '#3776AB' },
+    postgresql: { label: 'PostgreSQL',      color: '#336791' },
+    redis:      { label: 'Redis',           color: '#DC382D' },
+    mongodb:    { label: 'MongoDB',         color: '#47A248' },
+    gcloud:     { label: 'Google Cloud',    color: '#4285F4' },
+    rclone:     { label: 'rclone',          color: '#3F51B5' },
+    borg:       { label: 'BorgBackup',      color: '#7C6F64' },
+    restic:     { label: 'restic',          color: '#4F5D95' },
+    httpie:     { label: 'HTTPie',          color: '#73DC8C' },
   };
 
   function $(id) { return document.getElementById(id); }
@@ -183,7 +192,7 @@
       note('  help              cette aide');
       note('  clear             efface l\'écran');
       note('  random            une commande au hasard');
-      note('  ls                liste les 32 outils/OS disponibles');
+      note('  ls                liste les 40 outils/OS disponibles');
       note('  ls <outil>        liste les commandes d\'un outil (ex: ls docker)');
       note('  <commande>        tape n\'importe quelle commande → sa fiche');
       note('Astuce : Tab complète · ↑/↓ rejoue l\'historique.', 't-dim');
@@ -204,7 +213,7 @@
       } else {
         var counts = {};
         COMMANDS.forEach(function (c) { counts[c.os] = (counts[c.os] || 0) + 1; });
-        note('32 outils / OS — clique pour explorer (ou « ls <outil> ») :', 't-accent');
+        note('40 outils / OS — clique pour explorer (ou « ls <outil> ») :', 't-accent');
         chips(Object.keys(counts), null, 'ls ');
       }
       return true;
@@ -324,7 +333,7 @@
   });
 
   // Message d'accueil
-  note('MANPAGES.EXE — terminal interactif  ·  896 commandes indexées', 't-accent');
+  note('MANPAGES.EXE — terminal interactif  ·  1294 commandes indexées', 't-accent');
   note('Tape une commande (ex: tar -xzf archive.tar.gz) ou « help ».', 't-dim');
   input.focus();
 })();

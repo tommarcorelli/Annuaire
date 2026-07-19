@@ -40,6 +40,14 @@
     vim:        { label: 'Vim',             color: '#019733' },
     npm:        { label: 'npm/Node',        color: '#CB3837' },
     python:     { label: 'Python/pip',      color: '#3776AB' },
+    postgresql: { label: 'PostgreSQL',      color: '#336791' },
+    redis:      { label: 'Redis',           color: '#DC382D' },
+    mongodb:    { label: 'MongoDB',         color: '#47A248' },
+    gcloud:     { label: 'Google Cloud',    color: '#4285F4' },
+    rclone:     { label: 'rclone',          color: '#3F51B5' },
+    borg:       { label: 'BorgBackup',      color: '#7C6F64' },
+    restic:     { label: 'restic',          color: '#4F5D95' },
+    httpie:     { label: 'HTTPie',          color: '#73DC8C' },
   };
 
   var state = {

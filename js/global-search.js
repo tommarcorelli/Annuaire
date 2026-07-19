@@ -32,12 +32,20 @@
     loading = true;
     loadScript('js/data/data.js', function() {
       loadScript('js/data/data-extra.js', function() {
-        loadScript('js/data/packages-data.js', function() {
-          loadScript('js/data/scenarios-data.js', function() {
-            loaded = true;
-            loading = false;
-            if (lastQ.trim().length >= 2) render(lastQ);
-            else box.classList.remove('show');
+        loadScript('js/data/data-extra2.js', function() {
+          loadScript('js/data/data-extra3.js', function() {
+            loadScript('js/data/data-extra4.js', function() {
+              loadScript('js/data/data-extra5.js', function() {
+                loadScript('js/data/packages-data.js', function() {
+                  loadScript('js/data/scenarios-data.js', function() {
+                    loaded = true;
+                    loading = false;
+                    if (lastQ.trim().length >= 2) render(lastQ);
+                    else box.classList.remove('show');
+                  });
+                });
+              });
+            });
           });
         });
       });

@@ -110,7 +110,10 @@
     night_owl:   { icon: '🦉', title: 'Night Owl',       desc: 'Mode sombre activé.' },
     bright_side: { icon: '☀️', title: 'Bright Side',     desc: 'Mode jour activé. Shōnen vibes.' },
     scenario_master: { icon: '🧭', title: 'Mission Master', desc: 'Tous les scénarios terminés. Respect.' },
-    install_master: { icon: '💿', title: 'OS Whisperer', desc: 'Tous les guides d\'installation terminés. Rien ne te fait plus peur.' }
+    install_master: { icon: '💿', title: 'OS Whisperer', desc: 'Tous les guides d\'installation terminés. Rien ne te fait plus peur.' },
+    db_polyglot: { icon: '🗃️', title: 'DB Polyglot', desc: 'PostgreSQL, Redis et MongoDB explorés. Une base pour chaque besoin.' },
+    cloud_native: { icon: '☁️', title: 'Cloud Native', desc: 'Google Cloud exploré. AWS, Azure, GCP — la trinité complète.' },
+    backup_paranoid: { icon: '🗄️', title: 'Backup Paranoid', desc: 'rclone, BorgBackup et restic explorés. Rien ne se perd.' }
   };
 
   function unlocked() {
@@ -192,6 +195,15 @@
     if (os && os !== 'all') {
       osFilters.add(os);
       if (osFilters.size >= 3) unlock('explorer');
+      if (osFilters.has('postgresql') && osFilters.has('redis') && osFilters.has('mongodb')) {
+        unlock('db_polyglot');
+      }
+      if (osFilters.has('gcloud') && (osFilters.has('awscli') || osFilters.has('azurecli'))) {
+        unlock('cloud_native');
+      }
+      if (osFilters.has('rclone') && osFilters.has('borg') && osFilters.has('restic')) {
+        unlock('backup_paranoid');
+      }
     }
   });
 

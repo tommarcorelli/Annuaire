@@ -23,6 +23,10 @@ const CORE_ASSETS = [
   './js/mobile-nav.js',
   './js/data/data.js',
   './js/data/data-extra.js',
+  './js/data/data-extra2.js',
+  './js/data/data-extra3.js',
+  './js/data/data-extra4.js',
+  './js/data/data-extra5.js',
   './js/data/packages-data.js',
   './js/data/scenarios-data.js',
   './js/commands.js',
@@ -62,6 +66,10 @@ const EXTERNAL_ASSETS = [
   'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/vim.svg',
   'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/npm.svg',
   'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/python.svg',
+  'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/postgresql.svg',
+  'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/redis.svg',
+  'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/mongodb.svg',
+  'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/googlecloud.svg',
   'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=VT323&family=Honk&family=Noto+Sans+JP:wght@500;700&family=Inter:wght@400;500;600&display=swap',
 ];
 

@@ -779,7 +779,7 @@ const EXTRA_COMMANDS = [
   {
     name: "mysql",
     os: "mysql",
-    category: "Base de données",
+    category: "Bases de données",
     description: "Client en ligne de commande pour se connecter à un serveur MySQL/MariaDB.",
     syntax: "mysql -u <utilisateur> -p [base]",
     examples: [
@@ -792,7 +792,7 @@ const EXTRA_COMMANDS = [
   {
     name: "SHOW DATABASES",
     os: "mysql",
-    category: "Base de données",
+    category: "Bases de données",
     description: "Liste toutes les bases de données du serveur.",
     syntax: "SHOW DATABASES;",
     examples: [
@@ -805,7 +805,7 @@ const EXTRA_COMMANDS = [
   {
     name: "CREATE DATABASE",
     os: "mysql",
-    category: "Base de données",
+    category: "Bases de données",
     description: "Crée une nouvelle base de données.",
     syntax: "CREATE DATABASE <nom>;",
     examples: [
@@ -844,7 +844,7 @@ const EXTRA_COMMANDS = [
   {
     name: "mysqldump",
     os: "mysql",
-    category: "Base de données",
+    category: "Bases de données",
     description: "Exporte une base de données en fichier SQL (sauvegarde logique).",
     syntax: "mysqldump -u <user> -p <base> > dump.sql",
     examples: [
@@ -857,7 +857,7 @@ const EXTRA_COMMANDS = [
   {
     name: "SELECT",
     os: "mysql",
-    category: "Base de données",
+    category: "Bases de données",
     description: "Interroge les données d'une table (la requête SQL fondamentale).",
     syntax: "SELECT <colonnes> FROM <table> [WHERE ...] [ORDER BY ...] [LIMIT n];",
     examples: [
@@ -870,7 +870,7 @@ const EXTRA_COMMANDS = [
   {
     name: "INSERT / UPDATE / DELETE",
     os: "mysql",
-    category: "Base de données",
+    category: "Bases de données",
     description: "Les trois requêtes de modification des données : ajout, mise à jour, suppression.",
     syntax: "INSERT INTO <table> (...) VALUES (...);",
     examples: [
@@ -919,7 +919,7 @@ const EXTRA_COMMANDS = [
   {
     name: "ALTER TABLE",
     os: "mysql",
-    category: "Base de données",
+    category: "Bases de données",
     description: "Modifie la structure d'une table : ajout/suppression de colonnes, index, clés.",
     syntax: "ALTER TABLE <table> <action>;",
     examples: [

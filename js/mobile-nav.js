@@ -66,7 +66,7 @@
       '<nav class="mnav-links">' + linksHtml + '</nav>' +
       '<div class="mnav-foot">' +
         '<button class="mnav-theme" id="mnavTheme"><span id="mnavThemeIco">🎨</span> Thème</button>' +
-        '<span class="mnav-tag">896 CMD · 74 PKG · 32 OUTILS</span>' +
+        '<span class="mnav-tag">1294 CMD · 78 PKG · 40 OUTILS</span>' +
       '</div>';
 
     document.body.appendChild(overlay);

@@ -270,4 +270,46 @@ const SCENARIOS_DATA = [
     kw: 'tshark wireshark capture paquets analyse reseau filtre',
     cmds: ['tshark -D', 'tshark -i', 'tshark -f', 'tshark -Y', 'tshark -T fields -e', 'tshark -z conv,tcp', 'tshark -z follow,tcp', 'tshark -z expert']
   },
+  {
+    id: 'sc-postgresql', icon: '🐘',
+    title: 'Créer une base PostgreSQL et automatiser ses sauvegardes',
+    kw: 'postgresql psql base de donnees sql backup pg_dump role grant',
+    cmds: ['psql', 'CREATE DATABASE', 'CREATE ROLE', 'GRANT', '\\dt', 'pg_dump', 'pg_restore', 'crontab -e', 'pg_isready']
+  },
+  {
+    id: 'sc-redis', icon: '⚡',
+    title: 'Mettre en cache une application avec Redis',
+    kw: 'redis cache memoire cle valeur expiration pub sub session',
+    cmds: ['redis-cli', 'PING', 'SET', 'GET', 'EXPIRE', 'TTL', 'INFO', 'CONFIG SET', 'BGSAVE', 'SUBSCRIBE']
+  },
+  {
+    id: 'sc-mongodb', icon: '🍃',
+    title: 'Modéliser et interroger une base MongoDB',
+    kw: 'mongodb mongosh nosql document collection aggregate json',
+    cmds: ['mongosh', 'use', 'db.createCollection', 'db.insertOne', 'db.find', 'db.updateOne', 'db.createIndex', 'db.aggregate', 'mongodump']
+  },
+  {
+    id: 'sc-gcloud', icon: '☁️',
+    title: 'Déployer une application conteneurisée sur Google Cloud',
+    kw: 'gcloud google cloud gke cloud run compute engine bucket iam',
+    cmds: ['gcloud init', 'gcloud config set project', 'gcloud builds submit', 'gcloud run deploy', 'gcloud container clusters create', 'gcloud container clusters get-credentials', 'gcloud iam service-accounts create', 'gsutil cp', 'gcloud logging read']
+  },
+  {
+    id: 'sc-backup-cloud', icon: '🗄️',
+    title: 'Mettre en place une sauvegarde chiffrée et externalisée',
+    kw: 'backup sauvegarde restic borg rclone cloud chiffrement retention cron',
+    cmds: ['restic init', 'restic backup', 'restic forget', 'restic snapshots', 'borg create', 'borg prune', 'rclone sync', 'rclone check', 'crontab -e']
+  },
+  {
+    id: 'sc-api-rest', icon: '🔌',
+    title: 'Explorer et déboguer une API REST en ligne de commande',
+    kw: 'api rest http json curl httpie jq requete debug',
+    cmds: ['http GET', 'http POST', 'http --auth', 'curl -L', 'curl -w', 'jq', 'jq -c', 'jq --arg']
+  },
+  {
+    id: 'sc-ssh-bastion', icon: '🔐',
+    title: 'Accéder à un serveur interne via un bastion SSH',
+    kw: 'ssh bastion tunnel jump host proxy socks agent forward',
+    cmds: ['ssh -J', 'ssh -L', 'ssh -D', '~/.ssh/config', 'ssh-agent', 'ssh-add', 'ssh-copy-id']
+  },
 ];
