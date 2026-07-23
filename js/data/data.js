@@ -8894,6 +8894,345 @@ const COMMANDS = [
       { cmd: "az devops project list --org https://dev.azure.com/nexa", desc: "Vérifie les projets déjà existants dans l'organisation" }
     ],
     flags: ["--name", "--org", "--visibility public|private"]
+  },
+
+  // ── BAZZITE ─────────────────────────────────────────────────
+  {
+    name: "ujust --choose",
+    os: "bazzite",
+    category: "Système",
+    description: "Ouvre un menu interactif listant toutes les commandes ujust disponibles sur Bazzite, à choisir avec les flèches.",
+    syntax: "ujust --choose",
+    examples: [
+      { cmd: "ujust --choose", desc: "Ouvre le menu interactif des commandes ujust" },
+      { cmd: "ujust --list", desc: "Liste toutes les commandes ujust en texte" }
+    ],
+    flags: ["--choose (menu TUI)", "--list (liste brute)"]
+  },
+  {
+    name: "ujust update",
+    os: "bazzite",
+    category: "Système",
+    description: "Met à jour le système Bazzite dans son ensemble : image rpm-ostree, Flatpaks et conteneurs, via topgrade.",
+    syntax: "ujust update",
+    examples: [
+      { cmd: "ujust update", desc: "Met à jour l'OS, les Flatpaks et les conteneurs en une seule commande" }
+    ],
+    flags: []
+  },
+  {
+    name: "ujust clean-system",
+    os: "bazzite",
+    category: "Système",
+    description: "Nettoie les images podman inutilisées, les volumes, les paquets Flatpak orphelins et le contenu rpm-ostree obsolète.",
+    syntax: "ujust clean-system",
+    examples: [
+      { cmd: "ujust clean-system", desc: "Libère de l'espace disque en supprimant les résidus système" }
+    ],
+    flags: []
+  },
+  {
+    name: "ujust enroll-secure-boot-key",
+    os: "bazzite",
+    category: "Système",
+    description: "Enregistre la clé de signature nécessaire pour utiliser les pilotes Nvidia et les KMODs avec le Secure Boot activé.",
+    syntax: "ujust enroll-secure-boot-key",
+    examples: [
+      { cmd: "ujust enroll-secure-boot-key", desc: "Inscrit la clé MOK pour signer les modules noyau tiers" }
+    ],
+    flags: []
+  },
+  {
+    name: "ujust bios",
+    os: "bazzite",
+    category: "Système",
+    description: "Redémarre directement l'appareil dans l'écran BIOS/UEFI, sans passer par le menu de boot classique.",
+    syntax: "ujust bios",
+    examples: [
+      { cmd: "ujust bios", desc: "Reboot direct vers le firmware BIOS/UEFI" }
+    ],
+    flags: []
+  },
+  {
+    name: "ujust configure-grub",
+    os: "bazzite",
+    category: "Système",
+    description: "Configure la visibilité et le délai du menu de démarrage GRUB.",
+    syntax: "ujust configure-grub",
+    examples: [
+      { cmd: "ujust configure-grub", desc: "Ouvre l'assistant de configuration du menu GRUB" }
+    ],
+    flags: []
+  },
+  {
+    name: "ujust fix-reset-steam",
+    os: "bazzite",
+    category: "Gaming",
+    description: "Réinitialise le dossier Steam à un état propre sans supprimer les jeux, sauvegardes ni musiques. Utile en cas d'écran noir en Game Mode.",
+    syntax: "ujust fix-reset-steam",
+    examples: [
+      { cmd: "ujust fix-reset-steam", desc: "Répare une installation Steam corrompue" }
+    ],
+    flags: []
+  },
+  {
+    name: "ujust fix-proton-hang",
+    os: "bazzite",
+    category: "Gaming",
+    description: "Force l'arrêt de tous les processus Wine/Proton bloqués, quand un jeu ne se relance plus après une fermeture ratée.",
+    syntax: "ujust fix-proton-hang",
+    examples: [
+      { cmd: "ujust fix-proton-hang", desc: "Tue les processus Proton/Wine figés" }
+    ],
+    flags: []
+  },
+  {
+    name: "ujust restart-pipewire",
+    os: "bazzite",
+    category: "Gaming",
+    description: "Redémarre le serveur audio PipeWire, pratique en cas de craquements ou de coupures de son.",
+    syntax: "ujust restart-pipewire",
+    examples: [
+      { cmd: "ujust restart-pipewire", desc: "Relance PipeWire pour corriger un souci audio" }
+    ],
+    flags: []
+  },
+  {
+    name: "ujust toggle-iwd",
+    os: "bazzite",
+    category: "Réseau",
+    description: "Active ou désactive iwd comme backend Wi-Fi à la place de wpa_supplicant.",
+    syntax: "ujust toggle-iwd <enable|disable|status>",
+    examples: [
+      { cmd: "ujust toggle-iwd enable", desc: "Passe sur le backend Wi-Fi iwd" },
+      { cmd: "ujust toggle-iwd status", desc: "Affiche le backend Wi-Fi actif" }
+    ],
+    flags: ["enable", "disable", "status"]
+  },
+  {
+    name: "ujust setup-sunshine",
+    os: "bazzite",
+    category: "Gaming",
+    description: "Installe et configure Sunshine, un hôte de streaming de jeu façon GeForce Now/Moonlight.",
+    syntax: "ujust setup-sunshine",
+    examples: [
+      { cmd: "ujust setup-sunshine", desc: "Active le streaming de jeu vers un autre appareil" }
+    ],
+    flags: []
+  },
+  {
+    name: "ujust setup-boot-windows-steam",
+    os: "bazzite",
+    category: "Gaming",
+    description: "Ajoute un raccourci dans Steam pour redémarrer directement sous Windows, pratique en dual-boot.",
+    syntax: "ujust setup-boot-windows-steam",
+    examples: [
+      { cmd: "ujust setup-boot-windows-steam", desc: "Crée l'entrée Steam 'Reboot to Windows'" }
+    ],
+    flags: []
+  },
+  {
+    name: "ujust enable-supergfxctl",
+    os: "bazzite",
+    category: "Système",
+    description: "Active supergfxctl pour basculer entre GPU intégré et dédié sur les laptops hybrides (Optimus).",
+    syntax: "ujust enable-supergfxctl",
+    examples: [
+      { cmd: "ujust enable-supergfxctl", desc: "Active le switch GPU hybride" }
+    ],
+    flags: []
+  },
+  {
+    name: "ujust bazzite-cli",
+    os: "bazzite",
+    category: "Système",
+    description: "Installe le kit d'outils CLI de Bazzite (bat, atuin, chezmoi, bash-preexec...) pour améliorer le confort du terminal.",
+    syntax: "ujust bazzite-cli",
+    examples: [
+      { cmd: "ujust bazzite-cli", desc: "Installe les outils CLI recommandés par Bazzite" },
+      { cmd: "SHELL=fish ujust bazzite-cli", desc: "Installe la config pour le shell fish" }
+    ],
+    flags: []
+  },
+  {
+    name: "ujust configure-waydroid",
+    os: "bazzite",
+    category: "Gaming",
+    description: "Assistant de configuration de Waydroid pour lancer des applications et jeux Android sur Bazzite.",
+    syntax: "ujust configure-waydroid",
+    examples: [
+      { cmd: "ujust configure-waydroid", desc: "Configure le conteneur Android Waydroid" }
+    ],
+    flags: []
+  },
+  {
+    name: "rpm-ostree status",
+    os: "bazzite",
+    category: "Système",
+    description: "Affiche l'image système actuellement déployée et l'historique des déploiements rpm-ostree (système immuable façon Fedora Atomic).",
+    syntax: "rpm-ostree status",
+    examples: [
+      { cmd: "rpm-ostree status", desc: "Liste les déploiements et indique celui actif" },
+      { cmd: "rpm-ostree status -v", desc: "Détails complets sur chaque déploiement" }
+    ],
+    flags: ["-v (verbeux)"]
+  },
+  {
+    name: "rpm-ostree upgrade",
+    os: "bazzite",
+    category: "Système",
+    description: "Télécharge et prépare la nouvelle image du système Bazzite ; le changement s'applique au redémarrage suivant.",
+    syntax: "rpm-ostree upgrade",
+    examples: [
+      { cmd: "rpm-ostree upgrade", desc: "Prépare la mise à jour de l'image système" },
+      { cmd: "systemctl reboot", desc: "Redémarre pour appliquer la nouvelle image" }
+    ],
+    flags: ["--check (vérifier sans télécharger)", "--preview"]
+  },
+  {
+    name: "rpm-ostree rollback",
+    os: "bazzite",
+    category: "Système",
+    description: "Revient au déploiement précédent en cas de problème après une mise à jour de l'image système.",
+    syntax: "rpm-ostree rollback",
+    examples: [
+      { cmd: "rpm-ostree rollback", desc: "Restaure le déploiement système précédent" },
+      { cmd: "systemctl reboot", desc: "Redémarre pour appliquer le rollback" }
+    ],
+    flags: []
+  },
+  {
+    name: "rpm-ostree install",
+    os: "bazzite",
+    category: "Paquets",
+    description: "Superpose (layer) un paquet RPM sur l'image immuable Bazzite. À utiliser avec parcimonie : privilégier Flatpak ou les commandes ujust.",
+    syntax: "rpm-ostree install <paquet>",
+    examples: [
+      { cmd: "rpm-ostree install fastfetch", desc: "Ajoute un paquet en couche supplémentaire sur l'image" },
+      { cmd: "rpm-ostree uninstall fastfetch", desc: "Retire un paquet superposé" }
+    ],
+    flags: ["uninstall", "--apply-live (test sans reboot)"]
+  },
+  {
+    name: "rpm-ostree usroverlay",
+    os: "bazzite",
+    category: "Système",
+    description: "Rend /usr temporairement modifiable (overlay en écriture) pour du dépannage ponctuel, sans faire de changement persistant sur l'image.",
+    syntax: "rpm-ostree usroverlay",
+    examples: [
+      { cmd: "rpm-ostree usroverlay", desc: "Autorise l'écriture temporaire dans /usr jusqu'au reboot" }
+    ],
+    flags: []
+  },
+  {
+    name: "flatpak (Bazzite)",
+    os: "bazzite",
+    category: "Paquets",
+    description: "Gère les applications Flatpak, méthode d'installation recommandée sur Bazzite via le magasin Bazaar ou en ligne de commande.",
+    syntax: "flatpak <action> <app-id>",
+    examples: [
+      { cmd: "flatpak install flathub com.valvesoftware.Steam", desc: "Installe une application depuis Flathub" },
+      { cmd: "flatpak update", desc: "Met à jour toutes les applications Flatpak" },
+      { cmd: "flatpak list", desc: "Liste les applications Flatpak installées" }
+    ],
+    flags: ["--user", "--system", "-y (auto-confirmer)"]
+  },
+  {
+    name: "distrobox (Bazzite)",
+    os: "bazzite",
+    category: "Système",
+    description: "Crée des conteneurs de distributions Linux classiques (Ubuntu, Arch...) pour installer des paquets impossibles sur l'image immuable de Bazzite.",
+    syntax: "distrobox create --name <nom> --image <image> / distrobox enter <nom>",
+    examples: [
+      { cmd: "distrobox create --name dev --image archlinux:latest", desc: "Crée un conteneur Arch Linux nommé 'dev'" },
+      { cmd: "distrobox enter dev", desc: "Entre dans le conteneur pour installer des paquets classiques" }
+    ],
+    flags: ["--name", "--image", "list", "rm"]
+  },
+
+  // ── CACHYOS ─────────────────────────────────────────────────
+  {
+    name: "cachyos-rate-mirrors",
+    os: "cachyos",
+    category: "Système",
+    description: "Teste la vitesse des mirroirs CachyOS et met à jour /etc/pacman.d/cachyos-mirrorlist avec les plus rapides. Premier réflexe après l'installation.",
+    syntax: "sudo cachyos-rate-mirrors",
+    examples: [
+      { cmd: "sudo cachyos-rate-mirrors", desc: "Classe et applique les mirroirs les plus rapides" }
+    ],
+    flags: []
+  },
+  {
+    name: "cachyos-kernel-manager",
+    os: "cachyos",
+    category: "Système",
+    description: "Interface graphique pour compiler, installer et basculer entre les variantes de noyau CachyOS (BORE, LTS, hardened...) et gérer les ordonnanceurs sched-ext.",
+    syntax: "cachyos-kernel-manager",
+    examples: [
+      { cmd: "cachyos-kernel-manager", desc: "Ouvre le gestionnaire de noyaux et de schedulers sched-ext" }
+    ],
+    flags: []
+  },
+  {
+    name: "scxctl",
+    os: "cachyos",
+    category: "Système",
+    description: "Client en ligne de commande de scx_loader pour changer d'ordonnanceur sched-ext (scx) à chaud, sans redémarrer.",
+    syntax: "scxctl <get|list|start|switch|stop> [options]",
+    examples: [
+      { cmd: "scxctl list", desc: "Liste les schedulers sched-ext disponibles (bpfland, lavd, rusty...)" },
+      { cmd: "scxctl get", desc: "Affiche le scheduler actuellement actif et son mode" },
+      { cmd: "scxctl switch -s lavd -m gaming", desc: "Bascule sur le scheduler LAVD en mode Gaming" },
+      { cmd: "scxctl stop", desc: "Arrête le scheduler sched-ext actif, retour à l'ordonnanceur par défaut" }
+    ],
+    flags: ["-s / --sched", "-m / --mode auto|gaming|powersave|lowlatency|server", "-a / --args"]
+  },
+  {
+    name: "paru",
+    os: "cachyos",
+    category: "Paquets",
+    description: "Auxiliaire AUR écrit en Rust, préinstallé par défaut sur CachyOS pour compiler et installer des paquets AUR en plus des dépôts officiels.",
+    syntax: "paru [-S|-Syu|-Ss] <paquet>",
+    examples: [
+      { cmd: "paru -S visual-studio-code-bin", desc: "Installe un paquet AUR" },
+      { cmd: "paru -Syu", desc: "Met à jour dépôts officiels et AUR en une fois" },
+      { cmd: "paru -Ss neovim", desc: "Recherche un paquet dans les dépôts et l'AUR" }
+    ],
+    flags: ["-S (installer)", "-Syu (tout mettre à jour)", "-Ss (chercher)"]
+  },
+  {
+    name: "cachyos-hello",
+    os: "cachyos",
+    category: "Système",
+    description: "Application d'accueil de CachyOS : active les snapshots Btrfs automatiques, le tray Cachy-Update, les paquets de sécurité (Firejail, AppArmor) et d'autres réglages post-installation.",
+    syntax: "cachyos-hello",
+    examples: [
+      { cmd: "cachyos-hello", desc: "Ouvre l'assistant de bienvenue et de réglages CachyOS" }
+    ],
+    flags: []
+  },
+  {
+    name: "cachyos-benchmarker",
+    os: "cachyos",
+    category: "Système",
+    description: "Compare les performances de plusieurs schedulers sched-ext (ou versions de noyau) sur ta machine avant de choisir lequel garder.",
+    syntax: "cachyos-benchmarker",
+    examples: [
+      { cmd: "cachyos-benchmarker", desc: "Lance une session de benchmark comparatif des schedulers" }
+    ],
+    flags: []
+  },
+  {
+    name: "journalctl --unit scx",
+    os: "cachyos",
+    category: "Système",
+    description: "Consulte les logs du service scx_loader / du scheduler sched-ext actif, utile pour diagnostiquer un freeze ou un crash lié au scheduler.",
+    syntax: "journalctl --unit scx.service --boot 0",
+    examples: [
+      { cmd: "journalctl --unit scx.service --boot 0", desc: "Logs du scheduler sched-ext depuis le dernier boot" },
+      { cmd: "systemctl status scx_loader.service", desc: "Vérifie que le service scx_loader tourne bien" }
+    ],
+    flags: ["--boot 0 (boot courant)", "-f (suivre en direct)"]
   }
 ];
 

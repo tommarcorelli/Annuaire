@@ -265,6 +265,18 @@ const SCENARIOS_DATA = [
     cmds: ['dnf install', 'sestatus', 'getenforce / setenforce', 'firewall-cmd', 'semanage', 'restorecon', 'systemctl (RHEL)', 'lvextend / xfs_growfs', 'subscription-manager']
   },
   {
+    id: 'sc-bazzite', icon: '🎮',
+    title: 'Configurer une machine de jeu fraîchement installée sous Bazzite',
+    kw: 'bazzite steam deck gaming ujust rpm-ostree flatpak immuable atomic proton',
+    cmds: ['ujust update', 'ujust enroll-secure-boot-key', 'rpm-ostree status', 'flatpak (Bazzite)', 'ujust setup-sunshine', 'ujust fix-reset-steam', 'distrobox (Bazzite)', 'ujust bazzite-cli']
+  },
+  {
+    id: 'sc-cachyos', icon: '⚡',
+    title: "Régler les performances d'un poste CachyOS fraîchement installé",
+    kw: 'cachyos arch performance scheduler scx gaming distrowatch bore lavd mirrors',
+    cmds: ['cachyos-rate-mirrors', 'cachyos-hello', 'scxctl', 'cachyos-kernel-manager', 'paru', 'cachyos-benchmarker', 'journalctl --unit scx']
+  },
+  {
     id: 'sc-tshark', icon: '🦈',
     title: 'Analyser du trafic réseau en ligne de commande avec tshark',
     kw: 'tshark wireshark capture paquets analyse reseau filtre',

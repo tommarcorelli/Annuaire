@@ -2558,6 +2558,118 @@ resource "local_file" "hello" {
       </div>
     </details>
 
+    <!-- ═══ 43b. BAZZITE ═══ -->
+    <details class="sc" id="sc-bazzite" style="--c:#9B59D0">
+      <summary>
+        <span class="sc-ico">🎮</span>
+        <div class="sc-head">
+          <div class="sc-name">Configurer une machine de jeu fraîchement installée sous Bazzite</div>
+          <div class="sc-meta">Bazzite — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Bazzite est une image Fedora Atomic taillée pour le jeu (façon SteamOS) : le système est immuable, tout passe par <code>ujust</code>, Flatpak et les mises à jour d'image rpm-ostree plutôt que par un gestionnaire de paquets classique.</p>
+        <p class="sc-links"><a href="commands.html?os=bazzite">⌘ commandes Bazzite</a> · <a href="quiz.html?os=bazzite">🎓 quiz Bazzite</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Tout mettre à jour d'un coup : image système, Flatpaks et conteneurs</div>
+            <code>ujust update</code>
+          </li>
+          <li>
+            <div class="st-desc">Activer Secure Boot sans bloquer les pilotes Nvidia</div>
+            <code>ujust enroll-secure-boot-key</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier quelle image est déployée avant de dépanner quoi que ce soit</div>
+            <code>rpm-ostree status</code>
+          </li>
+          <li>
+            <div class="st-desc">Installer une application via Flatpak plutôt que de superposer un paquet RPM</div>
+            <code>flatpak install flathub com.valvesoftware.Steam</code>
+          </li>
+          <li>
+            <div class="st-desc">Activer le streaming de jeu vers un autre appareil du réseau</div>
+            <code>ujust setup-sunshine</code>
+          </li>
+          <li>
+            <div class="st-desc">Ouvrir un environnement Arch/Ubuntu classique pour un outil absent de l'image immuable</div>
+            <code>distrobox create --name dev --image archlinux:latest</code>
+            <code>distrobox enter dev</code>
+          </li>
+        </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Le mode Jeu (Game Mode) affiche un écran noir ou Steam se comporte bizarrement</div>
+            <div class="sc-trouble-a">Réinitialise le dossier Steam sans toucher aux jeux ni aux sauvegardes : <code>ujust fix-reset-steam</code>.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Un jeu refuse de se relancer après un crash</div>
+            <div class="sc-trouble-a">Les processus Proton/Wine sont probablement restés accrochés en arrière-plan : <code>ujust fix-proton-hang</code> les termine proprement.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Un paquet n'existe qu'en RPM classique, pas en Flatpak</div>
+            <div class="sc-trouble-a">Superpose-le sur l'image avec <code>rpm-ostree install &lt;paquet&gt;</code>, mais garde ça rare : chaque paquet layered ralentit les futures mises à jour d'image.</div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ═══ 43c. CACHYOS ═══ -->
+    <details class="sc" id="sc-cachyos" style="--c:#0FA3E0">
+      <summary>
+        <span class="sc-ico">⚡</span>
+        <div class="sc-head">
+          <div class="sc-name">Régler les performances d'un poste CachyOS fraîchement installé</div>
+          <div class="sc-meta">CachyOS — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">CachyOS est un Arch compilé avec des optimisations x86-64-v3/v4, LTO et PGO, et propose ses propres noyaux et schedulers sched-ext (BORE, LAVD, bpfland...). Les commandes pacman/yay classiques d'Arch fonctionnent aussi — voici ce qui est spécifique à CachyOS.</p>
+        <p class="sc-links"><a href="commands.html?os=cachyos">⌘ commandes CachyOS</a> · <a href="quiz.html?os=cachyos">🎓 quiz CachyOS</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Basculer sur les mirroirs CachyOS les plus rapides avant toute installation</div>
+            <code>sudo cachyos-rate-mirrors</code>
+          </li>
+          <li>
+            <div class="st-desc">Faire le tour des réglages post-install (snapshots Btrfs, tray de mises à jour, durcissement)</div>
+            <code>cachyos-hello</code>
+          </li>
+          <li>
+            <div class="st-desc">Lister puis essayer un scheduler sched-ext taillé pour le jeu</div>
+            <code>scxctl list</code>
+            <code>scxctl switch -s lavd -m gaming</code>
+          </li>
+          <li>
+            <div class="st-desc">Comparer plusieurs schedulers avant de figer son choix</div>
+            <code>cachyos-benchmarker</code>
+          </li>
+          <li>
+            <div class="st-desc">Changer de variante de noyau (LTS, hardened, BORE...) sans tout recompiler à la main</div>
+            <code>cachyos-kernel-manager</code>
+          </li>
+          <li>
+            <div class="st-desc">Installer un paquet AUR avec l'auxiliaire fourni par défaut</div>
+            <code>paru -S visual-studio-code-bin</code>
+          </li>
+        </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Le bureau devient saccadé ou instable après avoir activé un scheduler sched-ext</div>
+            <div class="sc-trouble-a">Regarde les logs du service avec <code>journalctl --unit scx.service --boot 0</code>, et reviens au scheduler par défaut avec <code>scxctl stop</code> si besoin.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Le premier <code>pacman -Syu</code> échoue ou traîne après l'installation</div>
+            <div class="sc-trouble-a">C'est un rolling release : l'ISO est toujours un peu en retard sur les dépôts. Relance <code>cachyos-rate-mirrors</code> d'abord si la synchronisation est trop lente.</div>
+          </div>
+        </div>
+      </div>
+    </details>
+
     <!-- ═══ 44. TSHARK ═══ -->
     <details class="sc" id="sc-tshark" style="--c:#1679BE">
       <summary>

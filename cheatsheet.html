@@ -193,7 +193,7 @@
     <!-- ═══ PAQUETS ═══ -->
     <section class="cs-section">
       <h2 class="cs-h">📦 Gestionnaires de <span>paquets</span></h2>
-      <p class="cs-note">// apt · apk · pacman · dnf · pkg · brew · winget</p>
+      <p class="cs-note">// apt · apk · pacman · dnf · pkg · brew · winget — et pour les dérivées Arch (CachyOS, EndeavourOS, Manjaro...), la colonne Arch s'applique telle quelle</p>
       <div class="cs-scroll">
         <table class="cs">
           <thead>
@@ -563,6 +563,33 @@
             <tr><td class="action">Historique</td><td><code>history</code></td><td><code>Get-History</code></td></tr>
             <tr><td class="action">Télécharger un fichier</td><td><code>curl -O https://site.fr/f.iso</code></td><td><code>Invoke-WebRequest https://site.fr/f.iso -OutFile f.iso</code></td></tr>
             <tr><td class="action">Redémarrer la machine</td><td><code>sudo reboot</code></td><td><code>Restart-Computer</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ BAZZITE ═══ -->
+    <section class="cs-section">
+      <h2 class="cs-h">🎮 Distro classique <span>↔</span> Bazzite</h2>
+      <p class="cs-note">// sur une image immuable, la logique change : pas d'apt/dnf direct, tout passe par ujust, Flatpak ou rpm-ostree</p>
+      <div class="cs-scroll">
+        <table class="cs" style="min-width:680px">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th><span class="dot" style="background:#EE0000"></span>Debian/RHEL classique</th>
+              <th><span class="dot" style="background:#9B59D0"></span>Bazzite</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="action">Mettre à jour tout le système</td><td><code>apt upgrade</code> / <code>dnf upgrade</code></td><td><code>ujust update</code></td></tr>
+            <tr><td class="action">Installer une application</td><td><code>apt install steam</code></td><td><code>flatpak install flathub com.valvesoftware.Steam</code></td></tr>
+            <tr><td class="action">Ajouter un paquet système ponctuel</td><td><code>apt install fastfetch</code></td><td><code>rpm-ostree install fastfetch</code></td></tr>
+            <tr><td class="action">Voir l'état / la version du système</td><td><code>apt list --installed</code></td><td><code>rpm-ostree status</code></td></tr>
+            <tr><td class="action">Revenir en arrière après une MAJ cassée</td><td><code>apt install pkg=ancienne-version</code></td><td><code>rpm-ostree rollback</code></td></tr>
+            <tr><td class="action">Nettoyer le système</td><td><code>apt autoremove</code></td><td><code>ujust clean-system</code></td></tr>
+            <tr><td class="action">Obtenir un environnement de dev complet</td><td><code>apt install build-essential</code></td><td><code>distrobox create --name dev --image archlinux:latest</code></td></tr>
+            <tr><td class="action">Réparer Steam / le mode Jeu</td><td>—</td><td><code>ujust fix-reset-steam</code></td></tr>
           </tbody>
         </table>
       </div>

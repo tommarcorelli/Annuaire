@@ -567,6 +567,124 @@
       </div>
     </details>
 
+    <!-- ═══ BAZZITE ═══ -->
+    <details class="sc" id="inst-bazzite" style="--c:#9B59D0">
+      <summary>
+        <span class="sc-ico">🎮</span>
+        <div class="sc-head">
+          <div class="sc-name">Installer Bazzite</div>
+          <div class="sc-meta">Bazzite — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">Bazzite se choisit selon le matériel : une image pour PC de bureau (KDE/GNOME) et une image "Deck" pensée pour les handhelds façon Steam Deck. Le système étant immuable, l'installation ressemble à celle d'un Fedora Atomic classique.</p>
+        <p class="sc-links"><a href="commands.html?os=bazzite">⌘ commandes Bazzite</a></p>
+        <p class="sc-dl"><a href="https://bazzite.gg/" target="_blank" rel="noopener">📥 Télécharger l'ISO officielle</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Choisir la bonne image selon le matériel et le GPU</div>
+            <p class="st-note">Variantes disponibles pour GPU Nvidia, AMD/Intel, et pour handhelds (Deck, ROG Ally, Legion Go...) — se tromper de variante Nvidia est la cause n°1 d'écran noir au premier boot.</p>
+          </li>
+          <li>
+            <div class="st-desc">Créer le support d'installation</div>
+            <code>sudo dd if=bazzite.iso of=/dev/sdX bs=4M status=progress</code>
+          </li>
+          <li>
+            <div class="st-desc">Premier démarrage : tout mettre à jour d'un coup</div>
+            <code>ujust update</code>
+          </li>
+          <li>
+            <div class="st-desc">Activer le Secure Boot si besoin (indispensable pour Nvidia)</div>
+            <code>ujust enroll-secure-boot-key</code>
+          </li>
+          <li>
+            <div class="st-desc">Vérifier que l'image système est bien déployée</div>
+            <code>rpm-ostree status</code>
+          </li>
+          <li>
+            <div class="st-desc">Installer ses jeux et applications via le magasin Flatpak (Bazaar)</div>
+            <code>flatpak install flathub com.valvesoftware.Steam</code>
+          </li>
+        </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Écran noir ou artefacts graphiques au premier démarrage</div>
+            <div class="sc-trouble-a">Vérifie que l'image téléchargée correspond bien au GPU (Nvidia vs AMD/Intel) — c'est l'erreur la plus fréquente à l'installation.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Envie d'installer un paquet avec un gestionnaire classique (apt, dnf...)</div>
+            <div class="sc-trouble-a">Le système est immuable : privilégie Flatpak ou une commande <code>ujust</code>, et réserve <code>rpm-ostree install</code> aux cas où rien d'autre ne fonctionne.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Besoin d'un outil en ligne de commande absent de l'image (ex : un compilateur, une lib de dev)</div>
+            <div class="sc-trouble-a">Ouvre un conteneur de distribution classique avec <code>distrobox create --name dev --image archlinux:latest</code> puis <code>distrobox enter dev</code>, sans jamais modifier l'image de base.</div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ═══ CACHYOS ═══ -->
+    <details class="sc" id="inst-cachyos" style="--c:#0FA3E0">
+      <summary>
+        <span class="sc-ico">⚡</span>
+        <div class="sc-head">
+          <div class="sc-name">Installer CachyOS</div>
+          <div class="sc-meta">CachyOS — 6 étapes</div>
+        </div>
+        <span class="sc-arrow">▼</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-intro">CachyOS est un Arch Linux pré-optimisé (compilation x86-64-v3/v4, LTO, PGO) : l'installeur graphique Calamares détecte le micro-architecture du CPU et choisit automatiquement les dépôts adaptés. #1 sur DistroWatch pendant plus de 18 mois consécutifs.</p>
+        <p class="sc-links"><a href="commands.html?os=cachyos">⌘ commandes CachyOS</a></p>
+        <p class="sc-dl"><a href="https://cachyos.org/download" target="_blank" rel="noopener">📥 Télécharger l'ISO officielle</a></p>
+        <ol class="sc-steps">
+          <li>
+            <div class="st-desc">Choisir la variante d'ISO selon l'usage</div>
+            <p class="st-note">Desktop (KDE, GNOME, plusieurs autres DE), Handheld (Steam Deck et consorts), ou minimale — inutile de prendre le Handheld sur un PC de bureau classique.</p>
+          </li>
+          <li>
+            <div class="st-desc">Créer le support d'installation</div>
+            <code>sudo dd if=cachyos-desktop.iso of=/dev/sdX bs=4M status=progress</code>
+          </li>
+          <li>
+            <div class="st-desc">Choisir le système de fichiers dans Calamares</div>
+            <p class="st-note">Btrfs est recommandé : il permet les snapshots automatiques proposés ensuite par CachyOS Hello (utile pour revenir en arrière après une mise à jour cassée).</p>
+          </li>
+          <li>
+            <div class="st-desc">Premier démarrage : passer sur les mirroirs les plus rapides puis tout synchroniser</div>
+            <code>sudo cachyos-rate-mirrors</code>
+            <code>sudo pacman -Syu</code>
+          </li>
+          <li>
+            <div class="st-desc">Ouvrir l'assistant de bienvenue pour les réglages post-install</div>
+            <code>cachyos-hello</code>
+          </li>
+          <li>
+            <div class="st-desc">Essayer un scheduler sched-ext pour le bureau ou le jeu</div>
+            <code>scxctl list</code>
+            <code>scxctl switch -s bpfland -m auto</code>
+          </li>
+        </ol>
+        <div class="sc-trouble">
+          <div class="sc-trouble-title">🩹 Problèmes fréquents</div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">La première synchronisation pacman est très lente</div>
+            <div class="sc-trouble-a">Relance <code>sudo cachyos-rate-mirrors</code> : les mirroirs par défaut de l'ISO ne sont pas toujours les plus proches géographiquement.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Le système devient instable après avoir changé de scheduler sched-ext</div>
+            <div class="sc-trouble-a">Reviens à l'ordonnateur par défaut avec <code>scxctl stop</code>, puis regarde les logs avec <code>journalctl --unit scx.service --boot 0</code>.</div>
+          </div>
+          <div class="sc-trouble-item">
+            <div class="sc-trouble-q">Un paquet AUR ne compile pas</div>
+            <div class="sc-trouble-a">Comme sur tout Arch, vérifie les dépendances manquantes et les mises à jour en attente avant de relancer <code>paru -S &lt;paquet&gt;</code> ; en dernier recours, consulte les commentaires de la page AUR du paquet.</div>
+          </div>
+        </div>
+      </div>
+    </details>
+
     <!-- ═══ FREEBSD ═══ -->
     <details class="sc" id="inst-freebsd" style="--c:#AB2B28">
       <summary>

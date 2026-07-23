@@ -17,6 +17,8 @@
     alpine:     { label: 'Alpine Linux',    color: '#0D597F' },
     arch:       { label: 'Arch Linux',      color: '#1793D1' },
     rhel:       { label: 'RHEL/Fedora',     color: '#EE0000' },
+    bazzite:    { label: 'Bazzite',         color: '#9B59D0' },
+    cachyos:    { label: 'CachyOS',         color: '#0FA3E0' },
     freebsd:    { label: 'FreeBSD',         color: '#AB2B28' },
     macos:      { label: 'macOS',           color: '#A8A8A8' },
     windows:    { label: 'Windows',         color: '#0078D4' },
